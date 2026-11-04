@@ -1,0 +1,430 @@
+import streamlit as st
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
+import numpy as np
+import io
+
+st.set_page_config(
+    page_title="Material Analysis Dashboard",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+# Custom CSS to inject an ultra-clean modern corporate layout style and styled dividers
+st.markdown("""
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        html, body, [class*="css"] {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .main {
+            background-color: #f8fafc;
+        }
+        .metric-card {
+            background-color: #ffffff;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border-top: 4px solid #0f172a;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .metric-card h6 {
+            color: #475569;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+        .metric-card h3 {
+            color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+        }
+        /* Premium custom divider style */
+        .custom-divider {
+            margin-top: 2.5rem;
+            margin-bottom: 2.5rem;
+            border: 0;
+            height: 1px;
+            background-image: linear-gradient(to right, rgba(148, 163, 184, 0), rgba(148, 163, 184, 0.4), rgba(148, 163, 184, 0));
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+st.title("📦 Material Overview & Stock Analysis")
+st.markdown("Retrieve structured insights, classify inventory status, and assess material for scrapping or to be transferred.")
+
+# 1. FILE UPLOADERS IN SIDEBAR
+with st.sidebar:
+    st.header("📂 Data Source Configuration")
+    uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
+    uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
+    st.markdown("---")
+
+if uploaded_materials is not None and uploaded_prices is not None:
+    # Read DataFrames
+    removed_materials_df = pd.read_excel(uploaded_materials)
+    unit_price_df = pd.read_excel(uploaded_prices)
+
+    # 2. PROCESSING INFORMATION
+    filtered_unit_prices = unit_price_df[unit_price_df['Valuation Type'] == 'BLOC-17']
+    material_prices = filtered_unit_prices.groupby('Material n°')['Item Price'].mean()
+    removed_materials_df['Unit price'] = removed_materials_df['Material n°'].map(material_prices)
+
+    requested_columns = [
+        'Material n°', 'Material description', 'Material discipline',
+        'Plant code', 'Plant', 'storage bin', 'FASD', 'Blocking status',
+        'MRP Type', 'Stock qty', 'Blocked Stock Qty', 'Safety', 'Min',
+        'Max', 'Unit price'
+    ]
+    existing_columns = [col for col in requested_columns if col in removed_materials_df.columns]
+    df = removed_materials_df[existing_columns].copy()
+
+    # DYNAMIC PLANT SELECTOR IN SIDEBAR
+    with st.sidebar:
+        available_plants = sorted(df['Plant'].dropna().unique())
+        plant = st.selectbox(
+            "Select Plant of Interest:",
+            available_plants,
+            index=0 if 'PAZFLOR' not in available_plants else available_plants.index('PAZFLOR')
+        )
+
+    # Perform calculations based on selection
+    Total_removed_materials = df['Material n°'].nunique()
+    pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
+    pd_v1_unique_materials = pd_v1_df.drop_duplicates(subset=['Material n°'])
+
+    stock_greater_zero = pd_v1_df[pd_v1_df['Stock qty'] > 0]
+    stock_greater_zero_unique = pd_v1_df[pd_v1_df['Stock qty'] > 0].drop_duplicates(subset=['Material n°']).copy()
+
+    Interested_plant = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
+    Interested_plant_unique = Interested_plant.drop_duplicates(subset=['Material n°']).copy()
+
+    Total_stock_value = (stock_greater_zero['Stock qty'] * stock_greater_zero['Unit price']).sum()
+    Interested_plant_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
+
+    # Categorization logic
+    other_active_materials = pd_v1_df [
+        (pd_v1_df['Plant'] != plant) &
+        (pd_v1_df['FASD'].str.upper() != 'DEAD')
+    ]['Material n°'].unique()
+
+    def categorize_material(row):
+        mat_no = row['Material n°']
+        if mat_no in other_active_materials:
+            return 'TO BE TRANSFERRED'
+        else:
+            return 'TO BE SCRAPPED'
+
+    if not Interested_plant.empty:
+        Interested_plant['Category'] = Interested_plant.apply(categorize_material, axis=1)
+    else:
+        Interested_plant['Category'] = pd.Series(dtype='object')
+
+    # 3. HIGHLY VISUAL KPI METRICS SECTION
+    st.markdown("### MAIN HIGHLIGHT")
+    kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+
+    with kpi1:
+        st.markdown(f'<div class="metric-card"><h6>Total Removed Materials</h6><h3>{Total_removed_materials:,}</h3></div>', unsafe_allow_html=True)
+    with kpi2:
+        st.markdown(f'<div class="metric-card"><h6>TOTAL STOCK MATERIALS</h6><h3>{len(pd_v1_unique_materials):,}</h3></div>', unsafe_allow_html=True)
+    with kpi3:
+        st.markdown(f'<div class="metric-card"><h6>TOTAL STOCK VALUE (USD)</h6><h3>${Total_stock_value:,.2f}</h3></div>', unsafe_allow_html=True)
+    with kpi4:
+        st.markdown(f'<div class="metric-card"><h6>POTENTIAL {plant} DEAD STOCK VALUE(USD)</h6><h3>${Interested_plant_stock_value:,.2f}</h3></div>', unsafe_allow_html=True)
+
+    # Separator after KPIs
+    st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
+
+    # 4. INTERACTIVE CHARTS (HEATMAP & PIE)
+    st.markdown("### Distribution and Visual Categorization Insights")
+
+    if not Interested_plant.empty:
+        col_left, col_right = st.columns(2)
+
+        with col_left:
+            cross_tab = pd.crosstab(Interested_plant['FASD'], Interested_plant['Category'])
+            # IMPROVED COLOR: 'Ice' or 'deep' offers exceptionally clear, professional stakeholder visualization
+            fig_heat = px.imshow(
+                cross_tab,
+                text_auto=True,
+                aspect="auto",
+                color_continuous_scale="ice",
+                labels=dict(x="Category", y="FASD Status", color="Material Quantity"),
+                title="Distribution per FASD Status"
+            )
+            fig_heat.update_layout(
+                margin=dict(l=40, r=40, t=60, b=40),
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter, sans-serif", size=12)
+            )
+            st.plotly_chart(fig_heat, use_container_width=True)
+
+        with col_right:
+            category_counts = Interested_plant['Category'].value_counts().reset_index()
+            category_counts.columns = ['Category', 'Count']
+
+            # IMPROVED COLORS: Muted Slate Gray for Scrapped, Executive Cyan/Blue for Transferred
+            color_map = {"TO BE SCRAPPED": "#334155", "TO BE TRANSFERRED": "#0284c7"}
+            fig_pie = px.pie(
+                category_counts,
+                values='Count',
+                names='Category',
+                hole=0.45,
+                color='Category',
+                color_discrete_map=color_map,
+                title="General Classification Distribution"
+        
+            )
+            fig_pie.update_traces(textinfo='percent+label', pull=[0.02] * len(category_counts))
+            fig_pie.update_layout(
+                showlegend=True,
+                legend=dict(orientation="h", yanchor="bottom", y=-0.1, xanchor="center", x=0.5),
+                margin=dict(l=40, r=40, t=60, b=40),
+                paper_bgcolor="rgba(0,0,0,0)",
+                font=dict(family="Inter, sans-serif", size=12)
+            
+            )
+            st.plotly_chart(fig_pie, use_container_width=True)
+    else:
+        st.warning(f"No stock records found for plant: {plant}")
+
+    # Separator before Advanced Insights
+    st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
+
+    # NEW INTERACTIVE ANALYSIS SECTION
+    st.markdown("### 🔍 Advanced Stock Insights")
+    col_new1, col_new2 = st.columns(2)
+
+    with col_new1:
+        st.markdown("**FASD Status vs. Stock Value Distribution**")
+        if not Interested_plant.empty:
+            Interested_plant['Total Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price']
+            # Clean, premium grey-blue palette suited for corporate boards
+            fig_box = px.box(
+                Interested_plant,
+                x='FASD',
+                y='Total Value',
+                color='FASD',
+                points="all",
+                color_discrete_sequence=px.colors.sequential.Plotly3_r,
+               
+            )
+            fig_box.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                yaxis_title="Value per Stock Item (USD)",
+                xaxis_title="FASD Movement Code",
+                margin=dict(t=40, l=40, r=40, b=40),
+                font=dict(family="Inter, sans-serif", size=12)
+            )
+            st.plotly_chart(fig_box, use_container_width=True)
+        else:
+            st.info("No stock data available to display Box Distribution.")
+
+    with col_new2:
+        st.markdown("**Discipline Breakdown by Financial Category**")
+        if not Interested_plant.empty:
+            discipline_group = Interested_plant.groupby(['Material discipline', 'Category'])['Total Value'].sum().reset_index()
+            fig_bar_group = px.bar(
+                discipline_group,
+                x="Material discipline",
+                y="Total Value",
+                color="Category",
+                barmode="group",
+                color_discrete_map={"TO BE SCRAPPED": "#334155", "TO BE TRANSFERRED": "#0284c7"},
+              
+            )
+            fig_bar_group.update_layout(
+                plot_bgcolor="rgba(0,0,0,0)",
+                paper_bgcolor="rgba(0,0,0,0)",
+                yaxis_title="Total Financial Value (USD)",
+                font=dict(family="Inter, sans-serif", size=12)
+            )
+            st.plotly_chart(fig_bar_group, use_container_width=True)
+        else:
+            st.info("No stock data available for Discipline breakdown.")
+
+    # Separator before Operational Scatter
+    st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
+
+    # ADDED ADDITIONAL STOCK METRICS INTERACTIVE ANALYSIS
+    st.markdown("### 📈 Advanced Operational Scatter")
+    if not Interested_plant.empty:
+        fig_scatter = px.scatter(
+            Interested_plant,
+            x="Stock qty",
+            y="Unit price",
+            color="Category",
+            size="Total Value",
+            hover_data=["Material n°", "Material description"],
+            color_discrete_map={"TO BE SCRAPPED": "#334155", "TO BE TRANSFERRED": "#0284c7"},
+            title="Interactive Material Outlier Mapping (Size = Financial Value)"
+        )
+        fig_scatter.update_layout(
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(gridcolor="rgba(226, 232, 240, 0.4)"),
+            yaxis=dict(gridcolor="rgba(226, 232, 240, 0.4)"),
+            font=dict(family="Inter, sans-serif", size=12)
+        )
+        st.plotly_chart(fig_scatter, use_container_width=True)
+    else:
+        st.info("No stock data available for Scatter Plot.")
+
+    # Separator before Flow Funnel Analysis
+    st.markdown("<div class='custom-divider'></div>", unsafe_allow_html=True)
+
+    # 5. MULTI-VIEW MATERIALS ANALYSIS
+    st.markdown("### Material Filtering & Stock Value Distribution Analysis")
+
+    layout_choice = st.radio(
+        "Select visualization layout:",
+        ["Modern 3D Funnel Flow", "Sankey Flow Diagram (Highly Interactive)"],
+        horizontal=True
+    )
+
+    stage1_count = df['Material n°'].nunique()
+    stage1_value = (df[df['Stock qty'] > 0].eval('`Stock qty` * `Unit price`')).sum()
+    if pd.isna(stage1_value) or stage1_value == 0:
+        stage1_value = Total_stock_value
+
+    stage2_count = len(pd_v1_unique_materials)
+    stage2_value = (pd_v1_df[pd_v1_df['Stock qty'] > 0].eval('`Stock qty` * `Unit price`')).sum()
+
+    stage3_count = len(stock_greater_zero_unique)
+    stage3_value = Total_stock_value
+
+    transferred_df = Interested_plant[Interested_plant['Category'] == 'TO BE TRANSFERRED']
+    stage_transferred_count = transferred_df['Material n°'].nunique()
+    transferred_stock_value = (transferred_df.eval('`Stock qty` * `Unit price`')).sum()
+
+    stage4_count = len(Interested_plant_unique) - stage_transferred_count
+    stage4_value = Interested_plant_stock_value - transferred_stock_value
+
+    # Rest of plants calculation
+    other_plants_unique_count = stage3_count - len(Interested_plant_unique)
+    other_plants_unique_value = stage3_value - Interested_plant_stock_value
+
+    # Excluded steps calculation
+    non_stock_count = stage1_count - stage2_count
+    zero_stock_count = stage2_count - stage3_count
+
+    stages = [
+        "Total Removed Materials",
+        "Total Stock Materials",
+        "Material with Stock Qty > 0 (All Plants)",
+        f"Potential {plant} Dead Stock Material",
+        f"Stock Materials to be Transferred from ({plant})"
+    ]
+    counts = [stage1_count, stage2_count, stage3_count, stage4_count, stage_transferred_count]
+    values = [stage1_value, stage2_value, stage3_value, stage4_value, transferred_stock_value]
+    text_labels = [f" {c} Materials<br>${v:,.0f}" for c, v in zip(counts, values)]
+
+    if layout_choice == "Modern 3D Funnel Flow":
+        fig_funnel = go.Figure(go.Funnel(
+            y=stages,
+            x=counts,
+            textinfo="text",
+            text=text_labels,
+            hoverinfo="y+text",
+            marker=dict(
+                color=["#0f172a", "#1e293b", "#334155", "#64748b", "#0284c7"],
+                line=dict(color="#ffffff", width=2)
+            ),
+            connector=dict(fillcolor="rgba(226, 232, 240, 0.4)", line=dict(color="#cbd5e1", width=1))
+        ))
+        fig_funnel.update_layout(
+            title_text="Sleek Progression Funnel Analysis",
+            title_x=0.5,
+            funnelmode="stack",
+            showlegend=False,
+            height=480,
+            paper_bgcolor="rgba(0,0,0,0)",
+            plot_bgcolor="rgba(0,0,0,0)",
+            font=dict(family="Inter, sans-serif", size=12)
+        )
+        st.plotly_chart(fig_funnel, use_container_width=True)
+    else:
+        # ENHANCED SANKEY DIAGRAM (Includes both material quantity and stock financial value)
+        label_nodes = [
+            f"Total Materials<br>({stage1_count} Mat / ${stage1_value:,.0f})",
+            f"PD/V1 Qualified<br>({stage2_count} Mat / ${stage2_value:,.0f})",
+            f"Non-Stock (Excluded)<br>({non_stock_count} Mat)",
+            f"Active Stock (All Plants)<br>({stage3_count} Mat / ${stage3_value:,.0f})",
+            f"Other Plants Stock<br>({other_plants_unique_count} Mat / ${other_plants_unique_value:,.0f})",
+            f"{plant} Net Stock (Scrapped)<br>({stage4_count} Mat / ${stage4_value:,.0f})",
+            f"To Be Transferred ({plant})<br>({stage_transferred_count} Mat / ${transferred_stock_value:,.0f})"
+        ]
+
+        fig_sankey = go.Figure(data=[go.Sankey(
+            node=dict(
+                pad=24,
+                thickness=20,
+                line=dict(color="#ffffff", width=1.5),
+                label=label_nodes,
+                color=["#0f172a", "#1e293b", "#64748b", "#334155", "#94a3b8", "#475569", "#0284c7"]
+            ),
+            link=dict(
+                source=[0, 0, 1, 1, 3, 3],
+                target=[1, 2, 3, 4, 5, 6],
+                # Quantities represent the raw link weights
+                value=[
+                    stage2_count,
+                    max(1, non_stock_count),
+                    stage3_count,
+                    max(1, other_plants_unique_count),
+                    stage4_count,
+                    stage_transferred_count
+                ],
+                # Custom tooltip text showing both quantity and financial value
+                customdata=[
+                    f"PD/V1 Qualified Flow: {stage2_count} Materials (${stage2_value:,.0f})",
+                    f"Non-Stock Outflow: {non_stock_count} Materials",
+                    f"Active Stock Flow: {stage3_count} Materials (${stage3_value:,.0f})",
+                    f"Other Plants Allocation: {other_plants_unique_count} Materials (${other_plants_unique_value:,.0f})",
+                    f"Local Scrapping Flow: {stage4_count} Materials (${stage4_value:,.0f})",
+                    f"Transfer Flow: {stage_transferred_count} Materials (${transferred_stock_value:,.0f})"
+                ],
+                hovertemplate="%{customdata}<extra></extra>",
+                color="rgba(2, 132, 199, 0.15)"
+            )
+        )])
+        fig_sankey.update_layout(
+            title_text="Dynamic Stock Lifecycle Flow & Transitions",
+            title_x=0.5,
+            height=500,
+            font=dict(family="Inter, sans-serif", size=12),
+            paper_bgcolor="rgba(0,0,0,0)"
+        )
+        st.plotly_chart(fig_sankey, use_container_width=True)
+
+    # 6. EXPORT ACTION IN SIDEBAR
+    with st.sidebar:
+        st.markdown("--- ")
+        st.header("📦 Download the Results")
+        if not Interested_plant.empty:
+            buffer = io.BytesIO()
+            export_df = Interested_plant.drop(columns=['Total Value'], errors='ignore')
+            with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                export_df.to_excel(writer, index=False, sheet_name=f'{plant}_Materials')
+            buffer.seek(0)
+
+            st.download_button(
+                label=f"📥 {plant} Materials for Scrap (Excel)",
+                data=buffer,
+                file_name=f"{plant}_potential_materials_for_scrap.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+        else:
+            st.info("No data available to export.")
+else:
+    st.info("Please upload both Excel files in the sidebar to activate the dashboard.")
