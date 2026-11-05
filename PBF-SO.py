@@ -20,7 +20,7 @@ with st.sidebar:
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     Bom_template = st.file_uploader("Bom template (Excel)", type=["xlsx"])
-    impacted_FL = st.file_uploader("Impacted FL (Excel)", type=["xlsx"])
+    uploaded_impacted_fl = st.file_uploader("Impacted FL (Excel)", type=["xlsx"])
     st.markdown("---")
 
 if uploaded_materials is not None and uploaded_prices is not None:
@@ -28,7 +28,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     removed_materials_df = pd.read_excel(uploaded_materials)
     unit_price_df = pd.read_excel(uploaded_prices)
 
-    # 2. PROCESSING INFORMATION
+     # 2. PROCESSING INFORMATION
     filtered_unit_prices = unit_price_df[unit_price_df['Valuation Type'] == 'BLOC-17']
     material_prices = filtered_unit_prices.groupby('Material n°')['Item Price'].mean()
     removed_materials_df['Unit price'] = removed_materials_df['Material n°'].map(material_prices)
@@ -134,14 +134,63 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown("### 📋 BOM Assignment Overview")
             st.dataframe(final_display_df, use_container_width=True)
 
-            # EXPORT TO EXCEL BUTTON
+            # If impacted FL file is uploaded, do the check and show/export verification df
+            if uploaded_impacted_fl is not None:
+                try:
+                    fl_sheet_df = pd.read_excel(uploaded_impacted_fl, sheet_name="FL")
+                    fl_sheet_df.columns = fl_sheet_df.columns.str.strip()
+                    
+                    # Find column holding the FL reference values
+                    fl_ref_col = fl_sheet_df.columns[0]
+                    for col in fl_sheet_df.columns:
+                        if 'FL' in col or 'Functional' in col or 'Reference' in col:
+                            fl_ref_col = col
+                            break
+                    
+                    fl_reference_set = set(fl_sheet_df[fl_ref_col].dropna().astype(str).str.strip().unique())
+                    
+                    # Check existence function
+                    def check_fl_exist(val):
+                        if pd.isna(val) or str(val).strip() == "" or str(val).strip().lower() == 'nan':
+                            return "FL not impacted"
+                        val_str = str(val).strip()
+                        return "Yes" if val_str in fl_reference_set else "FL not impacted"
+
+                    verified_df = final_display_df.copy()
+                    verified_df['Exist'] = verified_df['Functional Locations'].apply(check_fl_exist)
+
+                    # Insert "Exist" column right after "Functional Locations"
+                    cols = list(verified_df.columns)
+                    fl_index = cols.index('Functional Locations')
+                    cols.insert(fl_index + 1, cols.pop(cols.index('Exist')))
+                    verified_df = verified_df[cols]
+
+                    st.markdown("### 🔍 Verified Impacted FL Report")
+                    st.dataframe(verified_df, use_container_width=True)
+
+                    # Export verified df
+                    buffer_impacted = io.BytesIO()
+                    with pd.ExcelWriter(buffer_impacted, engine='openpyxl') as writer:
+                        verified_df.to_excel(writer, sheet_name='Impacted FL', index=False)
+                    buffer_impacted.seek(0)
+
+                    st.download_button(
+                        label="📥 Export Impacted FL to Excel",
+                        data=buffer_impacted,
+                        file_name="Impacted_FL.xlsx",
+                        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    )
+                except Exception as ex_fl:
+                    st.error(f"Error processing FL sheet from Impacted FL file: {ex_fl}")
+
+            # EXPORT TO EXCEL BUTTON FOR DEFAULT BOM OVERVIEW
             buffer = io.BytesIO()
             with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
                 final_display_df.to_excel(writer, sheet_name='BOM Assignment Overview', index=False)
             buffer.seek(0)
 
             st.download_button(
-                label="📥 Export to Excel",
+                label="📥 Export BOM Overview to Excel",
                 data=buffer,
                 file_name="BOM_Assignment_Overview.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
