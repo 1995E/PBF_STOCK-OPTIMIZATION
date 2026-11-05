@@ -46,8 +46,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
         plant = st.selectbox(
             "Select Plant of Interest:",
             available_plants,
-            index=0 if 'PAZFLOR' not in available_plants else available_plants.index('PAZFLOR')
-    st.markdown("---"),
+            index=0 if 'PAZFLOR' not in available_plants else available_plants.index('PAZFLOR'),
+    st.markdown("---")
         )
     
     
