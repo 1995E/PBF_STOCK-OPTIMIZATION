@@ -67,9 +67,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi1:
         st.markdown(f'<div class="metric-card"><h6>Total Removed Materials</h6><h3>{Total_removed_materials:,}</h3></div>', unsafe_allow_html=True)
     with kpi2:
-        st.markdown(f'<div class="metric-card"><h6>TOTAL STOCK MATERIALS</h6><h3>{len(pd_v1_unique_materials):,}</h3></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-card"><h6>Total Stock Materials</h6><h3>{len(pd_v1_unique_materials):,}</h3></div>', unsafe_allow_html=True)
     with kpi3:
-        st.markdown(f'<div class="metric-card"><h6>TOTAL STOCK VALUE (USD)</h6><h3>${Total_stock_value:,.2f}</h3></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-card"><h6>Total Stock Value (USD)</h6><h3>${Total_stock_value:,.2f}</h3></div>', unsafe_allow_html=True)
     with kpi4:
-        st.markdown(f'<div class="metric-card"><h6>POTENTIAL {plant} DEAD STOCK VALUE(USD)</h6><h3>${Interested_plant_stock_value:,.2f}</h3></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="metric-card"><h6>Potential {plant} Dead Stock Value (USD)</h6><h3>${Interested_plant_stock_value:,.2f}</h3></div>', unsafe_allow_html=True)
 
