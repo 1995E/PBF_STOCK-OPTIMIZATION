@@ -21,7 +21,7 @@ with st.sidebar:
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
 
-    if uploaded_materials is not None and uploaded_prices is not None:
+if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
     removed_materials_df = pd.read_excel(uploaded_materials)
     unit_price_df = pd.read_excel(uploaded_prices)
