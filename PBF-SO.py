@@ -65,15 +65,13 @@ with st.sidebar:
     st.header("📂 Data Source Configuration")
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
-    uploaded_bom = st.file_uploader("Bom template (Excel)", type=["xlsx"])
     st.markdown("---")
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
     removed_materials_df = pd.read_excel(uploaded_materials)
     unit_price_df = pd.read_excel(uploaded_prices)
-    BOM_df = pd.read_excel(upload_Bom)
-
+    
     # 2. PROCESSING INFORMATION
     filtered_unit_prices = unit_price_df[unit_price_df['Valuation Type'] == 'BLOC-17']
     material_prices = filtered_unit_prices.groupby('Material n°')['Item Price'].mean()
