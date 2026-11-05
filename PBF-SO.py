@@ -47,6 +47,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             "Select Plant of Interest:",
             available_plants,
             index=0 if 'PAZFLOR' not in available_plants else available_plants.index('PAZFLOR')
+            st.markdown("---")
         )
 
     # Perform calculations based on selection
