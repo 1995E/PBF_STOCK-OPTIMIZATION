@@ -11,52 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS to inject an ultra-clean modern corporate layout style and styled dividers
-st.markdown("""
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        
-        html, body, [class*="css"] {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        .main {
-            background-color: #f8fafc;
-        }
-        .metric-card {
-            background-color: #ffffff;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            border-top: 4px solid #0f172a;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .metric-card h6 {
-            color: #475569;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 8px;
-        }
-        .metric-card h3 {
-            color: #0f172a;
-            font-family: 'Inter', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin: 0;
-        }
-        /* Premium custom divider style */
-        .custom-divider {
-            margin-top: 2.5rem;
-            margin-bottom: 2.5rem;
-            border: 0;
-            height: 1px;
-            background-image: linear-gradient(to right, rgba(148, 163, 184, 0), rgba(148, 163, 184, 0.4), rgba(148, 163, 184, 0));
-        }
-    </style>
-""", unsafe_allow_html=True)
-
 st.title("📦 Material Overview & Stock Analysis")
 st.markdown("Retrieve structured insights, classify inventory status, and assess material for scrapping or to be transferred.")
 
