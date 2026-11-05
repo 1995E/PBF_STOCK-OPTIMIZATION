@@ -26,7 +26,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
     removed_materials_df = pd.read_excel(uploaded_materials)
     unit_price_df = pd.read_excel(uploaded_prices)
-    Bom_df = pd.read_excel(uploaded_Bom)
+Bom_df = pd.read_excel(uploaded_Bom)
     
     # 2. PROCESSING INFORMATION
     filtered_unit_prices = unit_price_df[unit_price_df['Valuation Type'] == 'BLOC-17']
