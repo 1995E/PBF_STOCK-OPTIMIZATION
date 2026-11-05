@@ -133,6 +133,19 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown("### 📋 BOM Assignment Overview")
             st.dataframe(final_display_df, use_container_width=True)
 
+            # EXPORT TO EXCEL BUTTON
+            buffer = io.BytesIO()
+            with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
+                final_display_df.to_excel(writer, sheet_name='BOM Assignment Overview', index=False)
+            buffer.seek(0)
+
+            st.download_button(
+                label="📥 Export to Excel",
+                data=buffer,
+                file_name="BOM_Assignment_Overview.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
         except Exception as e:
             st.error(f"Error processing BOM template sheets: {e}")
     else:
