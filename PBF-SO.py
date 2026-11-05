@@ -65,6 +65,7 @@ with st.sidebar:
     st.header("📂 Data Source Configuration")
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
+    uploaded_bom = st.file_uploader("Bom template (Excel)", type=["xlsx"])
     st.markdown("---")
 
 if uploaded_materials is not None and uploaded_prices is not None:
