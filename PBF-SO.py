@@ -19,16 +19,12 @@ with st.sidebar:
     st.header("📂 Data Source Configuration")
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
-    Bom_template = st.file_uploader("Bom template (Excel)", type=["xlsx"])
     st.markdown("---")
 
-    
-
-if uploaded_materials is not None and uploaded_prices is not None and Bom_template is not None:
+    if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
     removed_materials_df = pd.read_excel(uploaded_materials)
     unit_price_df = pd.read_excel(uploaded_prices)
-    Bom_df = pd.read_excel(uploaded_Bom)
     
     # 2. PROCESSING INFORMATION
     filtered_unit_prices = unit_price_df[unit_price_df['Valuation Type'] == 'BLOC-17']
@@ -77,3 +73,8 @@ if uploaded_materials is not None and uploaded_prices is not None and Bom_templa
     with kpi4:
         st.markdown(f'<div class="metric-card"><h6>Potential {plant} Dead Stock Value (USD)</h6><h3>${Interested_plant_stock_value:,.2f}</h3></div>', unsafe_allow_html=True)
 
+# 1. FILE UPLOADERS IN SIDEBAR
+with st.sidebar:
+    st.header("📂 BOM template to check materials in other FL")
+    Bom_template = st.file_uploader("Bom template (Excel)", type=["xlsx"])
+    st.markdown("---")
