@@ -42,12 +42,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # DYNAMIC PLANT SELECTOR IN SIDEBAR
     with st.sidebar:
-        available_plants = sorted(df['Plant'].dropna().unique())
-        Bom_template = st.file_uploader("Bom template (Excel)", type=["xlsx"])
+        available_plants = sorted(df['Plant'].dropna().unique())  
         plant = st.selectbox(
             "Select Plant of Interest:",
             available_plants,
             index=0 if 'PAZFLOR' not in available_plants else available_plants.index('PAZFLOR')
+        Bom_template = st.file_uploader("Bom template (Excel)", type=["xlsx"])
         )
 
     # Perform calculations based on selection
