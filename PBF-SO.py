@@ -79,7 +79,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
         try:
             # Load BOM, Assembly (assembly sheet), and BOM Assignment sheets
             bom_sheet_df = pd.read_excel(Bom_template, sheet_name="BOM")
-            assembly_sheet_df = pd.read_excel(Bom_template, sheet_name="assembly")
             bom_assignment_df = pd.read_excel(Bom_template, sheet_name="BOM Assignment")
 
             # Clean column names just in case
