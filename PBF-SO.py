@@ -77,56 +77,82 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # 4. BOM ANALYSIS MAPPING
     if Bom_template is not None:
         try:
-            # Load BOM & BOM Assignment sheets
+            # Load BOM, Assembly (assembly sheet), and BOM Assignment sheets
             bom_sheet_df = pd.read_excel(Bom_template, sheet_name="BOM")
+            assembly_sheet_df = pd.read_excel(Bom_template, sheet_name="assembly")
             bom_assignment_df = pd.read_excel(Bom_template, sheet_name="BOM Assignment")
-            
+
             # Clean column names just in case
             bom_sheet_df.columns = bom_sheet_df.columns.str.strip()
+            assembly_sheet_df.columns = assembly_sheet_df.columns.str.strip()
             bom_assignment_df.columns = bom_assignment_df.columns.str.strip()
 
-            # Rename assembly reference key in BOM sheet and join with plant unique list
-            # Typically BOM sheet associates Material reference -> Assembly
-            # Let's map Interested_plant_unique['Material n°'] to Assembly
+            # Clean and prepare mapping list
             mapping_df = Interested_plant_unique[['Material n°']].copy()
             mapping_df['Material n°'] = mapping_df['Material n°'].astype(str).str.strip()
-            
+
             bom_sheet_df['Material reference'] = bom_sheet_df['Material reference'].astype(str).str.strip()
             bom_sheet_df['Assembly'] = bom_sheet_df['Assembly'].astype(str).str.strip()
-            
-            # Merge to get the associated Assembly reference
+
+            # Merge to get the Sub-assembly
             merged_bom = pd.merge(
-                mapping_df, 
-                bom_sheet_df[['Material reference', 'Assembly']], 
-                left_on='Material n°', 
-                right_on='Material reference', 
+                mapping_df,
+                bom_sheet_df[['Material reference', 'Assembly']],
+                left_on='Material n°',
+                right_on='Material reference',
+                how='left'
+            )
+            merged_bom.rename(columns={'Assembly': 'Sub-assembly'}, inplace=True)
+            merged_bom.drop(columns=['Material reference'], errors='ignore', inplace=True)
+
+            # Clean assembly sheet columns
+            # In assembly sheet, check the columns representing child (Sub-assembly) and parent (Assembly)
+            # Adjust column names dynamically if different
+            sub_assembly_col = [c for c in assembly_sheet_df.columns if 'sub' in c.lower() or 'child' in c.lower() or 'ref' in c.lower() or 'material' in c.lower()]
+            sub_assembly_col = sub_assembly_col[0] if sub_assembly_col else assembly_sheet_df.columns[0]
+            
+            parent_assembly_col = [c for c in assembly_sheet_df.columns if 'assembly' in c.lower() and c != sub_assembly_col]
+            parent_assembly_col = parent_assembly_col[0] if parent_assembly_col else assembly_sheet_df.columns[1]
+
+            assembly_sheet_df[sub_assembly_col] = assembly_sheet_df[sub_assembly_col].astype(str).str.strip()
+            assembly_sheet_df[parent_assembly_col] = assembly_sheet_df[parent_assembly_col].astype(str).str.strip()
+
+            # Get associated parent Assembly value from assembly sheet
+            merged_assembly = pd.merge(
+                merged_bom,
+                assembly_sheet_df[[sub_assembly_col, parent_assembly_col]],
+                left_on='Sub-assembly',
+                right_on=sub_assembly_col,
                 how='left'
             )
             
-            # Rename 'Assembly' to 'Sub-assembly'
-            merged_bom.rename(columns={'Assembly': 'Sub-assembly'}, inplace=True)
-            
-            # Use Assembly reference value to go to BOM Assignment sheet and get associated FL
+            merged_assembly.rename(columns={parent_assembly_col: 'Assembly'}, inplace=True)
+            if sub_assembly_col != 'Sub-assembly':
+                merged_assembly.drop(columns=[sub_assembly_col], errors='ignore', inplace=True)
+
+            # Clean BOM assignment sheet columns
             bom_assignment_df['Assembly'] = bom_assignment_df['Assembly'].astype(str).str.strip()
             bom_assignment_df['FL'] = bom_assignment_df['FL'].astype(str).str.strip()
-            
+
+            # Use new 'Assembly' value to get functional locations
             final_bom_df = pd.merge(
-                merged_bom, 
-                bom_assignment_df[['Assembly', 'FL']], 
-                left_on='Sub-assembly', 
-                right_on='Assembly', 
+                merged_assembly,
+                bom_assignment_df[['Assembly', 'FL']],
+                on='Assembly',
                 how='left'
             )
-            
+
             # Rename FL to Functional Locations
             final_bom_df.rename(columns={'FL': 'Functional Locations'}, inplace=True)
-            
-            # Structure final dataframe columns
-            final_display_df = final_bom_df[['Material n°', 'Sub-assembly', 'Functional Locations']].drop_duplicates()
-            
+
+            # Structure final dataframe columns to put 'Assembly' right after 'Material n°'
+            col_order = ['Material n°', 'Assembly', 'Sub-assembly', 'Functional Locations']
+            existing_order = [c for c in col_order if c in final_bom_df.columns]
+            final_display_df = final_bom_df[existing_order].drop_duplicates()
+
             st.markdown("### 📋 BOM Assignment Overview")
             st.dataframe(final_display_df, use_container_width=True)
-            
+
         except Exception as e:
             st.error(f"Error processing BOM template sheets: {e}")
     else:
