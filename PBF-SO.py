@@ -80,6 +80,23 @@ if uploaded_materials is not None and uploaded_prices is not None:
             # Load BOM & BOM Assignment sheets
             bom_sheet_df = pd.read_excel(Bom_template, sheet_name="BOM")
             bom_assignment_df = pd.read_excel(Bom_template, sheet_name="BOM Assignment")
+            
+            # Load FL reference sheet if present
+            fl_exists = False
+            try:
+                fl_sheet_df = pd.read_excel(Bom_template, sheet_name="FL")
+                fl_sheet_df.columns = fl_sheet_df.columns.str.strip()
+                # Find column containing FL or Reference values
+                fl_ref_col = [col for col in fl_sheet_df.columns if 'FL' in col or 'Functional' in col or 'Reference' in col]
+                if len(fl_ref_col) > 0:
+                    fl_reference_set = set(fl_sheet_df[fl_ref_col[0]].astype(str).str.strip().unique())
+                    fl_exists = True
+                else:
+                    # Fallback to the first column if no named match is found
+                    fl_reference_set = set(fl_sheet_df.iloc[:, 0].astype(str).str.strip().unique())
+                    fl_exists = True
+            except Exception as fl_err:
+                st.warning(f"Could not process 'FL' sheet from BOM Template. Please ensure 'FL' sheet exists. Error: {fl_err}")
 
             # Clean column names
             bom_sheet_df.columns = bom_sheet_df.columns.str.strip()
@@ -133,14 +150,49 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown("### 📋 BOM Assignment Overview")
             st.dataframe(final_display_df, use_container_width=True)
 
-            # EXPORT TO EXCEL BUTTON
+            # Process and display Impacted FL if reference list exists
+            if fl_exists:
+                impacted_df = final_display_df.copy()
+                
+                # Helper function to check if FL is present inside reference set
+                def check_existence(val):
+                    val_str = str(val).strip()
+                    if pd.isna(val) or val_str == "nan" or val_str == "":
+                        return "FL not impacted"
+                    return "Yes" if val_str in fl_reference_set else "FL not impacted"
+                
+                impacted_df['Exist'] = impacted_df['Functional Locations'].apply(check_existence)
+                
+                # Ensure column order places 'Exist' right after 'Functional Locations'
+                cols = list(impacted_df.columns)
+                fl_idx = cols.index('Functional Locations')
+                cols.insert(fl_idx + 1, cols.pop(cols.index('Exist')))
+                impacted_df = impacted_df[cols]
+
+                st.markdown("### 🔍 Impacted FL (Verification)")
+                st.dataframe(impacted_df, use_container_width=True)
+
+                # EXPORT IMPACTED FL BUTTON
+                buffer_impacted = io.BytesIO()
+                with pd.ExcelWriter(buffer_impacted, engine='openpyxl') as writer:
+                    impacted_df.to_excel(writer, sheet_name='Impacted FL', index=False)
+                buffer_impacted.seek(0)
+
+                st.download_button(
+                    label="📥 Export Impacted FL to Excel",
+                    data=buffer_impacted,
+                    file_name="Impacted_FL.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+
+            # EXPORT STANDARD BOM OVERVIEW BUTTON
             buffer = io.BytesIO()
             with pd.ExcelWriter(buffer, engine='openpyxl') as writer:
                 final_display_df.to_excel(writer, sheet_name='BOM Assignment Overview', index=False)
             buffer.seek(0)
 
             st.download_button(
-                label="📥 Export to Excel",
+                label="📥 Export BOM Overview to Excel",
                 data=buffer,
                 file_name="BOM_Assignment_Overview.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
