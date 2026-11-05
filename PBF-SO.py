@@ -20,7 +20,7 @@ with st.sidebar:
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     Bom_template = st.file_uploader("Bom template (Excel)", type=["xlsx"])
-    impacted_FL = st.file_uploader("Impacted FL (Excel)", type=["xlsx"])
+  
     st.markdown("---")
 
 if uploaded_materials is not None and uploaded_prices is not None:
