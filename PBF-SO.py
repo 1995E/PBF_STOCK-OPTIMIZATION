@@ -57,10 +57,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
     stock_greater_zero = pd_v1_df[pd_v1_df['Stock qty'] > 0]
     stock_greater_zero_unique = pd_v1_df[pd_v1_df['Stock qty'] > 0].drop_duplicates(subset=['Material n°']).copy()
 
-    Interested_plant = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
+    Interested_plant = pd_v1_df[pd_v1_df['Plant'] == plant].copy()
     Interested_plant_unique = Interested_plant.drop_duplicates(subset=['Material n°']).copy()
 
-    Total_stock_value = (stock_greater_zero['Stock qty'] * stock_greater_zero['Unit price']).sum()
+    Total_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
     Interested_plant_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
 
     # Categorization logic
