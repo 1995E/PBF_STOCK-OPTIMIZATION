@@ -47,7 +47,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
             "Select Plant of Interest:",
             available_plants,
             index=0 if 'PAZFLOR' not in available_plants else available_plants.index('PAZFLOR')
-        Bom_template = st.file_uploader("Bom template (Excel)", type=["xlsx"])
         )
 
     # Perform calculations based on selection
@@ -76,6 +75,5 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
 # 1. FILE UPLOADERS IN SIDEBAR
 with st.sidebar:
-    st.header("📂 BOM template to check materials in other FL")
     Bom_template = st.file_uploader("Bom template (Excel)", type=["xlsx"])
     st.markdown("---")
