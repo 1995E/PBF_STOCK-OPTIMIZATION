@@ -70,7 +70,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # UPDATE INTERESTED PLANT DATAFRAME WITH ACTION COLUMN FROM IMPACTED BOM BEFORE DISPLAYING KPIs
     scrap_value = 0.0
+    transfer_value = 0.0
     bom_loaded = False
+    materials_to_transfer = pd.DataFrame()
+
     if Bom_template is not None:
         try:
             material_list_df = pd.read_excel(Bom_template, sheet_name="Material_List")
@@ -93,16 +96,31 @@ if uploaded_materials is not None and uploaded_prices is not None:
             Interested_plant.loc[mask, 'Action'] = 'Scrap analyse'
             Interested_plant.loc[mask, 'Optimization Status'] = 'Optimized'
 
-            # Calculate Scrap Value (including the newly updated Scrap analyse items)
+            # Identify material n° belonging to Interested_plant's "Scrap analyse" list
+            scrap_analyse_materials = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']['Material n°'].unique()
+            
+            # Filter Others_plant where FASD is not "Dead" and material exists in the Scrap analyse list
+            active_others_df = Others_plant[(Others_plant['Material n°'].isin(scrap_analyse_materials)) & (Others_plant['FASD'] != 'Dead')]
+            transfer_material_ids = active_others_df['Material n°'].unique()
+
+            # Split Interested_plant: extract materials to be transferred
+            materials_to_transfer = Interested_plant[Interested_plant['Material n°'].isin(transfer_material_ids)].copy()
+            Interested_plant = Interested_plant[~Interested_plant['Material n°'].isin(transfer_material_ids)].copy()
+
+            # Calculate Scrap Value for the remaining items in Interested_plant
             scrap_df = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']
             scrap_value = (scrap_df['Stock qty'] * scrap_df['Unit price']).sum()
+            
+            # Calculate Transfer Value
+            transfer_value = (materials_to_transfer['Stock qty'] * materials_to_transfer['Unit price']).sum()
+
             bom_loaded = True
         except Exception as e:
             st.error(f"Error reading Material_List from Impacted Bom: {e}")
 
     # 3. HIGHLY VISUAL KPI METRICS SECTION
     st.markdown("### MAIN HIGHLIGHTS")
-    kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
+    kpi1, kpi2, kpi3, kpi4, kpi5, kpi6 = st.columns(6)
 
     with kpi1:
         st.markdown(f'<div class="metric-card"><h6>Total Removed Materials</h6><h3>{Total_removed_materials:,}</h3></div>', unsafe_allow_html=True)
@@ -117,21 +135,22 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown(f'<div class="metric-card" style="border-left: 5px solid red;"><h6>Scrap Analyse Value for {plant} (USD)</h6><h3>${scrap_value:,.2f}</h3></div>', unsafe_allow_html=True)
         else:
             st.markdown(f'<div class="metric-card" style="color: gray;"><h6>Scrap Analyse Value</h6><h3>N/A</h3><small>Upload Impacted Bom</small></div>', unsafe_allow_html=True)
+    with kpi6:
+        if bom_loaded:
+            st.markdown(f'<div class="metric-card" style="border-left: 5px solid green;"><h6>Materials to Transfer Value (USD)</h6><h3>${transfer_value:,.2f}</h3></div>', unsafe_allow_html=True)
+        else:
+            st.markdown(f'<div class="metric-card" style="color: gray;"><h6>Transfer Value</h6><h3>N/A</h3><small>Upload Impacted Bom</small></div>', unsafe_allow_html=True)
 
     # Display Dataframe
     if bom_loaded:
         st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
         st.dataframe(Interested_plant, use_container_width=True)
-        
-        # Filter Others_plant where FASD is not "Dead" and material n° belongs to Interested_plant's "Scrap analyse" list
-        scrap_analyse_materials = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']['Material n°'].unique()
-        active_others_df = Others_plant[(Others_plant['Material n°'].isin(scrap_analyse_materials)) & (Others_plant['FASD'] != 'Dead')]
-        
-        st.markdown("### 🔄 Other Plants Active Status Check (FASD != 'Dead' for 'Scrap analyse' materials)")
-        if not active_others_df.empty:
-            st.dataframe(active_others_df, use_container_width=True)
+
+        st.markdown("### 🔄 Materials to be Transferred (Active in other plants, FASD != 'Dead')")
+        if not materials_to_transfer.empty:
+            st.dataframe(materials_to_transfer, use_container_width=True)
         else:
-            st.info("No matching materials with 'Scrap analyse' action are active (FASD != 'Dead') in other plants.")
+            st.info("No matching materials to transfer.")
     else:
         st.markdown(f"### 📋 Interested Plant Materials for {plant}")
         st.dataframe(Interested_plant, use_container_width=True)
