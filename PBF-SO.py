@@ -80,7 +80,15 @@ if uploaded_materials is not None and uploaded_prices is not None:
             action_mapping = material_list_df.set_index('Material n°')['Results'].to_dict()
             Interested_plant['Action'] = Interested_plant['Material n°'].map(action_mapping)
             
-            # Calculate Scrap Value
+            # Create default status column
+            Interested_plant['Optimization Status'] = 'Standard'
+            
+            # Rule: If Action is "FASD analyse" and FASD status is "Dead", update Action to "Scrap analyse" and Optimization Status to "Optimized"
+            mask = (Interested_plant['Action'] == 'FASD analyse') & (Interested_plant['FASD'] == 'Dead')
+            Interested_plant.loc[mask, 'Action'] = 'Scrap analyse'
+            Interested_plant.loc[mask, 'Optimization Status'] = 'Optimized'
+
+            # Calculate Scrap Value (including the newly updated Scrap analyse items)
             scrap_df = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']
             scrap_value = (scrap_df['Stock qty'] * scrap_df['Unit price']).sum()
             bom_loaded = True
@@ -107,7 +115,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # Display Dataframe
     if bom_loaded:
-        st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions)")
+        st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
         st.dataframe(Interested_plant, use_container_width=True)
     else:
         st.markdown(f"### 📋 Interested Plant Materials for {plant}")
