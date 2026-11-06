@@ -65,7 +65,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Others_plant = pd_v1_df[pd_v1_df['Plant'] != plant].copy()
     Others_plant_unique = Others_plant.drop_duplicates(subset=['Material n°']).copy()
 
-    Total_stock_value = (pd_v1_df['Stock qty'] *  pd_v1_df['Unit price']).sum()
+    Total_stock_value = (stock_greater_zero['Stock qty'] *  stock_greater_zero['Unit price']).sum()
     Interested_plant_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
 
     # UPDATE INTERESTED PLANT DATAFRAME WITH ACTION COLUMN FROM IMPACTED BOM BEFORE DISPLAYING KPIs
@@ -169,13 +169,24 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Display Dataframe
     if bom_loaded:
         st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
-        st.dataframe(Interested_plant, use_container_width=True)
         
+        # Filter Interested_plant to only the requested columns
+        interested_plant_display_cols = [
+            'Material n°', 'Material description', 'Material discipline',
+            'Plant code', 'Plant', 'storage bin', 'FASD', 'Blocking status',
+            'MRP Type', 'Stock qty', 'Blocked Stock Qty', 'Safety', 'Min',
+            'Max', 'Unit price', 'Action', 'Optimization Status'
+        ]
+        existing_display_cols = [c for c in interested_plant_display_cols if c in Interested_plant.columns]
+        Interested_plant_display = Interested_plant[existing_display_cols]
+        
+        st.dataframe(Interested_plant_display, use_container_width=True)
+
         # Export Option for Interested Plant
         buffer_interested = io.BytesIO()
         with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
-            Interested_plant.to_excel(writer, index=False, sheet_name='Interested Plant')
-        st.download_button(
+            Interested_plant_display.to_excel(writer, index=False, sheet_name='Interested Plant')
+        st.download_button( 
             label="📥 Download Interested Plant Excel",
             data=buffer_interested.getvalue(),
             file_name=f"Interested_Plant_{plant}.xlsx",
@@ -185,7 +196,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         st.markdown("### 🔄 Materials to be Transferred (Active in other plants, FASD != 'Dead')")
         if not materials_to_transfer.empty:
             st.dataframe(materials_to_transfer, use_container_width=True)
-            
+
             # Export Option for Materials to Transfer
             buffer_transfer = io.BytesIO()
             with pd.ExcelWriter(buffer_transfer, engine='openpyxl') as writer:
