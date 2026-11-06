@@ -21,11 +21,16 @@ with st.sidebar:
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
 
+# 1. FILE UPLOADERS IN SIDEBAR
+with st.sidebar:
+    Bom_template = st.file_uploader("Impacted Bom (Excel)", type=["xlsx"])
+    st.markdown("---")
+
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
     removed_materials_df = pd.read_excel(uploaded_materials)
     unit_price_df = pd.read_excel(uploaded_prices)
-    
+
     # 2. PROCESSING INFORMATION
     filtered_unit_prices = unit_price_df[unit_price_df['Valuation Type'] == 'BLOC-17']
     material_prices = filtered_unit_prices.groupby('Material n°')['Item Price'].mean()
@@ -42,14 +47,14 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # DYNAMIC PLANT SELECTOR IN SIDEBAR
     with st.sidebar:
-        available_plants = sorted(df['Plant'].dropna().unique())  
+        available_plants = sorted(df['Plant'].dropna().unique())
         plant = st.selectbox(
             "Select Plant of Interest:",
             available_plants,
             index=0 if 'PAZFLOR' not in available_plants else available_plants.index('PAZFLOR'),
         )
-    
-    
+
+
     # Perform calculations based on selection
     Total_removed_materials = df['Material n°'].nunique()
     pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
@@ -74,7 +79,24 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi4:
         st.markdown(f'<div class="metric-card"><h6>Potential {plant} Dead Stock Value (USD)</h6><h3>${Interested_plant_stock_value:,.2f}</h3></div>', unsafe_allow_html=True)
 
-# 1. FILE UPLOADERS IN SIDEBAR
-with st.sidebar:
-    Bom_template = st.file_uploader("Impacted Bom (Excel)", type=["xlsx"])
-    st.markdown("---")
+    # UPDATE INTERESTED PLANT DATAFRAME WITH ACTION COLUMN FROM IMPACTED BOM
+    if Bom_template is not None:
+        try:
+            material_list_df = pd.read_excel(Bom_template, sheet_name="Material_List")
+            material_list_df.columns = material_list_df.columns.str.strip()
+            
+            # Clean mapping IDs to prevent string/numeric mismatch issues
+            material_list_df['Material n°'] = material_list_df['Material n°'].astype(str).str.strip()
+            Interested_plant['Material n°'] = Interested_plant['Material n°'].astype(str).str.strip()
+            
+            # Group by material number if there are duplicates to get unique mapping values
+            action_mapping = material_list_df.set_index('Material n°')['Results'].to_dict()
+            Interested_plant['Action'] = Interested_plant['Material n°'].map(action_mapping)
+            
+            st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions)")
+            st.dataframe(Interested_plant, use_container_width=True)
+        except Exception as e:
+            st.error(f"Error reading Material_List from Impacted Bom: {e}")
+    else:
+        st.markdown(f"### 📋 Interested Plant Materials for {plant}")
+        st.dataframe(Interested_plant, use_container_width=True)
