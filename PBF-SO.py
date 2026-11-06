@@ -125,7 +125,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # Keep only specific requested columns (including storage bin)
                 target_cols = [
                     'Material n°', 'Material description', 'Material discipline',
-                    'Plant code', 'Plant', 'Storage bin', 'FASD', {plant}'Stock qty',
+                    'Plant code', 'Plant', 'Storage bin', 'FASD', {plant} Stock qty,
                     'Receiving plant', 'Receiving quantity', 'Unit price',
                 ]
                 existing_target_cols = [c for c in target_cols if c in raw_transfer_df.columns]
