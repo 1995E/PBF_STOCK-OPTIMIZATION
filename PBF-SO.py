@@ -68,6 +68,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Total_stock_value = (pd_v1_df['Stock qty'] *  pd_v1_df['Unit price']).sum()
     Interested_plant_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
 
+    # Create a mapping for storage bins from original removed_materials_df
+    # Casting keys to strings to ensure matching consistency
+    storage_bin_map = removed_materials_df.dropna(subset=['Material n°']).drop_duplicates('Material n°').set_index(removed_materials_df.dropna(subset=['Material n°']).drop_duplicates('Material n°')['Material n°'].astype(str).str.strip())['storage bin'].to_dict()
+
     # UPDATE INTERESTED PLANT DATAFRAME WITH ACTION COLUMN FROM IMPACTED BOM BEFORE DISPLAYING KPIs
     scrap_value = 0.0
     transfer_value = 0.0
@@ -122,6 +126,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # Quantity is mapped to the inventory stock quantity of the item
                 raw_transfer_df['quantity'] = raw_transfer_df['Stock qty']
 
+                # Force-update storage bin in materials_to_transfer from the original dataframe mapping
+                raw_transfer_df['storage bin'] = raw_transfer_df['Material n°'].map(storage_bin_map)
+
                 # Keep only specific requested columns (including storage bin)
                 target_cols = [
                     'Material n°', 'Material description', 'Material discipline',
@@ -134,6 +141,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
             else:
                 materials_to_transfer = pd.DataFrame()
                 transfer_value = 0.0
+
+            # Force-update storage bin in remaining Interested_plant from the original dataframe mapping
+            Interested_plant['storage bin'] = Interested_plant['Material n°'].map(storage_bin_map)
 
             # Calculate Scrap Value for the remaining items in Interested_plant
             scrap_df = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']
@@ -170,7 +180,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     if bom_loaded:
         st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
         st.dataframe(Interested_plant, use_container_width=True)
-        
+
         # Export Option for Interested Plant
         buffer_interested = io.BytesIO()
         with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
@@ -185,7 +195,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         st.markdown("### 🔄 Materials to be Transferred (Active in other plants, FASD != 'Dead')")
         if not materials_to_transfer.empty:
             st.dataframe(materials_to_transfer, use_container_width=True)
-            
+
             # Export Option for Materials to Transfer
             buffer_transfer = io.BytesIO()
             with pd.ExcelWriter(buffer_transfer, engine='openpyxl') as writer:
