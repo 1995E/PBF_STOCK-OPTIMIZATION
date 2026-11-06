@@ -126,7 +126,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 target_cols = [
                     'Material n°', 'Material description', 'Material discipline',
                     'Plant code', 'Plant', 'FASD', 'Stock qty', 'Unit price',
-                    'Receiving plant', 'Receiving quantity', 'Unit price',
+                    'Receiving plant', 'Receiving quantity', 'Unit price_',
                 ]
                 existing_target_cols = [c for c in target_cols if c in raw_transfer_df.columns]
                 materials_to_transfer = raw_transfer_df[existing_target_cols].copy()
