@@ -14,9 +14,10 @@ st.set_page_config(
 st.title("📦 Material Overview & Stock Analysis")
 st.markdown("Retrieve structured insights, classify inventory status, and assess material for scrapping or to be transferred.")
 
+# CHOOSE THE IMPACTED PLANT
 with st.sidebar:
     plant = st.selectbox(
-    "Select Plant of Interest:",
+    "Select the impacted Plant:",
     ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
 )
 
@@ -49,15 +50,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
     ]
     existing_columns = [col for col in requested_columns if col in removed_materials_df.columns]
     df = removed_materials_df[existing_columns].copy()
-
-    # DYNAMIC PLANT SELECTOR IN SIDEBAR
-    #with st.sidebar:
-        #available_plants = sorted(df['Plant'].dropna().unique())
-        #plant = st.selectbox(
-            #"Select Plant of Interest:",
-            #available_plants,
-            #index=0 if 'PAZFLOR' not in available_plants else available_plants.index('PAZFLOR'),
-        #)
 
     # Perform calculations based on selection
     Total_removed_materials = df['Material n°'].nunique()
