@@ -37,7 +37,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     requested_columns = [
         'Material n°', 'Material description', 'Material discipline',
-        'Plant code', 'Plant', 'storage bin', 'FASD', 'Blocking status',
+        'Plant code', 'Plant', 'Storage bin', 'FASD', 'Blocking status',
         'MRP Type', 'Stock qty', 'Blocked Stock Qty', 'Safety', 'Min',
         'Max', 'Unit price'
     ]
