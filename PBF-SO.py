@@ -56,12 +56,12 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Modern Title and Subheader
-st.markdown("<div class=\"main-header\">🚢 PBF Stock Analyse Tool</div>", unsafe_allow_html=True)
-st.markdown("<div class=\"sub-header\">High-level executive inventory analysis, dead stock valuation, and material transfer optimization dashboard.</div>", unsafe_allow_html=True)
+st.markdown("<div class=\"main-header\"> PBF Stock Analyse Tool</div>", unsafe_allow_html=True)
+#st.markdown("<div class=\"sub-header\">High-level executive inventory analysis, dead stock valuation, and material transfer optimization dashboard.</div>", unsafe_allow_html=True)
 
 # CHOOSE THE IMPACTED PLANT IN SIDEBAR
 with st.sidebar:
-    st.markdown("### 🏢 Plant Selection")
+    st.markdown("### 🚢 Plant Selection")
     plant = st.selectbox(
         "Select the impacted Plant:",
         ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
