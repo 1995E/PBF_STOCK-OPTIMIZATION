@@ -33,7 +33,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # 2. PROCESSING INFORMATION
     filtered_unit_prices = unit_price_df[unit_price_df['Valuation Type'] == 'BLOC-17']
     material_prices = filtered_unit_prices.groupby('Material n°')['Item Price'].mean()
-    removed_materials_df['Unit price'] = removed_materials_df['Material n°'].map(material_prices)
+    #removed_materials_df['Unit price'] = removed_materials_df['Material n°'].map(material_prices)
 
     requested_columns = [
         'Material n°', 'Material description', 'Material discipline',
