@@ -120,13 +120,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
             if not raw_transfer_df.empty:
                 raw_transfer_df['Receiving plant'] = raw_transfer_df['Material n°'].map(best_receiving_plants['Plant'])
                 # Quantity is mapped to the inventory stock quantity of the item
-                raw_transfer_df['quantity'] = raw_transfer_df['Stock qty']
+                raw_transfer_df['Receiving quantity'] = raw_transfer_df['Stock qty']
                 
                 # Keep only specific requested columns
                 target_cols = [
                     'Material n°', 'Material description', 'Material discipline',
                     'Plant code', 'Plant', 'FASD', 'Stock qty', 'Unit price',
-                    'Receiving plant', 'quantity'
+                    'Receiving plant', 'Receiving quantity', 'Unit price',
                 ]
                 existing_target_cols = [c for c in target_cols if c in raw_transfer_df.columns]
                 materials_to_transfer = raw_transfer_df[existing_target_cols].copy()
