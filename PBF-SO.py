@@ -42,7 +42,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         'Max', 'Unit price'
     ]
     existing_columns = [col for col in requested_columns if col in removed_materials_df.columns]
-    df = removed_materials_df[existing_columns].copy()
+    #df = removed_materials_df[existing_columns].copy()
 
     # DYNAMIC PLANT SELECTOR IN SIDEBAR
     with st.sidebar:
