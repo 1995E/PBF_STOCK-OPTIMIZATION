@@ -61,7 +61,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Interested_plant = pd_v1_df[pd_v1_df['Plant'] == plant].copy()
     Interested_plant_unique = Interested_plant.drop_duplicates(subset=['Material n°']).copy()
     
-    Others_plant =  Interested_plant = pd_v1_df[pd_v1_df['Plant'] !== plant].copy()
+    Others_plant =  Interested_plant = pd_v1_df[pd_v1_df['Plant'] != plant].copy()
     Others_plant_unique = Others_plant.drop_duplicates(subset=['Material n°']).copy()
 
     Total_stock_value = (pd_v1_df['Stock qty'] *  pd_v1_df['Unit price']).sum()
