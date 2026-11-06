@@ -70,7 +70,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # Create a mapping for storage bins from original removed_materials_df
     # Casting keys to strings to ensure matching consistency
-    storage_bin_map = removed_materials_df.dropna(subset=['Material n°']).drop_duplicates('Material n°').set_index(removed_materials_df.dropna(subset=['Material n°']).drop_duplicates('Material n°')['Material n°'].astype(str).str.strip())['storage bin'].to_dict()
+    storage_bin_map = removed_materials_df.dropna(subset=['Material n°']).drop_duplicates('Material n°').copy()
+    storage_bin_map['Material n°'] = storage_bin_map['Material n°'].astype(str).str.strip()
+    storage_bin_dict = storage_bin_map.set_index('Material n°')['storage bin'].to_dict()
 
     # UPDATE INTERESTED PLANT DATAFRAME WITH ACTION COLUMN FROM IMPACTED BOM BEFORE DISPLAYING KPIs
     scrap_value = 0.0
@@ -120,16 +122,15 @@ if uploaded_materials is not None and uploaded_prices is not None:
             raw_transfer_df = Interested_plant[Interested_plant['Material n°'].isin(transfer_material_ids)].copy()
             Interested_plant = Interested_plant[~Interested_plant['Material n°'].isin(transfer_material_ids)].copy()
 
-            # Assign Receiving plant and quantity
+            # Assign Receiving plant and quantity based on priority
             if not raw_transfer_df.empty:
                 raw_transfer_df['Receiving plant'] = raw_transfer_df['Material n°'].map(best_receiving_plants['Plant'])
-                # Quantity is mapped to the inventory stock quantity of the item
                 raw_transfer_df['quantity'] = raw_transfer_df['Stock qty']
 
                 # Force-update storage bin in materials_to_transfer from the original dataframe mapping
-                raw_transfer_df['storage bin'] = raw_transfer_df['Material n°'].map(storage_bin_map)
+                raw_transfer_df['storage bin'] = raw_transfer_df['Material n°'].map(storage_bin_dict)
 
-                # Keep only specific requested columns (including storage bin)
+                # Keep requested target columns including 'storage bin'
                 target_cols = [
                     'Material n°', 'Material description', 'Material discipline',
                     'Plant code', 'Plant', 'storage bin', 'FASD', 'Stock qty', 'Unit price',
@@ -143,7 +144,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 transfer_value = 0.0
 
             # Force-update storage bin in remaining Interested_plant from the original dataframe mapping
-            Interested_plant['storage bin'] = Interested_plant['Material n°'].map(storage_bin_map)
+            Interested_plant['storage bin'] = Interested_plant['Material n°'].map(storage_bin_dict)
 
             # Calculate Scrap Value for the remaining items in Interested_plant
             scrap_df = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']
