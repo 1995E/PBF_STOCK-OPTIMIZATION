@@ -60,8 +60,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     Interested_plant = pd_v1_df[pd_v1_df['Plant'] == plant].copy()
     Interested_plant_unique = Interested_plant.drop_duplicates(subset=['Material n°']).copy()
-    
-    Others_plant =  Interested_plant = pd_v1_df[pd_v1_df['Plant'] != plant].copy()
+
+    Others_plant = pd_v1_df[pd_v1_df['Plant'] != plant].copy()
     Others_plant_unique = Others_plant.drop_duplicates(subset=['Material n°']).copy()
 
     Total_stock_value = (pd_v1_df['Stock qty'] *  pd_v1_df['Unit price']).sum()
@@ -78,14 +78,15 @@ if uploaded_materials is not None and uploaded_prices is not None:
             # Clean mapping IDs to prevent string/numeric mismatch issues
             material_list_df['Material n°'] = material_list_df['Material n°'].astype(str).str.strip()
             Interested_plant['Material n°'] = Interested_plant['Material n°'].astype(str).str.strip()
+            Others_plant['Material n°'] = Others_plant['Material n°'].astype(str).str.strip()
 
             # Group by material number if there are duplicates to get unique mapping values
             action_mapping = material_list_df.set_index('Material n°')['Results'].to_dict()
             Interested_plant['Action'] = Interested_plant['Material n°'].map(action_mapping)
-            
+
             # Create default status column
             Interested_plant['Optimization Status'] = 'Standard'
-            
+
             # Rule: If Action is "FASD analyse" and FASD status is "Dead", update Action to "Scrap analyse" and Optimization Status to "Optimized"
             mask = (Interested_plant['Action'] == 'FASD analyse') & (Interested_plant['FASD'] == 'Dead')
             Interested_plant.loc[mask, 'Action'] = 'Scrap analyse'
@@ -120,6 +121,16 @@ if uploaded_materials is not None and uploaded_prices is not None:
     if bom_loaded:
         st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
         st.dataframe(Interested_plant, use_container_width=True)
+        
+        # Filter Others_plant where FASD is not "Dead" and material n° belongs to Interested_plant's "Scrap analyse" list
+        scrap_analyse_materials = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']['Material n°'].unique()
+        active_others_df = Others_plant[(Others_plant['Material n°'].isin(scrap_analyse_materials)) & (Others_plant['FASD'] != 'Dead')]
+        
+        st.markdown("### 🔄 Other Plants Active Status Check (FASD != 'Dead' for 'Scrap analyse' materials)")
+        if not active_others_df.empty:
+            st.dataframe(active_others_df, use_container_width=True)
+        else:
+            st.info("No matching materials with 'Scrap analyse' action are active (FASD != 'Dead') in other plants.")
     else:
         st.markdown(f"### 📋 Interested Plant Materials for {plant}")
         st.dataframe(Interested_plant, use_container_width=True)
