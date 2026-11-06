@@ -50,8 +50,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # Modern Title and Subheader
-st.markdown('<div class="main-header">🚢 PBF Stock Analyse Tool</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">High-level executive inventory analysis, dead stock valuation, and material transfer optimization dashboard.</div>', unsafe_allow_html=True)
+st.markdown("<div class=\"main-header\">🚢 PBF Stock Analyse Tool</div>", unsafe_allow_html=True)
+st.markdown("<div class=\"sub-header\">High-level executive inventory analysis, dead stock valuation, and material transfer optimization dashboard.</div>", unsafe_allow_html=True)
 
 # CHOOSE THE IMPACTED PLANT IN SIDEBAR
 with st.sidebar:
@@ -168,6 +168,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
         except Exception as e:
             st.error(f"Error reading Material_List from Impacted Bom: {e}")
 
+    # Calculate values if not yet set
+    if 'Calculated Value' not in Interested_plant.columns and not Interested_plant.empty:
+        Interested_plant['Calculated Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
+
     # 3. EXECUTIVE KPI CARDS
     st.markdown("### 📊 Key Performance Metrics")
     kpi_cols = st.columns(6)
@@ -197,30 +201,31 @@ if uploaded_materials is not None and uploaded_prices is not None:
     tab1, tab2 = st.tabs(["📈 Executive Visualizations", "📋 Detailed Datasets & Actions"])
 
     with tab1:
-        st.markdown("#### 🚀 Executive Insights")
+        st.markdown("#### 🚀 Strategic Analytics")
+        
+        # First Row of charts
         col_left, col_right = st.columns(2)
-
+        
         with col_left:
             # Visualization 1: FASD Value Split of Stock
-            st.markdown(f"##### 💎 Stock Value Distribution by FASD Status for {plant}")
+            st.markdown(f"##### 💎 Stock Value Distribution by FASD Status ({plant})")
             if not Interested_plant.empty:
-                Interested_plant['Calculated Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price']
                 fasd_chart_df = Interested_plant.groupby('FASD')['Calculated Value'].sum().reset_index()
                 fig_pie = px.pie(
                     fasd_chart_df, 
                     values='Calculated Value', 
                     names='FASD', 
-                    hole=0.4,
-                    color_discrete_sequence=px.colors.sequential.RdBu
+                    hole=0.45,
+                    color_discrete_sequence=px.colors.qualitative.Prism
                 )
-                fig_pie.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=320)
+                fig_pie.update_layout(margin=dict(t=20, b=20, l=10, r=10), height=320)
                 st.plotly_chart(fig_pie, use_container_width=True)
             else:
-                st.info("No stock greater than 0 available for visualization in selected plant.")
+                st.info("No active stock for selected plant to visualize.")
 
         with col_right:
-            # Visualization 2: Discipline Breakdown (Stock Qty vs Blocked Qty)
-            st.markdown("##### ⚙️ Material Discipline Asset Allocation")
+            # Visualization 2: Material Discipline Asset Allocation
+            st.markdown("##### ⚙️ Material Discipline Allocation (Stock vs Blocked)")
             if not Interested_plant.empty:
                 discipline_df = Interested_plant.groupby('Material discipline')[['Stock qty', 'Blocked Stock Qty']].sum().reset_index()
                 fig_bar = px.bar(
@@ -231,13 +236,78 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     color_discrete_map={'Stock qty': '#3B82F6', 'Blocked Stock Qty': '#EF4444'}
                 )
                 fig_bar.update_layout(
-                    margin=dict(t=10, b=10, l=10, r=10),
+                    margin=dict(t=20, b=20, l=10, r=10),
                     height=320,
                     legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
                 )
                 st.plotly_chart(fig_bar, use_container_width=True)
             else:
                 st.info("No data available for selected plant.")
+
+        # Second Row of Charts (Advanced Analytics)
+        col_left_2, col_right_2 = st.columns(2)
+        
+        with col_left_2:
+            # Pareto analysis (80/20 rule) of Stock Values
+            st.markdown("##### 📊 Cumulative Stock Value Analysis (Pareto Principle)")
+            if not Interested_plant.empty:
+                pareto_df = Interested_plant.sort_values(by='Calculated Value', ascending=False).copy()
+                pareto_df['Cumulative Value'] = pareto_df['Calculated Value'].cumsum()
+                total_val = pareto_df['Calculated Value'].sum()
+                pareto_df['Cumulative %'] = (pareto_df['Cumulative Value'] / total_val) * 100 if total_val > 0 else 0
+                pareto_df['Index'] = range(1, len(pareto_df) + 1)
+                
+                fig_pareto = go.Figure()
+                fig_pareto.add_trace(go.Bar(
+                    x=pareto_df['Index'],
+                    y=pareto_df['Calculated Value'],
+                    name='Material Value',
+                    marker_color='#1E3A8A'
+                ))
+                fig_pareto.add_trace(go.Scatter(
+                    x=pareto_df['Index'],
+                    y=pareto_df['Cumulative %'],
+                    name='Cumulative %',
+                    yaxis='y2',
+                    line=dict(color='#EF4444', width=3)
+                ))
+                
+                fig_pareto.update_layout(
+                    height=340,
+                    margin=dict(t=20, b=20, l=10, r=10),
+                    yaxis=dict(title='Stock Value (USD)'),
+                    yaxis2=dict(title='Cumulative %', overlaying='y', side='right', range=[0, 105]),
+                    xaxis=dict(title='Materials ordered by Stock Value (Rank)'),
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                )
+                st.plotly_chart(fig_pareto, use_container_width=True)
+            else:
+                st.info("No data available.")
+                
+        with col_right_2:
+            # Outlier / Material Profile Scatter Analysis
+            st.markdown("##### 🔍 Inventory Valuation & Volume Profiling")
+            if not Interested_plant.empty:
+                fig_scatter = px.scatter(
+                    Interested_plant,
+                    x='Stock qty',
+                    y='Unit price',
+                    color='FASD',
+                    size='Calculated Value',
+                    hover_name='Material description',
+                    log_x=True,
+                    log_y=True,
+                    color_discrete_sequence=px.colors.qualitative.Safe
+                )
+                fig_scatter.update_layout(
+                    height=340,
+                    margin=dict(t=20, b=20, l=10, r=10),
+                    xaxis_title='Stock Quantity (Log Scale)',
+                    yaxis_title='Unit Price (Log Scale)'
+                )
+                st.plotly_chart(fig_scatter, use_container_width=True)
+            else:
+                st.info("No data available.")
 
     with tab2:
         if bom_loaded:
