@@ -6,20 +6,60 @@ import numpy as np
 import io
 
 st.set_page_config(
-    page_title="Material Analysis Dashboard",
+    page_title="PBF Stock Analyse Tool",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-st.title(" PBF STOCK ANALYSE TOOL")
-st.markdown("Retrieve structured insights, classify inventory status, and assess material for scrapping or to be transferred.")
+# Modern Custom CSS Styling
+st.markdown("""
+    <style>
+        .main-header {
+            font-size: 2.2rem;
+            color: #1E3A8A;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+        .sub-header {
+            font-size: 1.1rem;
+            color: #4B5563;
+            margin-bottom: 1.5rem;
+        }
+        .metric-card {
+            background-color: #F9FAFB;
+            padding: 1.2rem;
+            border-radius: 10px;
+            border-left: 5px solid #3B82F6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 1rem;
+        }
+        .metric-label {
+            font-size: 0.85rem;
+            color: #6B7280;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        .metric-value {
+            font-size: 1.6rem;
+            color: #111827;
+            font-weight: 700;
+            margin-top: 0.2rem;
+        }
+    </style>
+""", unsafe_allow_html=True)
 
-# CHOOSE THE IMPACTED PLANT
+# Modern Title and Subheader
+st.markdown('<div class="main-header">🚢 PBF Stock Analyse Tool</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-header">High-level executive inventory analysis, dead stock valuation, and material transfer optimization dashboard.</div>', unsafe_allow_html=True)
+
+# CHOOSE THE IMPACTED PLANT IN SIDEBAR
 with st.sidebar:
+    st.markdown("### 🏢 Plant Selection")
     plant = st.selectbox(
-    " 🚢 Select the impacted Plant:",
-    ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
-)
+        "Select the impacted Plant:",
+        ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
+    )
 
 # 1. FILE UPLOADERS IN SIDEBAR
 with st.sidebar:
@@ -27,8 +67,6 @@ with st.sidebar:
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
-
-with st.sidebar:
     Bom_template = st.file_uploader("Impacted Bom (Excel)", type=["xlsx"])
     st.markdown("---")
 
@@ -77,50 +115,40 @@ if uploaded_materials is not None and uploaded_prices is not None:
             material_list_df = pd.read_excel(Bom_template, sheet_name="Material_List")
             material_list_df.columns = material_list_df.columns.str.strip()
 
-            # Clean mapping IDs to prevent string/numeric mismatch issues
+            # Clean mapping IDs
             material_list_df['Material n°'] = material_list_df['Material n°'].astype(str).str.strip()
             Interested_plant['Material n°'] = Interested_plant['Material n°'].astype(str).str.strip()
             Others_plant['Material n°'] = Others_plant['Material n°'].astype(str).str.strip()
 
-            # Group by material number if there are duplicates to get unique mapping values
+            # Group by material number if there are duplicates
             action_mapping = material_list_df.set_index('Material n°')['Results'].to_dict()
             Interested_plant['Action'] = Interested_plant['Material n°'].map(action_mapping)
 
             # Create default status column
             Interested_plant['Optimization Status'] = 'Standard'
 
-            # Rule: If Action is "FASD analyse" and FASD status is "Dead", update Action to "Scrap analyse" and Optimization Status to "Optimized"
+            # Rule: Action update
             mask = (Interested_plant['Action'] == 'FASD analyse') & (Interested_plant['FASD'] == 'Dead')
             Interested_plant.loc[mask, 'Action'] = 'Scrap analyse'
             Interested_plant.loc[mask, 'Optimization Status'] = 'Optimized'
 
-            # Identify material n° belonging to Interested_plant's "Scrap analyse" list
             scrap_analyse_materials = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']['Material n°'].unique()
-
-            # Filter Others_plant where FASD is not "Dead" and material exists in the Scrap analyse list
             active_others_df = Others_plant[(Others_plant['Material n°'].isin(scrap_analyse_materials)) & (Others_plant['FASD'] != 'Dead')].copy()
 
-            # Priority mapper based on FASD status
             priority_map = {'FAST': 1, 'Active': 2, 'Slow': 3}
             active_others_df['Priority'] = active_others_df['FASD'].map(priority_map).fillna(4)
-
-            # Sort so that highest priority (FAST) comes first
             active_others_df = active_others_df.sort_values(by=['Material n°', 'Priority'])
             best_receiving_plants = active_others_df.drop_duplicates(subset=['Material n°']).set_index('Material n°')
 
             transfer_material_ids = best_receiving_plants.index.unique()
 
-            # Split Interested_plant: extract materials to be transferred
             raw_transfer_df = Interested_plant[Interested_plant['Material n°'].isin(transfer_material_ids)].copy()
             Interested_plant = Interested_plant[~Interested_plant['Material n°'].isin(transfer_material_ids)].copy()
 
-            # Assign Receiving plant and quantity
             if not raw_transfer_df.empty:
                 raw_transfer_df['Receiving plant'] = raw_transfer_df['Material n°'].map(best_receiving_plants['Plant'])
-                # Quantity is mapped to the inventory stock quantity of the item
-                raw_transfer_df['quantity'] = raw_transfer_df['Stock qty']
+                raw_transfer_df['Receiving quantity'] = raw_transfer_df['Stock qty']
 
-                # Keep only specific requested columns (including storage bin)
                 target_cols = [
                     'Material n°', 'Material description', 'Material discipline',
                     'Plant code', 'Plant', 'Storage bin', 'FASD', 'Stock qty',
@@ -133,7 +161,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 materials_to_transfer = pd.DataFrame()
                 transfer_value = 0.0
 
-            # Calculate Scrap Value for the remaining items in Interested_plant
             scrap_df = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']
             scrap_value = (scrap_df['Stock qty'] * scrap_df['Unit price']).sum()
 
@@ -141,61 +168,120 @@ if uploaded_materials is not None and uploaded_prices is not None:
         except Exception as e:
             st.error(f"Error reading Material_List from Impacted Bom: {e}")
 
-    # 3. HIGHLY VISUAL KPI METRICS SECTION
-    st.markdown("### MAIN HIGHLIGHTS")
-    kpi1, kpi2, kpi3, kpi4, kpi5, kpi6 = st.columns(6)
+    # 3. EXECUTIVE KPI CARDS
+    st.markdown("### 📊 Key Performance Metrics")
+    kpi_cols = st.columns(6)
 
-    with kpi1:
-        st.markdown(f'<div class="metric-card"><h6>Total Removed Materials</h6><h3>{Total_removed_materials:,}</h3></div>', unsafe_allow_html=True)
-    with kpi2:
-        st.markdown(f'<div class="metric-card"><h6>Total Stock Materials</h6><h3>{len(pd_v1_unique_materials):,}</h3></div>', unsafe_allow_html=True)
-    with kpi3:
-        st.markdown(f'<div class="metric-card"><h6>Total Stock Value (USD)</h6><h3>${Total_stock_value:,.2f}</h3></div>', unsafe_allow_html=True)
-    with kpi4:
-        st.markdown(f'<div class="metric-card"><h6>Potential {plant} Dead Stock Value (USD)</h6><h3>${Interested_plant_stock_value:,.2f}</h3></div>', unsafe_allow_html=True)
-    with kpi5:
-        if bom_loaded:
-            st.markdown(f'<div class="metric-card" style="border-left: 5px solid red;"><h6>Scrap Analyse Value for {plant} (USD)</h6><h3>${scrap_value:,.2f}</h3></div>', unsafe_allow_html=True)
-        else:
-            st.markdown(f'<div class="metric-card" style="color: gray;"><h6>Scrap Analyse Value</h6><h3>N/A</h3><small>Upload Impacted Bom</small></div>', unsafe_allow_html=True)
-    with kpi6:
-        if bom_loaded:
-            st.markdown(f'<div class="metric-card" style="border-left: 5px solid green;"><h6>Materials to Transfer Value (USD)</h6><h3>${transfer_value:,.2f}</h3></div>', unsafe_allow_html=True)
-        else:
-            st.markdown(f'<div class="metric-card" style="color: gray;"><h6>Transfer Value</h6><h3>N/A</h3><small>Upload Impacted Bom</small></div>', unsafe_allow_html=True)
+    def render_kpi(col, title, value, color_border="#3B82F6"):
+        with col:
+            st.markdown(f"""
+                <div class="metric-card" style="border-left-color: {color_border};">
+                    <div class="metric-label">{title}</div>
+                    <div class="metric-value">{value}</div>
+                </div>
+            """, unsafe_allow_html=True)
 
-    # Display Dataframe
+    render_kpi(kpi_cols[0], "Total Unique Materials", f"{Total_removed_materials:,}", "#1E3A8A")
+    render_kpi(kpi_cols[1], "Total Active Stock Items", f"{len(pd_v1_unique_materials):,}", "#6366F1")
+    render_kpi(kpi_cols[2], "Total Portfolio Stock (USD)", f"${Total_stock_value:,.0f}", "#10B981")
+    render_kpi(kpi_cols[3], f"{plant} Selected Stock Value", f"${Interested_plant_stock_value:,.0f}", "#F59E0B")
+
     if bom_loaded:
-        st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
-        st.dataframe(Interested_plant, use_container_width=True)
-        
-        # Export Option for Interested Plant
-        buffer_interested = io.BytesIO()
-        with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
-            Interested_plant.to_excel(writer, index=False, sheet_name='Interested Plant')
-        st.download_button(
-            label="📥 Download Interested Plant Excel",
-            data=buffer_interested.getvalue(),
-            file_name=f"Interested_Plant_{plant}.xlsx",
-            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        )
+        render_kpi(kpi_cols[4], f"{plant} Scrap Proposal Value", f"${scrap_value:,.0f}", "#EF4444")
+        render_kpi(kpi_cols[5], "Potential Transfer Savings", f"${transfer_value:,.0f}", "#8B5CF6")
+    else:
+        render_kpi(kpi_cols[4], "Scrap Proposal Value", "N/A (Load BOM)", "#D1D5DB")
+        render_kpi(kpi_cols[5], "Transfer Savings", "N/A (Load BOM)", "#D1D5DB")
 
-        st.markdown("### 🔄 Materials to be Transferred (Active in other plants, FASD != 'Dead')")
-        if not materials_to_transfer.empty:
-            st.dataframe(materials_to_transfer, use_container_width=True)
-            
-            # Export Option for Materials to Transfer
-            buffer_transfer = io.BytesIO()
-            with pd.ExcelWriter(buffer_transfer, engine='openpyxl') as writer:
-                materials_to_transfer.to_excel(writer, index=False, sheet_name='Materials to Transfer')
+    # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
+    tab1, tab2 = st.tabs(["📈 Executive Visualizations", "📋 Detailed Datasets & Actions"])
+
+    with tab1:
+        st.markdown("#### 🚀 Executive Insights")
+        col_left, col_right = st.columns(2)
+
+        with col_left:
+            # Visualization 1: FASD Value Split of Stock
+            st.markdown(f"##### 💎 Stock Value Distribution by FASD Status for {plant}")
+            if not Interested_plant.empty:
+                Interested_plant['Calculated Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price']
+                fasd_chart_df = Interested_plant.groupby('FASD')['Calculated Value'].sum().reset_index()
+                fig_pie = px.pie(
+                    fasd_chart_df, 
+                    values='Calculated Value', 
+                    names='FASD', 
+                    hole=0.4,
+                    color_discrete_sequence=px.colors.sequential.RdBu
+                )
+                fig_pie.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=320)
+                st.plotly_chart(fig_pie, use_container_width=True)
+            else:
+                st.info("No stock greater than 0 available for visualization in selected plant.")
+
+        with col_right:
+            # Visualization 2: Discipline Breakdown (Stock Qty vs Blocked Qty)
+            st.markdown("##### ⚙️ Material Discipline Asset Allocation")
+            if not Interested_plant.empty:
+                discipline_df = Interested_plant.groupby('Material discipline')[['Stock qty', 'Blocked Stock Qty']].sum().reset_index()
+                fig_bar = px.bar(
+                    discipline_df, 
+                    x='Material discipline', 
+                    y=['Stock qty', 'Blocked Stock Qty'],
+                    barmode='group',
+                    color_discrete_map={'Stock qty': '#3B82F6', 'Blocked Stock Qty': '#EF4444'}
+                )
+                fig_bar.update_layout(
+                    margin=dict(t=10, b=10, l=10, r=10),
+                    height=320,
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                )
+                st.plotly_chart(fig_bar, use_container_width=True)
+            else:
+                st.info("No data available for selected plant.")
+
+    with tab2:
+        if bom_loaded:
+            st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
+            # Ensure the specific requested column orders layout is cleanly structured
+            display_columns = [
+                'Material n°', 'Material description', 'Material discipline',
+                'Plant code', 'Plant', 'Storage bin', 'FASD', 'Blocking status',
+                'MRP Type', 'Stock qty', 'Blocked Stock Qty', 'Safety', 'Min',
+                'Max', 'Unit price', 'Action', 'Optimization Status'
+            ]
+            existing_display_cols = [col for col in display_columns if col in Interested_plant.columns]
+            Interested_plant_display = Interested_plant[existing_display_cols]
+            st.dataframe(Interested_plant_display, use_container_width=True)
+
+            # Export Option
+            buffer_interested = io.BytesIO()
+            with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
+                Interested_plant_display.to_excel(writer, index=False, sheet_name='Interested Plant')
             st.download_button(
-                label="📥 Download Materials to Transfer Excel",
-                data=buffer_transfer.getvalue(),
-                file_name=f"Materials_to_Transfer_{plant}.xlsx",
+                label="📥 Download Interested Plant Excel",
+                data=buffer_interested.getvalue(),
+                file_name=f"Interested_Plant_{plant}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
+
+            st.markdown("### 🔄 Materials to be Transferred (Active in other plants, FASD != 'Dead')")
+            if not materials_to_transfer.empty:
+                st.dataframe(materials_to_transfer, use_container_width=True)
+
+                # Export Option
+                buffer_transfer = io.BytesIO()
+                with pd.ExcelWriter(buffer_transfer, engine='openpyxl') as writer:
+                    materials_to_transfer.to_excel(writer, index=False, sheet_name='Materials to Transfer')
+                st.download_button(
+                    label="📥 Download Materials to Transfer Excel",
+                    data=buffer_transfer.getvalue(),
+                    file_name=f"Materials_to_Transfer_{plant}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            else:
+                st.info("No matching materials to transfer.")
         else:
-            st.info("No matching materials to transfer.")
-    else:
-        st.markdown(f"### 📋 Interested Plant Materials for {plant}")
-        st.dataframe(pd_v1_df, use_container_width=True)
+            st.markdown(f"### 📋 Interested Plant Materials for {plant}")
+            st.dataframe(pd_v1_df, use_container_width=True)
+else:
+    st.info("💡 Please upload both 'Material Overview per Plant' and 'Material Overview per Price' Excel files in the sidebar to get started!")
