@@ -79,7 +79,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             # Group by material number if there are duplicates to get unique mapping values
             action_mapping = material_list_df.set_index('Material n°')['Results'].to_dict()
             Interested_plant['Action'] = Interested_plant['Material n°'].map(action_mapping)
-
+            
             # Calculate Scrap Value
             scrap_df = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']
             scrap_value = (scrap_df['Stock qty'] * scrap_df['Unit price']).sum()
@@ -105,23 +105,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
         else:
             st.markdown(f'<div class="metric-card" style="color: gray;"><h6>Scrap Analyse Value</h6><h3>N/A</h3><small>Upload Impacted Bom</small></div>', unsafe_allow_html=True)
 
-    # IDENTIFY MATERIALS IN SELECTED PLANT THAT ARE ACTIVE (FASD != "Dead") IN OTHER PLANTS
-    other_plants_active = pd_v1_df[(pd_v1_df['Plant'] != plant) & (pd_v1_df['FASD'].str.upper() != 'Dead')]
-    other_active_material_ids = other_plants_active['Material n°'].unique()
-    
-    # Filter the Interested_plant dataframe using these material IDs
-    interested_plant_with_active_elsewhere = Interested_plant[Interested_plant['Material n°'].isin(other_active_material_ids)].copy()
-
-    # Display Dataframes
+    # Display Dataframe
     if bom_loaded:
         st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions)")
         st.dataframe(Interested_plant, use_container_width=True)
     else:
         st.markdown(f"### 📋 Interested Plant Materials for {plant}")
         st.dataframe(Interested_plant, use_container_width=True)
-
-    st.markdown(f"### 🔄 Active Materials elsewhere (FASD != 'Dead' in other plants) for Transfer Opportunities")
-    if not interested_plant_with_active_elsewhere.empty:
-        st.dataframe(interested_plant_with_active_elsewhere, use_container_width=True)
-    else:
-        st.info("No matching materials found with active status (FASD != 'Dead') in other plants.")
