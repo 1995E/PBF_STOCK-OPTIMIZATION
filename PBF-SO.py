@@ -76,5 +76,5 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
 # 1. FILE UPLOADERS IN SIDEBAR
 with st.sidebar:
-    Bom_template = st.file_uploader("Bom template (Excel)", type=["xlsx"])
+    Bom_template = st.file_uploader("Impacted Bom (Excel)", type=["xlsx"])
     st.markdown("---")
