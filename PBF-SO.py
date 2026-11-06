@@ -106,7 +106,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown(f'<div class="metric-card" style="color: gray;"><h6>Scrap Analyse Value</h6><h3>N/A</h3><small>Upload Impacted Bom</small></div>', unsafe_allow_html=True)
 
     # IDENTIFY MATERIALS IN SELECTED PLANT THAT ARE ACTIVE (FASD != "Dead") IN OTHER PLANTS
-    other_plants_active = pd_v1_df[(pd_v1_df['Plant'] != plant) & (pd_v1_df['FASD'] != 'Dead')]
+    other_plants_active = pd_v1_df[(pd_v1_df['Plant'] != plant) & (pd_v1_df['FASD'].str.upper() != 'Dead')]
     other_active_material_ids = other_plants_active['Material n°'].unique()
     
     # Filter the Interested_plant dataframe using these material IDs
