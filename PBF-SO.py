@@ -11,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.title("📦 Material Overview & Stock Analysis")
+st.title("📦 Material Overview & Stock Analysis"
 st.markdown("Retrieve structured insights, classify inventory status, and assess material for scrapping or to be transferred.")
 
 # 1. FILE UPLOADERS IN SIDEBAR
