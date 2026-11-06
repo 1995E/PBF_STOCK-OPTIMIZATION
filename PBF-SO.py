@@ -200,4 +200,4 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.info("No matching materials to transfer.")
     else:
         st.markdown(f"### 📋 Interested Plant Materials for {plant}")
-        st.dataframe(Interested_plant, use_container_width=True)
+        st.dataframe(removed_materials_df, use_container_width=True)
