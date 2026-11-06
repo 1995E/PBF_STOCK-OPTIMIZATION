@@ -14,6 +14,12 @@ st.set_page_config(
 st.title("📦 Material Overview & Stock Analysis")
 st.markdown("Retrieve structured insights, classify inventory status, and assess material for scrapping or to be transferred.")
 
+with st.sidebar:
+    plant = st.selectbox(
+    "Select Plant of Interest:",
+    ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
+)
+
 # 1. FILE UPLOADERS IN SIDEBAR
 with st.sidebar:
     st.header("📂 Data Source Configuration")
