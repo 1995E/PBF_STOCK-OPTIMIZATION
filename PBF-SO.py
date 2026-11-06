@@ -174,7 +174,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         # Export Option for Interested Plant
         buffer_interested = io.BytesIO()
         with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
-            Interested_plant.to_excel(writer, index=False, sheet_name='Interested Plant')
+            removed_materials_df.to_excel(writer, index=False, sheet_name='Interested Plant')
         st.download_button(
             label="📥 Download Interested Plant Excel",
             data=buffer_interested.getvalue(),
