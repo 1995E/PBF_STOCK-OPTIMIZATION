@@ -122,7 +122,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # Quantity is mapped to the inventory stock quantity of the item
                 raw_transfer_df['quantity'] = raw_transfer_df['Stock qty']
 
-                # Keep only specific requested columns (now including storage bin)
+                # Keep only specific requested columns (including storage bin)
                 target_cols = [
                     'Material n°', 'Material description', 'Material discipline',
                     'Plant code', 'Plant', 'storage bin', 'FASD', 'Stock qty', 'Unit price',
@@ -170,10 +170,32 @@ if uploaded_materials is not None and uploaded_prices is not None:
     if bom_loaded:
         st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
         st.dataframe(Interested_plant, use_container_width=True)
+        
+        # Export Option for Interested Plant
+        buffer_interested = io.BytesIO()
+        with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
+            Interested_plant.to_excel(writer, index=False, sheet_name='Interested Plant')
+        st.download_button(
+            label="📥 Download Interested Plant Excel",
+            data=buffer_interested.getvalue(),
+            file_name=f"Interested_Plant_{plant}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
 
         st.markdown("### 🔄 Materials to be Transferred (Active in other plants, FASD != 'Dead')")
         if not materials_to_transfer.empty:
             st.dataframe(materials_to_transfer, use_container_width=True)
+            
+            # Export Option for Materials to Transfer
+            buffer_transfer = io.BytesIO()
+            with pd.ExcelWriter(buffer_transfer, engine='openpyxl') as writer:
+                materials_to_transfer.to_excel(writer, index=False, sheet_name='Materials to Transfer')
+            st.download_button(
+                label="📥 Download Materials to Transfer Excel",
+                data=buffer_transfer.getvalue(),
+                file_name=f"Materials_to_Transfer_{plant}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
         else:
             st.info("No matching materials to transfer.")
     else:
