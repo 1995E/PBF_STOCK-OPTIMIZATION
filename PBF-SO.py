@@ -98,21 +98,46 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
             # Identify material n° belonging to Interested_plant's "Scrap analyse" list
             scrap_analyse_materials = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']['Material n°'].unique()
-            
+
             # Filter Others_plant where FASD is not "Dead" and material exists in the Scrap analyse list
-            active_others_df = Others_plant[(Others_plant['Material n°'].isin(scrap_analyse_materials)) & (Others_plant['FASD'] != 'Dead')]
-            transfer_material_ids = active_others_df['Material n°'].unique()
+            active_others_df = Others_plant[(Others_plant['Material n°'].isin(scrap_analyse_materials)) & (Others_plant['FASD'] != 'Dead')].copy()
+            
+            # Priority mapper based on FASD status
+            priority_map = {'FAST': 1, 'Active': 2, 'Slow': 3}
+            active_others_df['Priority'] = active_others_df['FASD'].map(priority_map).fillna(4)
+            
+            # Sort so that highest priority (FAST) comes first
+            active_others_df = active_others_df.sort_values(by=['Material n°', 'Priority'])
+            best_receiving_plants = active_others_df.drop_duplicates(subset=['Material n°']).set_index('Material n°')
+
+            transfer_material_ids = best_receiving_plants.index.unique()
 
             # Split Interested_plant: extract materials to be transferred
-            materials_to_transfer = Interested_plant[Interested_plant['Material n°'].isin(transfer_material_ids)].copy()
+            raw_transfer_df = Interested_plant[Interested_plant['Material n°'].isin(transfer_material_ids)].copy()
             Interested_plant = Interested_plant[~Interested_plant['Material n°'].isin(transfer_material_ids)].copy()
+
+            # Assign Receiving plant and quantity
+            if not raw_transfer_df.empty:
+                raw_transfer_df['Receiving plant'] = raw_transfer_df['Material n°'].map(best_receiving_plants['Plant'])
+                # Quantity is mapped to the inventory stock quantity of the item
+                raw_transfer_df['quantity'] = raw_transfer_df['Stock qty']
+                
+                # Keep only specific requested columns
+                target_cols = [
+                    'Material n°', 'Material description', 'Material discipline',
+                    'Plant code', 'Plant', 'FASD', 'Stock qty', 'Unit price',
+                    'Receiving plant', 'quantity'
+                ]
+                existing_target_cols = [c for c in target_cols if c in raw_transfer_df.columns]
+                materials_to_transfer = raw_transfer_df[existing_target_cols].copy()
+                transfer_value = (materials_to_transfer['Stock qty'] * materials_to_transfer['Unit price']).sum()
+            else:
+                materials_to_transfer = pd.DataFrame()
+                transfer_value = 0.0
 
             # Calculate Scrap Value for the remaining items in Interested_plant
             scrap_df = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']
             scrap_value = (scrap_df['Stock qty'] * scrap_df['Unit price']).sum()
-            
-            # Calculate Transfer Value
-            transfer_value = (materials_to_transfer['Stock qty'] * materials_to_transfer['Unit price']).sum()
 
             bom_loaded = True
         except Exception as e:
