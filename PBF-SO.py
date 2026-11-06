@@ -17,7 +17,7 @@ st.markdown("Retrieve structured insights, classify inventory status, and assess
 # CHOOSE THE IMPACTED PLANT
 with st.sidebar:
     plant = st.selectbox(
-    "Select the impacted Plant:",
+    " 🚢 Select the impacted Plant:",
     ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
 )
 
