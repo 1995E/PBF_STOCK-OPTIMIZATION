@@ -62,6 +62,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Interested_plant = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
     Interested_plant_unique = Interested_plant.drop_duplicates(subset=['Material n°']).copy()
 
+    # Map storage bin into Interested_plant from the main removed_materials_df (df)
+    storage_bin_mapping = removed_materials_df.drop_duplicates(subset=['Material n°']).set_index('Material n°')['storage bin'].to_dict()
+    Interested_plant['storage bin'] = Interested_plant['Material n°'].map(storage_bin_mapping)
+
     Others_plant = pd_v1_df[pd_v1_df['Plant'] != plant].copy()
     Others_plant_unique = Others_plant.drop_duplicates(subset=['Material n°']).copy()
 
@@ -169,12 +173,23 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Display Dataframe
     if bom_loaded:
         st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
-        st.dataframe(Interested_plant, use_container_width=True)
         
+        # Define layout and ensure storage bin is positioned after Plant column
+        display_columns = [
+            'Material n°', 'Material description', 'Material discipline', 
+            'Plant code', 'Plant', 'storage bin', 'FASD', 'Blocking status', 
+            'MRP Type', 'Stock qty', 'Blocked Stock Qty', 'Safety', 'Min', 
+            'Max', 'Unit price', 'Action', 'Optimization Status'
+        ]
+        existing_display_cols = [col for col in display_columns if col in Interested_plant.columns]
+        Interested_plant_display = Interested_plant[existing_display_cols]
+        
+        st.dataframe(Interested_plant_display, use_container_width=True)
+
         # Export Option for Interested Plant
         buffer_interested = io.BytesIO()
         with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
-            Interested_plant.to_excel(writer, index=False, sheet_name='Interested Plant')
+            Interested_plant_display.to_excel(writer, index=False, sheet_name='Interested Plant')
         st.download_button(
             label="📥 Download Interested Plant Excel",
             data=buffer_interested.getvalue(),
@@ -185,7 +200,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         st.markdown("### 🔄 Materials to be Transferred (Active in other plants, FASD != 'Dead')")
         if not materials_to_transfer.empty:
             st.dataframe(materials_to_transfer, use_container_width=True)
-            
+
             # Export Option for Materials to Transfer
             buffer_transfer = io.BytesIO()
             with pd.ExcelWriter(buffer_transfer, engine='openpyxl') as writer:
