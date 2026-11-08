@@ -180,19 +180,85 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # 3. EXECUTIVE KPI CARDS
     st.markdown("### 📊 Key Performance Metrics")
-    kpi_cols = st.columns(4)
+    kpi_cols = st.columns(5)
 
-    # CARD 1: Portfolio Stock Value & Active Stock Items in same card
+    # Combined Unique & Active Stock Items Card
     with kpi_cols[0]:
         st.markdown(f"""
-            <div class="metric-card" style="border-left-color: #10B981;">
-                <div class="metric-label">Total Portfolio Stock</div>
-                <div class="metric-value">${Total_stock_value:,.0f}</div>
+            <div class="metric-card" style="border-left-color: #1E3A8A;">
+                <div class="metric-label">Material Portfolio Overview</div>
+                <div class="metric-value">{Total_removed_materials:,} <span style="font-size:0.9rem; font-weight:normal; color:#6B7280;">Unique</span></div>
                 <div class="metric-subvalue"><b>{len(pd_v1_unique_materials):,}</b> Active Stock Items</div>
             </div>
         """, unsafe_allow_html=True)
 
-    # CARD 2: Selected Plant Stock Value
-    with kpi_cols[1]:
-        st.markdown(f"""
-            <div class=
+    def render_kpi(col, title, value, color_border="#3B82F6"):
+        with col:
+            st.markdown(f"""
+                <div class="metric-card" style="border-left-color: {color_border};">
+                    <div class="metric-label">{title}</div>
+                    <div class="metric-value">{value}</div>
+                    <div class="metric-subvalue">&nbsp;</div>
+                </div>
+            """, unsafe_allow_html=True)
+
+    render_kpi(kpi_cols[1], "Total Portfolio Stock (USD)", f"${Total_stock_value:,.0f}", "#10B981")
+    render_kpi(kpi_cols[2], f"{plant} Selected Stock Value", f"${Interested_plant_stock_value:,.0f}", "#F59E0B")
+
+    if bom_loaded:
+        render_kpi(kpi_cols[3], f"{plant} Scrap Proposal Value", f"${scrap_value:,.0f}", "#EF4444")
+        render_kpi(kpi_cols[4], "Potential Transfer Savings", f"${transfer_value:,.0f}", "#8B5CF6")
+    else:
+        render_kpi(kpi_cols[3], "Scrap Proposal Value", "N/A (Load BOM)", "#D1D5DB")
+        render_kpi(kpi_cols[4], "Transfer Savings", "N/A (Load BOM)", "#D1D5DB")
+
+    # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
+    tab1, tab2 = st.tabs(["📈 Executive Visualizations", "📋 Detailed Datasets & Actions"])
+
+    
+    with tab2:
+        if bom_loaded:
+            st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
+            # Ensure the specific requested column orders layout is cleanly structured
+            display_columns = [
+                'Material n°', 'Material description', 'Material discipline',
+                'Plant code', 'Plant', 'Storage bin', 'FASD', 'Blocking status',
+                'MRP Type', 'Stock qty', 'Blocked Stock Qty', 'Safety', 'Min',
+                'Max', 'Unit price', 'Action', 'Optimization Status'
+            ]
+            existing_display_cols = [col for col in display_columns if col in Interested_plant.columns]
+            Interested_plant_display = Interested_plant[existing_display_cols]
+            st.dataframe(Interested_plant_display, use_container_width=True)
+
+            # Export Option
+            buffer_interested = io.BytesIO()
+            with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
+                Interested_plant_display.to_excel(writer, index=False, sheet_name='Interested Plant')
+            st.download_button( 
+                label="📥 Download Interested Plant Excel",
+                data=buffer_interested.getvalue(),
+                file_name=f"Interested_Plant_{plant}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+
+            st.markdown("### 🔄 Materials to be Transferred (Active in other plants, FASD != 'Dead')")
+            if not materials_to_transfer.empty:
+                st.dataframe(materials_to_transfer, use_container_width=True)
+
+                # Export Option
+                buffer_transfer = io.BytesIO()
+                with pd.ExcelWriter(buffer_transfer, engine='openpyxl') as writer:
+                    materials_to_transfer.to_excel(writer, index=False, sheet_name='Materials to Transfer')
+                st.download_button(
+                    label="📥 Download Materials to Transfer Excel",
+                    data=buffer_transfer.getvalue(),
+                    file_name=f"Materials_to_Transfer_{plant}.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
+            else:
+                st.info("No matching materials to transfer.")
+        else:
+            st.markdown(f"### 📋 Interested Plant Materials for {plant}")
+            st.dataframe(pd_v1_df, use_container_width=True)
+else:
+    st.info("💡 Please upload both 'Material Overview per Plant' and 'Material Overview per Price' Excel files in the sidebar to get started!")
