@@ -6,7 +6,7 @@ import numpy as np
 import io
 
 st.set_page_config(
-    page_title="PBF STOCK ANALYSE TOO",
+    page_title="PBF STOCK ANALYSE TO",
     layout="wide",
     initial_sidebar_state="expanded"
 )
