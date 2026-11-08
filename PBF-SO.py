@@ -200,7 +200,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         else:
             val_str = "N/A (Load BOM)"
             sub_str = "N/A (Load BOM)"
-
+            
         st.markdown(f"""
             <div class="metric-card" style="border-left-color: #8B5CF6;">
                 <div class="metric-label">Total Savings (Scrap + Transfer)</div>
@@ -359,7 +359,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             buffer_interested = io.BytesIO()
             with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
                 Interested_plant_display.to_excel(writer, index=False, sheet_name='Interested Plant')
-            st.download_button(
+            st.download_button( 
                 label="📥 Download Interested Plant Excel",
                 data=buffer_interested.getvalue(),
                 file_name=f"Interested_Plant_{plant}.xlsx",
