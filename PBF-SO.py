@@ -194,9 +194,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi_cols[1]:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #10B981;\">
-                <div class=\"metric-label\">Portfolio Overview</div>
+                <div class=\"metric-label\">Total Stock Value</div>
                 <div class=\"metric-value\">${Total_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> Active Stock Items</div>
+                <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> Stock Materials</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -204,9 +204,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi_cols[2]:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #F59E0B;\">
-                <div class=\"metric-label\">{plant} Selected Stock Value</div>
+                <div class=\"metric-label\">{plant} Stock Value</div>
                 <div class=\"metric-value\">${Interested_plant_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\">Selected Plant Stock</div>
+                <div class=\"metric-subvalue\">Stock Value in the impacted plant</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -228,9 +228,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
         scrap_val_str = f"${scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #EF4444;\">
-                <div class=\"metric-label\">Scrap Proposal Value</div>
+                <div class=\"metric-label\">Potential scrapping for {plant}</div>
                 <div class=\"metric-value\">{scrap_val_str}</div>
-                <div class=\"metric-subvalue\">&nbsp;</div>
+                <div class=\"metric-subvalue\">impacted plant</div>
             </div>
         """, unsafe_allow_html=True)
 
