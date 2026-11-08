@@ -185,9 +185,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi_cols[0]:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #1E3A8A;\">
-                <div class=\"metric-label\">Total Material Removed</div>
+                <div class=\"metric-label\">Total Material Assessed</div>
                 <div class=\"metric-value\">{Total_removed_materials:,}</div>
-                <div class=\"metric-subvalue\">Unique Materials</div>
             </div>
         """, unsafe_allow_html=True)
 
