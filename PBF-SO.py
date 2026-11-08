@@ -178,7 +178,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         Interested_plant['Calculated Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
 
     # 3. EXECUTIVE KPI CARDS
-    st.markdown("### 📊 Key Performance Metrics")
+    #st.markdown("### 📊 Key Performance Metrics")
     kpi_cols = st.columns(5)
 
     # Card 1: Total material removed in one card
@@ -206,7 +206,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             <div class=\"metric-card\" style=\"border-left-color: #F59E0B;\">
                 <div class=\"metric-label\">{plant} Stock Value</div>
                 <div class=\"metric-value\">${Interested_plant_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\">Stock Value in the impacted plant</div>
+                <div class=\"metric-subvalue\">Stock Value in the Impacted Plant</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -228,9 +228,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
         scrap_val_str = f"${scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #EF4444;\">
-                <div class=\"metric-label\">Potential scrapping for {plant}</div>
+                <div class=\"metric-label\">Potential scrapping value for {plant}</div>
                 <div class=\"metric-value\">{scrap_val_str}</div>
-                <div class=\"metric-subvalue\">impacted plant</div>
+                <div class=\"metric-subvalue\">Impacted Plant</div>
             </div>
         """, unsafe_allow_html=True)
 
