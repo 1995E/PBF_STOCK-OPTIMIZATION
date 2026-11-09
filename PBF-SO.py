@@ -219,7 +219,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #8B5CF6;\">
                 <div class=\"metric-label\">{plant} Potential Value for Scrapping</div>
-                <div class=\"metric-value\">{val_str}</div>
+                <div class=\"metric-value\">{scrap_val_str</div>
                 <div class=\"metric-subvalue\">{sub_str}</div>
             </div>
         """, unsafe_allow_html=True)
