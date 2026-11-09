@@ -289,7 +289,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 st.plotly_chart(bar_fig, use_container_width=True)
 
             with col_right:
-                st.markdown("##### 📈 Category-wise Scrap Stock Value Analysis")
+                st.markdown("##### 📈 Stock Value per FASD Status")
 
                 # Horizontal bar chart with scrap_df FASD Category (sorted for highest stock value)
                 if not scrap_df.empty:
@@ -306,11 +306,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         text_auto='.2s'
                     )
                     fasd_bar_fig.update_layout(
-                        yaxis_title="FASD Category",
                         xaxis_title="Stock Value ($)",
                         margin=dict(t=10, b=10, l=10, r=10)
                     )
-                    st.plotly_chart(fasd_bar_fig, use_container_width=True)
+                    st.plotly_chart(fasd_bar_fig, use_container_width=False)
                 else:
                     st.info("No data available in scrap_df for FASD Category analysis.")
 
