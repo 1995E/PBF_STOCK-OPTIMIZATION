@@ -250,18 +250,18 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
                 # Stacked Bar Data: Selected plant and other plants are segments of the "Plant Stock Value Comparison" bar
                 bar_data = [
-                    {"Category": "Total Stock Value", "Type": "Total Stock Value", "Value": Total_stock_value},
+                    {"Category": "Total Stock Value", "Type": "All plant", "Value": Total_stock_value},
                     {"Category": "Stock Distribution", "Type": f"{plant}", "Value": Interested_plant_stock_value},
-                    {"Category": "Stock Distribution", "Type": "Others Plant", "Value": Others_plant_stock_value},
-                    {"Category": f"{plant} Scrap Result", "Type": f"{plant} Potential Value for Scrapping", "Value": scrap_value},
-                    {"Category": f"{plant} Scrap Result", "Type": "Transferred Value", "Value": transfer_value}
+                    {"Category": "Stock Distribution", "Type": "Others plant", "Value": Others_plant_stock_value},
+                    {"Category": f"{plant} Scrap Result", "Type": f"{plant} Potential value for scrapping", "Value": scrap_value},
+                    {"Category": f"{plant} Scrap Result", "Type": "Transferred value", "Value": transfer_value}
                 ]
                 bar_df = pd.DataFrame(bar_data)
 
                 # Explicitly define Category order so that 'Total Stock' is top, 'Stock Distribution' is middle, and '{plant} Scrap Result' is at the bottom.
                 # Plotly orientation='h' renders categories from the bottom-up of the array list.
                 # Thus, we put Scrap Result first in the array, followed by Stock Distribution, and Total Stock last.
-                sorted_cats = ["Total Stock", "Stock Distribution", f"{plant} Scrap Result"]
+                sorted_cats = ["Total Stock Value", "Stock Distribution", f"{plant} Scrap Result"]
 
                 bar_fig = px.bar(
                     bar_df,
