@@ -214,7 +214,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Card 4: Sum of (scrap proposal value + potential transfer saving) and potential transfer saving in the same card
     with kpi_cols[3]:
         total_savings = scrap_value + transfer_value if bom_loaded else 0.0
-        val_str = f"${total_savings:,.0f}" if bom_loaded else "N/A (Load BOM)"
+        scrap_val_str = f"${total_savings:,.0f}" if bom_loaded else "N/A (Load BOM)"
         sub_str = f"<b>${transfer_value:,.0f}</b> Stock value to be transferred" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #8B5CF6;\">
