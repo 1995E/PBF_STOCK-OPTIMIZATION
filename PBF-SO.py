@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # Modern Custom CSS Styling
-st.markdown(""" 
+st.markdown("""
     <style>
         .main-header {
             font-size: 2.2rem;
@@ -248,7 +248,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
             with col_left:
                 st.markdown("##### 📊 Stock Allocation Overview")
-                
+
                 # Stacked Bar Data: Selected plant and other plants are segments of the "Plant Stock Value Comparison" bar
                 bar_data = [
                     {"Category": "Total Stock", "Type": "Total Value", "Value": Total_stock_value},
@@ -259,8 +259,16 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 ]
                 bar_df = pd.DataFrame(bar_data)
 
-                # Layout Category Sorting order
-                sorted_cats = ["Total Portfolio Stock", "Plant-wise Distribution", f"{plant} Optimization"]
+                # Layout Category Sorting order dynamically based on maximum value of each category
+                # Categories to sort: 'Total Stock' (Total_stock_value), 'Stock Distribution' (Total_stock_value), '{plant} Scrap Result' (scrap_value + transfer_value)
+                cat_totals = {
+                    "Total Stock": Total_stock_value,
+                    "Stock Distribution": Total_stock_value,
+                    f"{plant} Scrap Result": scrap_value + transfer_value
+                }
+                # Sort descending (highest value first). Plotly orientation='h' draws categories from bottom-up of y-axis list,
+                # so to get the highest category on top, we reverse the list when supplying to category_orders.
+                sorted_cats = sorted(cat_totals, key=cat_totals.get, reverse=True)
 
                 bar_fig = px.bar(
                     bar_df,
@@ -268,13 +276,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     x="Value",
                     color="Type",
                     orientation='h',
-                    category_orders={"Category": sorted_cats[::]},
+                    category_orders={"Category": sorted_cats[::-1]},
                     color_discrete_map={
-                        "Total Value": "#1E3A5F",                  # Forest Emerald Green
-                        f"{plant} Stock Value": "#2563EB",          # Corporate Navy Blue
-                        "Others Plant Stock Value": "#94A3B8",      # Clean Steel Muted Gray
-                        "Potential Value for Scrapping": "#D97706", # Vibrant Danger Red
-                        "Transferred Value": "#059669"              # Professional Amber/Orange
+                        "Total Value": "#1E3A8A",                          # Deep Executive Navy
+                        f"{plant}": "#3B82F6",                             # Royal Blue
+                        "Others Plant": "#64748B",                         # Professional Slate Muted Gray
+                        f"{plant} Potential Value for Scrapping": "#EF4444",# Premium Warning Red
+                        "Transferred Value": "#F59E0B"                     # Accent Amber Orange
                     }
                 )
                 bar_fig.update_layout(
@@ -300,7 +308,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         y='FASD',
                         x='Stock Value',
                         orientation='h',
-                        color_discrete_sequence=['#7280a6'],
+                        color_discrete_sequence=['#1E3A8A'],
                         text_auto='.2s'
                     )
                     fasd_bar_fig.update_layout(
