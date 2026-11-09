@@ -276,7 +276,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     x="Value",
                     color="Type",
                     orientation='h',
-                    category_orders={"Category": sorted_cats[::1]},
+                    #category_orders={"Category": sorted_cats[::1]},
                     color_discrete_map={
                         "Total Value": "#1E3A8A",                          # Deep Executive Navy
                         f"{plant}": "#3B82F6",                             # Royal Blue
