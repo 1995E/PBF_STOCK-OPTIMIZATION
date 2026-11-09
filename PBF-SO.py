@@ -271,11 +271,11 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     orientation='h',
                     category_orders={"Category": sorted_cats},
                     color_discrete_map={
-                        "Total Value": "#1E3A8A",                          # Deep Executive Navy
-                        f"{plant}": "#3B82F6",                             # Royal Blue
-                        "Others Plant": "#64748B",                         # Professional Slate Muted Gray
-                        f"{plant} Potential Value for Scrapping": "#EF4444",# Premium Warning Red
-                        "Transferred Value": "#F59E0B"                     # Accent Amber Orange
+                        "Total Value": "#1E3A5F",                          # Deep Executive Navy
+                        f"{plant}": "#2563EB",                             # Royal Blue
+                        "Others Plant": "#94A3B8",                         # Professional Slate Muted Gray
+                        f"{plant} Potential Value for Scrapping": "#D97706",# Premium Warning Red
+                        "Transferred Value": "#059669"                     # Accent Amber Orange
                     }
                 )
                 bar_fig.update_layout(
