@@ -19,7 +19,7 @@ with st.sidebar:
     progress_color = st.selectbox(
         "Progress Bar Color Theme",
         options=["Blue", "Green", "Orange", "Red"]
-    #)
+    )
     # Row Spacing Customization
     #row_spacing = st.slider("Adjust Spacing Between Rows (px)", min_value=10, max_value=120, value=40, step=5)
 
