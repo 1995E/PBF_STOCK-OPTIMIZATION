@@ -241,7 +241,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown("---")
 
             # --------------------------- EXECUTIVE DASHBOARD ROW ---------------------------
-            st.markdown("### 🏢 Executive Portfolio Performance Dashboard")
 
             # Single horizontal row: Left Column for Allocation Comparison, Right Column for FASD Analysis
             col_left, col_right = st.columns([1.0, 1.0])
@@ -251,7 +250,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
                 # Stacked Bar Data: Selected plant and other plants are segments of the "Plant Stock Value Comparison" bar
                 bar_data = [
-                    {"Category": "Total Stock", "Type": "Total Value", "Value": Total_stock_value},
+                    {"Category": "Total Stock Value", "Value": Total_stock_value},
                     {"Category": "Stock Distribution", "Type": f"{plant}", "Value": Interested_plant_stock_value},
                     {"Category": "Stock Distribution", "Type": "Others Plant", "Value": Others_plant_stock_value},
                     {"Category": f"{plant} Scrap Result", "Type": f"{plant} Potential Value for Scrapping", "Value": scrap_value},
@@ -311,7 +310,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     )
                     st.plotly_chart(fasd_bar_fig, use_container_width=True)
                 else:
-                    st.info("No data available in scrap_df for FASD Category analysis.")
+                    st.info("No data available.")
 
             st.markdown("---")
         else:
