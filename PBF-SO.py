@@ -20,8 +20,6 @@ with st.sidebar:
         "Progress Bar Color Theme",
         options=["Blue", "Green", "Orange", "Red"]
     )
-    # Row Spacing Customization
-    #row_spacing = st.slider("Adjust Spacing Between Rows (px)", min_value=10, max_value=120, value=40, step=5)
 
 # Modern Custom CSS Styling with Dynamic Spacing
 progress_hex = {"Blue": "#3B82F6", "Green": "#10B981", "Orange": "#F59E0B", "Red": "#EF4444"}[progress_color]
