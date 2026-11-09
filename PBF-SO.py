@@ -291,7 +291,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     yaxis_title=None,
                     xaxis_title="Value ($)",
                     margin=dict(t=10, b=10, l=10, r=10),
-                    legend=dict(orientation="h", y=-0.25, xanchor="center", x=0.5)
+                    legend=dict(orientation="h", y=-0.25, xanchor="left", x=0.5)
                 )
                 st.plotly_chart(bar_fig, use_container_width=True)
 
