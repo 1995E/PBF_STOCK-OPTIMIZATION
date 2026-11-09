@@ -251,10 +251,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 
                 # Stacked Bar Data: Selected plant and other plants are segments of the "Plant Stock Value Comparison" bar
                 bar_data = [
-                    {"Category": "Total Portfolio Stock", "Type": "Total Value", "Value": Total_stock_value},
+                    {"Category": "Total Stock", "Type": "Total Value", "Value": Total_stock_value},
                     {"Category": "Stock Distribution", "Type": f"{plant}", "Value": Interested_plant_stock_value},
                     {"Category": "Stock Distribution", "Type": "Others Plant", "Value": Others_plant_stock_value},
-                    {"Category": f"{plant} Scrap Result", "Type": "{plant} Potential Value for Scrapping", "Value": scrap_value},
+                    {"Category": f"{plant} Scrap Result", "Type": f"{plant} Potential Value for Scrapping", "Value": scrap_value},
                     {"Category": f"{plant} Scrap Result", "Type": "Transferred Value", "Value": transfer_value}
                 ]
                 bar_df = pd.DataFrame(bar_data)
@@ -268,7 +268,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     x="Value",
                     color="Type",
                     orientation='h',
-                    category_orders={"Category": sorted_cats[::-1]},
+                    category_orders={"Category": sorted_cats[::1]},
                     color_discrete_map={
                         "Total Value": "#1E3A5F",                  # Forest Emerald Green
                         f"{plant} Stock Value": "#2563EB",          # Corporate Navy Blue
