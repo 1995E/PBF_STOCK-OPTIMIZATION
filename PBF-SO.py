@@ -233,7 +233,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with tab1:
         if bom_loaded:
             # --------------------------- KPI PROGRESS BAR ---------------------------
-            st.markdown(f"### 📊 {custom_progress_title if custom_progress_title else 'Progress'}")
+            st.markdown(f"### 📊 {plant} Stock Value vs Scrapping Potential")
             if Interested_plant_stock_value > 0:
                 scrap_percentage = min(100.0, max(0.0, (scrap_value / Interested_plant_stock_value) * 100))
                 st.progress(scrap_percentage / 100.0)
