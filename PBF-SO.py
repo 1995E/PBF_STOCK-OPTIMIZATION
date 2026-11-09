@@ -15,7 +15,7 @@ st.set_page_config(
 st.markdown("""
     <style> 
         .main-header {
-            font-size: 2.2rem;
+            font-size: 2.9rem;
             color: #1E3A8A;
             font-weight: 700;
             margin-bottom: 2.5rem;
