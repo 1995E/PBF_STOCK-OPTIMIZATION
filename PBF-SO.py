@@ -243,7 +243,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
             
             # --------------------------- KPI PROGRESS BAR ---------------------------
-            st.markdown(f"### 📊 {plant} Stock Value vs Scrapping Potential")
+            st.markdown(f"### {plant} STOC vs POTENTIAL SCRAPPING VALUE")
             if Interested_plant_stock_value > 0:
                 scrap_percentage = min(100.0, max(0.0, (scrap_value / Interested_plant_stock_value) * 100))
                 st.progress(scrap_percentage / 100.0)
@@ -258,7 +258,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             col_left, col_right = st.columns([1.0, 1.0])
 
             with col_left:
-                st.markdown("##### 📊 STOCK DISTRIBUTION OVERVIEW")
+                st.markdown("##### STOCK DISTRIBUTION OVERVIEW")
 
                 # Stacked Bar Data in requested display order
                 bar_data = [
@@ -296,7 +296,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 st.plotly_chart(bar_fig, use_container_width=True)
 
             with col_right:
-                st.markdown("##### 📈 STOCK VALUE PER FASD STATUS")
+                st.markdown("##### STOCK VALUE PER FASD STATUS")
 
                 if not scrap_df.empty:
                     scrap_df['Stock Value'] = scrap_df['Stock qty'] * scrap_df['Unit price'].fillna(0)
