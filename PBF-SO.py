@@ -207,7 +207,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             <div class=\"metric-card\" style=\"border-left-color: #F59E0B;\">
                 <div class=\"metric-label\">{plant} Stock Value</div>
                 <div class=\"metric-value\">${Interested_plant_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\">Stock Value in the Impacted Plant</div>
+                <div class=\"metric-subvalue\">{Interested_plant_stock_value-val_str} Reduction after BOM analyse</div>
             </div>
         """, unsafe_allow_html=True)
 
