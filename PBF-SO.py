@@ -16,13 +16,12 @@ st.markdown(f"""
         .main-header {{
             font-size: 2.2rem;
             color: #1E3A8A;
-            font-weight: 900;
+            font-weight: 500;
             margin-bottom: 2rem;
         }}
         .section-gap {{
             margin-top: 50px;
             margin-bottom: 50px;
-            font-weight: 500;
         }}
         .kpi-gap {{
             margin-top: 50px;
@@ -245,7 +244,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
             
             # --------------------------- KPI PROGRESS BAR ---------------------------
-            st.markdown(f"### {plant} STOC vs POTENTIAL SCRAPPING VALUE")
+            st.markdown(f"### {plant} STOCK vs POTENTIAL SCRAPPING VALUE")
             if Interested_plant_stock_value > 0:
                 scrap_percentage = min(100.0, max(0.0, (scrap_value / Interested_plant_stock_value) * 100))
                 st.progress(scrap_percentage / 100.0)
