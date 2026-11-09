@@ -12,10 +12,10 @@ st.set_page_config(
 )
 
 # --- SIDEBAR: LAYOUT & VISUALS CUSTOMIZATION ---
-#with st.sidebar:
-    #st.markdown("### 🎨 Dashboard Customization")
+with st.sidebar:
+    st.markdown("### 🎨 Dashboard Customization")
     # Progress Bar Customization
-    #custom_progress_title = st.text_input("KPI Progress Bar Title", value="Stock Value vs Scrapping Potential")
+    custom_progress_title = st.text_input("KPI Progress Bar Title", value="Stock Value vs Scrapping Potential")
     progress_color = st.selectbox(
         "Progress Bar Color Theme",
         options=["Blue", "Green", "Orange", "Red"]
