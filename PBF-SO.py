@@ -244,7 +244,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown("### 🏢 Executive Portfolio Performance Dashboard")
 
             # Single horizontal row: Left Column for Allocation Comparison, Right Column for FASD Analysis
-            col_left, col_right = st.columns([1.0, 1.0, 1.0])
+            col_left, col_right = st.columns([1.0, 1.0])
 
             with col_left:
                 st.markdown("##### 📊 Stock Allocation Overview")
