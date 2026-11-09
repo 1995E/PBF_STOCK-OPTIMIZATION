@@ -38,13 +38,13 @@ st.markdown("""
             font-size: 0.85rem;
             color: #6B7280;
             text-transform: uppercase;
-            font-weight: 900;
+            font-weight: 600;
             letter-spacing: 0.5px;
         }
         .metric-value {
             font-size: 1.6rem;
             color: #111827;
-            font-weight: 700;
+            font-weight: 900;
             margin-top: 0.2rem;
         }
         .metric-subvalue {
