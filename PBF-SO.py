@@ -24,8 +24,8 @@ st.markdown(f"""
             margin-bottom: 50px;
         }}
         .kpi-gap {{
-            margin-top: 80px;
-            margin-bottom: 80px;
+            margin-top: 50px;
+            margin-bottom: 50px;
         }}
         .metric-card {{
             background-color: #F8FAFC;
@@ -241,7 +241,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         if bom_loaded:
             # Increased spacing between EXECUTIVE TABS and KPI PROGRESS BAR
             st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
-
+            
             # --------------------------- KPI PROGRESS BAR ---------------------------
             st.markdown(f"### 📊 {plant} Stock Value vs Scrapping Potential")
             if Interested_plant_stock_value > 0:
