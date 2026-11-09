@@ -218,7 +218,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         sub_str = f"<b>${transfer_value:,.0f}</b> Potential Transfer Savings" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #8B5CF6;\">
-                <div class=\"metric-label\">{plant} Gross Scrapping value</div>
+                <div class=\"metric-label\">{plant} Potential Value for Scrapping</div>
                 <div class=\"metric-value\">{val_str}</div>
                 <div class=\"metric-subvalue\">{sub_str}</div>
             </div>
