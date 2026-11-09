@@ -232,7 +232,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     with tab2:
         if bom_loaded:
-            st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
+            st.markdown(f"### 📋 Interested Plant Materials for {plant}")
             display_columns = [
                 'Material n°', 'Material description', 'Material discipline',
                 'Plant code', 'Plant', 'Storage bin', 'FASD', 'Blocking status',
@@ -254,7 +254,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-            st.markdown("### 🔄 Materials to be Transferred (Active in other plants, FASD != 'Dead')")
+            st.markdown("### 🔄 Materials to be Transferred")
             if not materials_to_transfer.empty:
                 st.dataframe(materials_to_transfer, use_container_width=True)
 
