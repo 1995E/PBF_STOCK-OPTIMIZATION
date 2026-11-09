@@ -298,6 +298,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
                     fasd_bar_fig = px.bar(
                         fasd_df,
+                        y='FASD',
                         x='Stock Value',
                         orientation='h',
                         color_discrete_sequence=['#1E3A8A'],
