@@ -244,7 +244,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown("### 🏢 Executive Portfolio Performance Dashboard")
 
             # Single horizontal row: Left Column for Allocation Comparison, Right Column for FASD Analysis
-            col_left, col_right = st.columns([1.0, 1.0])
+            col_left, col_right = st.columns([1.0, 1.0, 1.0]
 
             with col_left:
                 st.markdown("##### 📊 Stock Allocation Overview")
@@ -262,7 +262,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # Explicitly define Category order so that 'Total Stock' is top, 'Stock Distribution' is middle, and '{plant} Scrap Result' is at the bottom.
                 # Plotly orientation='h' renders categories from the bottom-up of the array list.
                 # Thus, we put Scrap Result first in the array, followed by Stock Distribution, and Total Stock last.
-                sorted_cats = [f"{plant} Scrap Result", "Stock Distribution", "Total Stock"]
+                sorted_cats = ["Total Stock", "Stock Distribution", f"{plant} Scrap Result"]
 
                 bar_fig = px.bar(
                     bar_df,
