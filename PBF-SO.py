@@ -213,8 +213,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # Card 4: Sum of (scrap proposal value + potential transfer saving) and potential transfer saving in the same card
     with kpi_cols[3]:
-        total_savings = scrap_value + transfer_value if bom_loaded else 0.0
-        scrap_val_str = f"${total_savings:,.0f}" if bom_loaded else "N/A (Load BOM)"
+        #total_savings = scrap_value + transfer_value if bom_loaded else 0.0
+        scrap_val_str = f"${ scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
         sub_str = f"<b>${transfer_value:,.0f}</b> Stock value to be transferred" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #8B5CF6;\">
@@ -224,16 +224,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
             </div>
         """, unsafe_allow_html=True)
 
-    # Card 5: Scrap proposal value as the last card
-    with kpi_cols[4]:
-        scrap_val_str = f"${scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
-        st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #EF4444;\">
-                <div class=\"metric-label\">{plant} Net Scrapping Value</div>
-                <div class=\"metric-value\">{scrap_val_str}</div>
-                <div class=\"metric-subvalue\">Impacted Plant</div>
-            </div>
-        """, unsafe_allow_html=True)
 
     # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
     tab1, tab2 = st.tabs(["📈 Executive Visualizations", "📋 Detailed Datasets & Actions"])
