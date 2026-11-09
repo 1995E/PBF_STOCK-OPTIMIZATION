@@ -309,7 +309,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         xaxis_title="Stock Value ($)",
                         margin=dict(t=10, b=10, l=10, r=10)
                     )
-                    st.plotly_chart(fasd_bar_fig, use_container_width=False)
+                    st.plotly_chart(fasd_bar_fig, use_container_width=True)
                 else:
                     st.info("No data available in scrap_df for FASD Category analysis.")
 
@@ -328,7 +328,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             ]
             existing_display_cols = [col for col in display_columns if col in Interested_plant.columns]
             Interested_plant_display = Interested_plant[existing_display_cols]
-            st.dataframe(Interested_plant_display, use_container_width=True)
+            st.dataframe(Interested_plant_display, use_container_width=False)
 
             # Export Option
             buffer_interested = io.BytesIO()
