@@ -266,7 +266,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     {"Category": "Stock Distribution", "Type": f"{plant}", "Value": Interested_plant_stock_value},
                     {"Category": "Stock Distribution", "Type": "Others plant", "Value": Others_plant_stock_value},
                     {"Category": f"{plant} Scrap Result", "Type": f"{plant} Potential value for scrapping", "Value": scrap_value},
-                    {"Category": f" {plant} Scrap Result", "Type": "Transferred value", "Value": transfer_value}
+                    {"Category": f"{plant} Scrap Result", "Type": "Transferred value", "Value": transfer_value}
                 ]
                 bar_df = pd.DataFrame(bar_data)
                 sorted_cats = ["Total Stock Value", "Stock Distribution", f"{plant} Scrap Result"]
