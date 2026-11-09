@@ -6,7 +6,7 @@ import numpy as np
 import io
 
 st.set_page_config(
-    page_title="PBF STOCK ANALYSE TOOL",
+    page_title="PBF Stock Analyse Tool",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -18,7 +18,7 @@ st.markdown("""
             font-size: 2.2rem;
             color: #1E3A8A;
             font-weight: 700;
-            margin-bottom: 2.5rem;
+            margin-bottom: 0.2rem;
         }
         .sub-header {
             font-size: 1.1rem;
@@ -55,8 +55,9 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Modern Title
-st.markdown("<div class=\"main-header\"> PBF STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
+# Modern Title and Subheader
+st.markdown("<div class=\"main-header\"> PBF Stock Analyse Tool</div>", unsafe_allow_html=True)
+#st.markdown("<div class=\"sub-header\">High-level executive inventory analysis, dead stock valuation, and material transfer optimization dashboard.</div>", unsafe_allow_html=True)
 
 # CHOOSE THE IMPACTED PLANT IN SIDEBAR
 with st.sidebar:
@@ -108,14 +109,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     Total_stock_value = (stock_greater_zero['Stock qty'] *  stock_greater_zero['Unit price']).sum()
     Interested_plant_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
-    Others_plant_stock_value = Total_stock_value - Interested_plant_stock_value
 
     # UPDATE INTERESTED PLANT DATAFRAME WITH ACTION COLUMN FROM IMPACTED BOM BEFORE DISPLAYING KPIs
     scrap_value = 0.0
     transfer_value = 0.0
     bom_loaded = False
     materials_to_transfer = pd.DataFrame()
-    scrap_df = pd.DataFrame()
 
     if Bom_template is not None:
         try:
@@ -168,7 +167,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 materials_to_transfer = pd.DataFrame()
                 transfer_value = 0.0
 
-            scrap_df = Interested_plant[Interested_plant['Action'] == 'Scrap analyse'].copy()
+            scrap_df = Interested_plant[Interested_plant['Action'] == 'Scrap analyse']
             scrap_value = (scrap_df['Stock qty'] * scrap_df['Unit price']).sum()
 
             bom_loaded = True
@@ -180,64 +179,47 @@ if uploaded_materials is not None and uploaded_prices is not None:
         Interested_plant['Calculated Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
 
     # 3. EXECUTIVE KPI CARDS
+    st.markdown("### 📊 Key Performance Metrics")
     kpi_cols = st.columns(5)
 
-    # Card 1: Total material removed in one card
+    # Combined Unique & Active Stock Items Card
     with kpi_cols[0]:
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #1E3A8A;\">
-                <div class=\"metric-label\">Total Material Assessed</div>
-                <div class=\"metric-value\">{Total_removed_materials:,}</div>
+            <div class="metric-card" style="border-left-color: #1E3A8A;">
+                <div class="metric-label">Material Portfolio Overview</div>
+                <div class="metric-value">{Total_removed_materials:,} <span style="font-size:0.9rem; font-weight:normal; color:#6B7280;">Unique</span></div>
+                <div class="metric-subvalue"><b>{len(pd_v1_unique_materials):,}</b> Active Stock Items</div>
             </div>
         """, unsafe_allow_html=True)
 
-    # Card 2: Show active stock item and total portfolio stock in the same card
-    with kpi_cols[1]:
-        st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #10B981;\">
-                <div class=\"metric-label\">Total Stock Value</div>
-                <div class=\"metric-value\">${Total_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> Stock Materials</div>
-            </div>
-        """, unsafe_allow_html=True)
+    def render_kpi(col, title, value, color_border="#3B82F6"):
+        with col:
+            st.markdown(f"""
+                <div class="metric-card" style="border-left-color: {color_border};">
+                    <div class="metric-label">{title}</div>
+                    <div class="metric-value">{value}</div>
+                    <div class="metric-subvalue">&nbsp;</div>
+                </div>
+            """, unsafe_allow_html=True)
 
-    # Card 3: Selected plant stock value (e.g. DALIA / GIRASSOL)
-    with kpi_cols[2]:
-        st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #F59E0B;\">
-                <div class=\"metric-label\">{plant} Stock Value</div>
-                <div class=\"metric-value\">${Interested_plant_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\">Stock Value in the Impacted Plant</div>
-            </div>
-        """, unsafe_allow_html=True)
+    render_kpi(kpi_cols[1], "Total Portfolio Stock (USD)", f"${Total_stock_value:,.0f}", "#10B981")
+    render_kpi(kpi_cols[2], f"{plant} Selected Stock Value", f"${Interested_plant_stock_value:,.0f}", "#F59E0B")
 
-    # Card 4: Sum of (scrap proposal value + potential transfer saving) and potential transfer saving in the same card
-    with kpi_cols[3]:
-        total_savings = scrap_value + transfer_value if bom_loaded else 0.0
-        val_str = f"${total_savings:,.0f}" if bom_loaded else "N/A (Load BOM)"
-        sub_str = f"<b>${transfer_value:,.0f}</b> Potential Transfer Savings" if bom_loaded else "N/A (Load BOM)"
-        st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #8B5CF6;\">
-                <div class=\"metric-label\">Total Savings (Scrap + Transfer)</div>
-                <div class=\"metric-value\">{val_str}</div>
-                <div class=\"metric-subvalue\">{sub_str}</div>
-            </div>
-        """, unsafe_allow_html=True)
+    if bom_loaded:
+        render_kpi(kpi_cols[3], f"{plant} Scrap Proposal Value", f"${scrap_value:,.0f}", "#EF4444")
+        render_kpi(kpi_cols[4], "Potential Transfer Savings", f"${transfer_value:,.0f}", "#8B5CF6")
+    else:
+        render_kpi(kpi_cols[3], "Scrap Proposal Value", "N/A (Load BOM)", "#D1D5DB")
+        render_kpi(kpi_cols[4], "Transfer Savings", "N/A (Load BOM)", "#D1D5DB")
 
-    # Card 5: Scrap proposal value as the last card
-    with kpi_cols[4]:
-        scrap_val_str = f"${scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
-        st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #EF4444;\">
-                <div class=\"metric-label\">Potential scrapping value for {plant}</div>
-                <div class=\"metric-value\">{scrap_val_str}</div>
-                <div class=\"metric-subvalue\">Impacted Plant</div>
-            </div>
-        """, unsafe_allow_html=True)
+    # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
+    tab1, tab2 = st.tabs(["📈 Executive Visualizations", "📋 Detailed Datasets & Actions"])
 
+    
     with tab2:
         if bom_loaded:
             st.markdown(f"### 📋 Interested Plant Materials for {plant} (with Actions & Optimization Rules)")
+            # Ensure the specific requested column orders layout is cleanly structured
             display_columns = [
                 'Material n°', 'Material description', 'Material discipline',
                 'Plant code', 'Plant', 'Storage bin', 'FASD', 'Blocking status',
@@ -252,7 +234,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             buffer_interested = io.BytesIO()
             with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
                 Interested_plant_display.to_excel(writer, index=False, sheet_name='Interested Plant')
-            st.download_button(
+            st.download_button( 
                 label="📥 Download Interested Plant Excel",
                 data=buffer_interested.getvalue(),
                 file_name=f"Interested_Plant_{plant}.xlsx",
