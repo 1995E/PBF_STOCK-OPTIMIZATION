@@ -235,7 +235,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
     st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
-    tab1, tab2 = st.tabs([" CHART", " DETAILED DATASET"])
+    tab1, tab2 = st.tabs([" DISPLAY CHART", " DETAILED DATASET"])
 
     with tab1:
         if bom_loaded:
@@ -334,7 +334,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             ]
             existing_display_cols = [col for col in display_columns if col in Interested_plant.columns]
             Interested_plant_display = Interested_plant[existing_display_cols]
-            st.dataframe(Interested_plant_display, use_container_width=False)
+            st.dataframe(Interested_plant_display, use_container_width=True)
 
             # Export Option
             buffer_interested = io.BytesIO()
