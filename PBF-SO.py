@@ -11,6 +11,33 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# CHOOSE THE IMPACTED PLANT IN SIDEBAR
+with st.sidebar:
+    st.markdown("### 🚢 Plant Selection")
+    plant = st.selectbox(
+        "Select the impacted Plant:",
+        ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
+    )
+
+    st.markdown("### 🎨 Font Customization")
+    # Allow custom font size for the progress bar title
+    kpi_title_font_size = st.slider(
+        "KPI Progress Bar Title Font Size (rem)",
+        min_value=1.0,
+        max_value=3.5,
+        value=1.75,
+        step=0.1
+    )
+
+# 1. FILE UPLOADERS IN SIDEBAR
+with st.sidebar:
+    st.header("📂 Data Source Configuration")
+    uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
+    uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
+    st.markdown("---")
+    Bom_template = st.file_uploader("Impacted Bom (Excel)", type=["xlsx"])
+    st.markdown("---")
+
 st.markdown(f"""
     <style>
         .main-header {{
@@ -26,7 +53,11 @@ st.markdown(f"""
         .kpi-gap {{
             margin-top: 50px;
             margin-bottom: 50px;
-
+        }}
+        .kpi-title {{
+            font-size: {kpi_title_font_size}rem !important;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
         }}
         .metric-card {{
             background-color: #F8FAFC;
@@ -47,7 +78,7 @@ st.markdown(f"""
             font-weight: 700;
             letter-spacing: 0.75px;
         }}
-        .metric-value {{ 
+        .metric-value {{
             font-size: 1.75rem;
             color: #0F172A;
             font-weight: 800;
@@ -67,23 +98,6 @@ st.markdown(f"""
 
 # Modern Title
 st.markdown("<div class=\"main-header\"> PBF STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
-
-# CHOOSE THE IMPACTED PLANT IN SIDEBAR
-with st.sidebar:
-    st.markdown("### 🚢 Plant Selection")
-    plant = st.selectbox(
-        "Select the impacted Plant:",
-        ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
-    )
-
-# 1. FILE UPLOADERS IN SIDEBAR
-with st.sidebar:
-    st.header("📂 Data Source Configuration")
-    uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
-    uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
-    st.markdown("---")
-    Bom_template = st.file_uploader("Impacted Bom (Excel)", type=["xlsx"])
-    st.markdown("---")
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
@@ -242,9 +256,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
         if bom_loaded:
             # Increased spacing between EXECUTIVE TABS and KPI PROGRESS BAR
             st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
-            
+
             # --------------------------- KPI PROGRESS BAR ---------------------------
-            st.markdown(f"### {plant} STOCK vs POTENTIAL SCRAPPING VALUE")
+            st.markdown(f"<div class=\"kpi-title\">{plant} STOCK vs POTENTIAL SCRAPPING VALUE</div>", unsafe_allow_html=True)
             if Interested_plant_stock_value > 0:
                 scrap_percentage = min(100.0, max(0.0, (scrap_value / Interested_plant_stock_value) * 100))
                 st.progress(scrap_percentage / 100.0)
