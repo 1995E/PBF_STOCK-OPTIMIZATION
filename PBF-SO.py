@@ -15,7 +15,7 @@ st.set_page_config(
 st.markdown("""
     <style> 
         .main-header {
-            font-size: 2.9rem;
+            font-size: 2.2rem;
             color: #1E3A8A;
             font-weight: 700;
             margin-bottom: 2.5rem;
@@ -180,7 +180,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         Interested_plant['Calculated Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
 
     # 3. EXECUTIVE KPI CARDS
-    kpi_cols = st.columns(5)
+    kpi_cols = st.columns(4)
 
     # Card 1: Total material removed in one card
     with kpi_cols[0]:
