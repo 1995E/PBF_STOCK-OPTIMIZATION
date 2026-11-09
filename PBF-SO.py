@@ -252,7 +252,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             if Interested_plant_stock_value > 0:
                 scrap_percentage = min(100.0, max(0.0, (scrap_value / Interested_plant_stock_value) * 100))
                 st.progress(scrap_percentage / 100.0)
-                st.markdown(f"**{scrap_percentage:.2f}%** of {plant} Stock Value is potential for scrapping")
+                st.markdown(f"**{scrap_percentage:.2f}%** of {plant} STOCK VALUE IS POTENTIAL FOR SCRAPPING")
             else:
                 st.info("No stock value for selected plant to calculate scrapping progress.")
 
