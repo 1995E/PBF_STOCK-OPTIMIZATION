@@ -49,7 +49,7 @@ st.markdown("""
         }
         .metric-subvalue {
             font-size: 0.95rem;
-            color: #2200ff;
+            color: #020094;
             margin-top: 0.1rem;
         }
     </style>
