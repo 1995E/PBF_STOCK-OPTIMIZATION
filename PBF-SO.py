@@ -289,7 +289,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px;">', unsafe_allow_html=True)
 
             # --------------------------- EXECUTIVE DASHBOARD ROW 1 ---------------------------
-            col_left, col_right = st.columns([1.1, 0.9]) # Adjusted column ratio to make horizontal chart wider
+            col_left, col_right = st.columns([1.0, 1.0]) # Adjusted column ratio to make horizontal chart wider
 
             with col_left:
                 st.markdown('<div class="chart-card">', unsafe_allow_html=True)
