@@ -250,7 +250,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
                 # Stacked Bar Data: Selected plant and other plants are segments of the "Plant Stock Value Comparison" bar
                 bar_data = [
-                    {"Category": "Total Stock Value", "Type": " All Plant", "Value": Total_stock_value},
+                    {"Category": "Total Stock Value", "Type": "Total Stock Value", "Value": Total_stock_value},
                     {"Category": "Stock Distribution", "Type": f"{plant}", "Value": Interested_plant_stock_value},
                     {"Category": "Stock Distribution", "Type": "Others Plant", "Value": Others_plant_stock_value},
                     {"Category": f"{plant} Scrap Result", "Type": f"{plant} Potential Value for Scrapping", "Value": scrap_value},
