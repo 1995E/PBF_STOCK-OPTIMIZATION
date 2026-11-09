@@ -306,13 +306,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     fasd_bar_fig = px.bar(
                         fasd_df,
                         y='FASD',
-                        #x='Stock Value',
+                        x='Stock Value',
                         orientation='h',
                         color_discrete_sequence=['#1E3A8A'],
                         text_auto='.2s'
                     )
                     fasd_bar_fig.update_layout(
-                        xaxis_title="Stock Value ($)",
                         yaxis_title=None,
                         margin=dict(t=10, b=10, l=10, r=10)
                     )
