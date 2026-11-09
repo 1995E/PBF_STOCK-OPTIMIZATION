@@ -359,51 +359,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     st.info("No data available for FASD breakdown.")
                 st.markdown('</div>', unsafe_allow_html=True)
 
-            # --------------------------- EXECUTIVE DASHBOARD ROW 2 ---------------------------
-            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 15px; margin-bottom: 25px;">', unsafe_allow_html=True)
-            st.markdown("### 🔍 DEEPER SCRAP VISUALS (GRID SECTION)", unsafe_allow_html=True)
-
-            col_bottom_left, col_bottom_right = st.columns([1.0, 1.0])
-
-            with col_bottom_left:
-                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
-                st.markdown("##### MATERIAL DISCIPLINE DISTRIBUTION FOR SCRAPPING")
-                if not scrap_df.empty and 'Material discipline' in scrap_df.columns:
-                    discipline_df = scrap_df.groupby('Material discipline')['Stock Value'].sum().reset_index()
-                    disc_pie = px.pie(
-                        discipline_df, 
-                        values='Stock Value', 
-                        names='Material discipline', 
-                        hole=0.4,
-                        color_discrete_sequence=px.colors.qualitative.Safe
-                    )
-                    disc_pie.update_layout(height=340, margin=dict(t=20, b=20, l=20, r=20))
-                    st.plotly_chart(disc_pie, use_container_width=True)
-                else:
-                    st.info("No discipline data available.")
-                st.markdown('</div>', unsafe_allow_html=True)
-
-            with col_bottom_right:
-                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
-                st.markdown("##### COMPOSITION: ACTIVE STOCK VS POTENTIAL SCRAP")
-                if Interested_plant_stock_value > 0:
-                    pie_comparison_data = pd.DataFrame({
-                        "Allocation": ["Active Keep-Stock", "Potential Scrap Value"],
-                        "Value": [Interested_plant_stock_value - scrap_value, scrap_value]
-                    })
-                    comparison_pie = px.pie(
-                        pie_comparison_data, 
-                        values='Value', 
-                        names='Allocation',
-                        hole=0.4,
-                        color_discrete_sequence=['#3B82F6', '#EF4444']
-                    )
-                    comparison_pie.update_layout(height=340, margin=dict(t=20, b=20, l=20, r=20))
-                    st.plotly_chart(comparison_pie, use_container_width=True)
-                else:
-                    st.info("No comparison data available.")
-                st.markdown('</div>', unsafe_allow_html=True)
-
             st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
         else:
             st.info("💡 Please upload the Impacted BOM template to preview interactive visualization panels!")
