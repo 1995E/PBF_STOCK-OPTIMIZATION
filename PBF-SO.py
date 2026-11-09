@@ -242,45 +242,26 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
             # --------------------------- EXECUTIVE DASHBOARD ROW ---------------------------
             st.markdown("### 🏢 Executive Portfolio Performance Dashboard")
-            
-            # Split screen: Pie Chart on Left (column width ratio 1.5), Two Bar Charts on Right (column width ratio 2.0)
-            col_left, col_right = st.columns([1.5, 2.0])
-            
+
+            # Single horizontal row: Left Column for Allocation Comparison, Right Column for FASD Analysis
+            col_left, col_right = st.columns([1.0, 1.0])
+
             with col_left:
-                st.markdown("##### 🍕 Asset Distribution Analysis")
-                # Pie chart with total stock in the interested plant and others plant
-                pie_fig = px.pie(
-                    names=[f"{plant} Stock Value", "Others Plant Stock Value"],
-                    values=[Interested_plant_stock_value, Others_plant_stock_value],
-                    hole=0.4,
-                    color_discrete_sequence=["#1E3A8A", "#9CA3AF"]
-                )
-                pie_fig.update_traces(textinfo='value+percent')
-                pie_fig.update_layout(
-                    margin=dict(t=30, b=10, l=10, r=10),
-                    legend=dict(orientation="h", y=-0.1, xanchor="center", x=0.5)
-                )
-                st.plotly_chart(pie_fig, use_container_width=True)
-            
-            with col_right:
                 st.markdown("##### 📊 Stock Allocation Overview")
-                # Horizontal Stacked Bar Chart
+                
+                # Stacked Bar Data: Selected plant and other plants are segments of the "Plant Stock Value Comparison" bar
                 bar_data = [
-                    {"Category": "Total Stock Value", "Type": "Total Value", "Value": Total_stock_value},
-                    {"Category": f"{plant} Stock Value", "Type": "Total Value", "Value": Interested_plant_stock_value},
-                    {"Category": f"{plant} Scrapping & Transfer", "Type": "Potential Value for Scrapping", "Value": scrap_value},
-                    {"Category": f"{plant} Scrapping & Transfer", "Type": "Transferred Value", "Value": transfer_value}
+                    {"Category": "Total Portfolio Stock", "Type": "Total Value", "Value": Total_stock_value},
+                    {"Category": "Plant-wise Distribution", "Type": f"{plant} Stock Value", "Value": Interested_plant_stock_value},
+                    {"Category": "Plant-wise Distribution", "Type": "Others Plant Stock Value", "Value": Others_plant_stock_value},
+                    {"Category": f"{plant} Optimization", "Type": "Potential Value for Scrapping", "Value": scrap_value},
+                    {"Category": f"{plant} Optimization", "Type": "Transferred Value", "Value": transfer_value}
                 ]
                 bar_df = pd.DataFrame(bar_data)
-                
-                # Sort categories from highest value to lowest
-                cat_totals = {
-                    "Total Stock Value": Total_stock_value,
-                    f"{plant} Stock Value": Interested_plant_stock_value,
-                    f"{plant} Scrapping & Transfer": scrap_value + transfer_value
-                }
-                sorted_cats = sorted(cat_totals, key=cat_totals.get, reverse=True)
-                
+
+                # Layout Category Sorting order
+                sorted_cats = ["Total Portfolio Stock", "Plant-wise Distribution", f"{plant} Optimization"]
+
                 bar_fig = px.bar(
                     bar_df,
                     y="Category",
@@ -289,9 +270,11 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     orientation='h',
                     category_orders={"Category": sorted_cats[::-1]},
                     color_discrete_map={
-                        "Total Value": "#10B981",
-                        "Potential Value for Scrapping": "#EF4444",
-                        "Transferred Value": "#3B82F6"
+                        "Total Value": "#10B981",                  # Forest Emerald Green
+                        f"{plant} Stock Value": "#1E3A8A",          # Corporate Navy Blue
+                        "Others Plant Stock Value": "#9CA3AF",      # Clean Steel Muted Gray
+                        "Potential Value for Scrapping": "#EF4444", # Vibrant Danger Red
+                        "Transferred Value": "#F59E0B"              # Professional Amber/Orange
                     }
                 )
                 bar_fig.update_layout(
@@ -302,16 +285,16 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     legend=dict(orientation="h", y=-0.2, xanchor="center", x=0.5)
                 )
                 st.plotly_chart(bar_fig, use_container_width=True)
-                
-                st.markdown("---")
+
+            with col_right:
                 st.markdown("##### 📈 Category-wise Scrap Stock Value Analysis")
-                
+
                 # Horizontal bar chart with scrap_df FASD Category (sorted for highest stock value)
                 if not scrap_df.empty:
                     scrap_df['Stock Value'] = scrap_df['Stock qty'] * scrap_df['Unit price'].fillna(0)
                     fasd_df = scrap_df.groupby('FASD')['Stock Value'].sum().reset_index()
                     fasd_df = fasd_df.sort_values(by='Stock Value', ascending=True)
-                    
+
                     fasd_bar_fig = px.bar(
                         fasd_df,
                         y='FASD',
@@ -328,7 +311,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     st.plotly_chart(fasd_bar_fig, use_container_width=True)
                 else:
                     st.info("No data available in scrap_df for FASD Category analysis.")
-            
+
             st.markdown("---")
         else:
             st.info("💡 Please upload the Impacted BOM template to preview interactive visualization panels!")
