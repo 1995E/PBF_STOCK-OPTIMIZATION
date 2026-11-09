@@ -275,7 +275,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     bar_df,
                     y="Category",
                     x="Value",
-                    color="Type",
+                    #color="Type",
                     orientation='h',
                     category_orders={"Category": sorted_cats},
                     color_discrete_map={
