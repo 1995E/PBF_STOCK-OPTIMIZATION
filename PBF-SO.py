@@ -12,16 +12,16 @@ st.set_page_config(
 )
 
 # --- SIDEBAR: LAYOUT & VISUALS CUSTOMIZATION ---
-with st.sidebar:
-    st.markdown("### 🎨 Dashboard Customization")
+#with st.sidebar:
+    #st.markdown("### 🎨 Dashboard Customization")
     # Progress Bar Customization
-    custom_progress_title = st.text_input("KPI Progress Bar Title", value="Stock Value vs Scrapping Potential")
-    progress_color = st.selectbox(
-        "Progress Bar Color Theme",
-        options=["Blue", "Green", "Orange", "Red"]
-    )
+    #custom_progress_title = st.text_input("KPI Progress Bar Title", value="Stock Value vs Scrapping Potential")
+    #progress_color = st.selectbox(
+        #"Progress Bar Color Theme",
+        #options=["Blue", "Green", "Orange", "Red"]
+    #)
     # Row Spacing Customization
-    row_spacing = st.slider("Adjust Spacing Between Rows (px)", min_value=10, max_value=120, value=40, step=5)
+    #row_spacing = st.slider("Adjust Spacing Between Rows (px)", min_value=10, max_value=120, value=40, step=5)
 
 # Modern Custom CSS Styling with Dynamic Spacing
 progress_hex = {"Blue": "#3B82F6", "Green": "#10B981", "Orange": "#F59E0B", "Red": "#EF4444"}[progress_color]
@@ -35,8 +35,8 @@ st.markdown(f"""
             margin-bottom: 2rem;
         }}
         .section-gap {{
-            margin-top: {row_spacing}px;
-            margin-bottom: {row_spacing}px;
+            margin-top: 50px;
+            margin-bottom: 50px;
         }}
         .metric-card {{
             background-color: #F8FAFC;
