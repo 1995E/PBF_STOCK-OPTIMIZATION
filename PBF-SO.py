@@ -266,7 +266,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             <div class="metric-card" style="border-left-color: #7C3AED; background-color: #FAF5FF;">
                 <div class="metric-label">Potential Scrap Ratio</div>
                 <div class="metric-value" style="color: #EF4444;">{scrap_pct_str}</div>
-                <div class="metric-subvalue">{remaining_crap:.0f} to be kept in {plant} as it's also used in others BOM</div>
+                <div class="metric-subvalue">{remaining_crap:.0f}% to be kept in {plant}</div>
             </div>
         """, unsafe_allow_html=True)
 
