@@ -308,7 +308,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         y='FASD',
                         x='Stock Value',
                         orientation='h',
-                        color_discrete_sequence=['#1E3A8A'],
+                        color_discrete_sequence=['#736667'],
                         text_auto='.2s'
                     )
                     fasd_bar_fig.update_layout(
