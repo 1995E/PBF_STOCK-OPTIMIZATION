@@ -292,7 +292,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     margin=dict(t=10, b=10, l=10, r=10),
                     legend=dict(orientation="h", y=-0.2, xanchor="center", x=0.5)
                 )
-                st.plotly_chart(bar_fig, use_container_width=True)
+                st.plotly_chart(bar_fig, use_container_width=True,  ascending=True)
 
             with col_right:
                 st.markdown("##### 📈 Category-wise Scrap Stock Value Analysis")
