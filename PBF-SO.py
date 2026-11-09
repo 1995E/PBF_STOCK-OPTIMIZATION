@@ -6,14 +6,14 @@ import numpy as np
 import io
 
 st.set_page_config(
-    page_title="PBF STOCK ANALYSE TOOL", 
+    page_title="PBF STOCK ANALYSE TOOL",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # Modern Custom CSS Styling
 st.markdown("""
-    <style> 
+    <style>
         .main-header {
             font-size: 2.2rem;
             color: #1E3A8A;
@@ -196,12 +196,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi_cols[1]:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #10B981;\">
-                <div class=\"metric-label\">Total Stock Value</div> 
+                <div class=\"metric-label\">Total Stock Value</div>
                 <div class=\"metric-value\">${Total_stock_value:,.0f}</div>
                 <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> stock materials</div>
             </div>
         """, unsafe_allow_html=True)
-        
+
     # Card 3: Selected plant stock value (e.g. DALIA / GIRASSOL)
     with kpi_cols[2]:
         st.markdown(f"""
@@ -214,7 +214,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # Card 4: Sum of (scrap proposal value + potential transfer saving) and potential transfer saving in the same card
     with kpi_cols[3]:
-        #total_savings = scrap_value + transfer_value if bom_loaded else 0.0
         scrap_val_str = f"${ scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
         sub_str = f"<b>${transfer_value:,.0f}</b> amount to be transferred in others plant" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
@@ -225,10 +224,143 @@ if uploaded_materials is not None and uploaded_prices is not None:
             </div>
         """, unsafe_allow_html=True)
 
-
     # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
     tab1, tab2 = st.tabs(["📈 Executive Visualizations", "📋 Detailed Datasets & Actions"])
 
+    with tab1:
+        if bom_loaded:
+            # --------------------------- VISUALIZATION ROW 1 ---------------------------
+            st.markdown("### 🍕 Asset Distribution & Scrapping Analysis")
+            col_viz1, col_viz2 = st.columns(2)
+            
+            with col_viz1:
+                st.markdown(f"##### {plant} Stock Value vs Scrapping Proposal")
+                remaining_val = max(0.0, Interested_plant_stock_value - scrap_value)
+                pie1_fig = px.pie(
+                    names=[f"{plant} Active Stock Value", f"{plant} Potential Scrap Value"],
+                    values=[remaining_val, scrap_value],
+                    hole=0.4,
+                    color_discrete_sequence=["#F59E0B", "#EF4444"]
+                )
+                pie1_fig.update_traces(textinfo='value+percent')
+                st.plotly_chart(pie1_fig, use_container_width=True)
+            
+            with col_viz2:
+                st.markdown(f"##### {plant} Stock vs Others Plant Stock Value")
+                pie2_fig = px.pie(
+                    names=[f"{plant} Stock Value", "Others Plant Stock Value"],
+                    values=[Interested_plant_stock_value, Others_plant_stock_value],
+                    hole=0.4,
+                    color_discrete_sequence=["#3B82F6", "#9CA3AF"]
+                )
+                pie2_fig.update_traces(textinfo='value+percent')
+                st.plotly_chart(pie2_fig, use_container_width=True)
+            
+            st.markdown("---")
+            
+            # --------------------------- VISUALIZATION ROW 2 ---------------------------
+            st.markdown("### 📊 Stock Allocation Overview")
+            
+            # Horizontal Bar Chart
+            # Total Stock Value, Interested plant stock value, Interested potential value for scrapping and transfer value on same bar
+            st.markdown("##### Portfolio Value Breakdown (Sorted Highest to Lowest)")
+            
+            bar_data = [
+                {"Category": "Total Stock Value", "Type": "Total Value", "Value": Total_stock_value},
+                {"Category": f"{plant} Stock Value", "Type": "Total Value", "Value": Interested_plant_stock_value},
+                {"Category": f"{plant} Scrapping & Transfer", "Type": "Potential Value for Scrapping", "Value": scrap_value},
+                {"Category": f"{plant} Scrapping & Transfer", "Type": "Transferred Value", "Value": transfer_value}
+            ]
+            bar_df = pd.DataFrame(bar_data)
+            
+            # Map each category to its grand total for sorting
+            cat_totals = {
+                "Total Stock Value": Total_stock_value,
+                f"{plant} Stock Value": Interested_plant_stock_value,
+                f"{plant} Scrapping & Transfer": scrap_value + transfer_value
+            }
+            # Sort from highest value to lowest
+            sorted_cats = sorted(cat_totals, key=cat_totals.get, reverse=True)
+            
+            bar_fig = px.bar(
+                bar_df,
+                y="Category",
+                x="Value",
+                color="Type",
+                orientation='h',
+                category_orders={"Category": sorted_cats[::-1]},  # Inverse for bottom-up drawing sequence in Plotly
+                color_discrete_map={
+                    "Total Value": "#10B981",
+                    "Potential Value for Scrapping": "#EF4444",
+                    "Transferred Value": "#3B82F6"
+                }
+            )
+            bar_fig.update_layout(barmode='stack', yaxis_title=None, xaxis_title="Value ($)")
+            st.plotly_chart(bar_fig, use_container_width=True)
+            
+            st.markdown("---")
+            
+            # --------------------------- VISUALIZATION ROW 3 ---------------------------
+            st.markdown("### 🌊 Waterfall & Scrap Insights")
+            col_viz3, col_viz4 = st.columns(2)
+            
+            with col_viz3:
+                st.markdown("##### Stock Value & Optimization Transition")
+                waterfall_fig = go.Figure(go.Waterfall(
+                    orientation = "v",
+                    measure = ["absolute", "relative", "relative", "relative", "total"],
+                    x = [
+                        "Total Stock Value", 
+                        f"-{plant} Stock Value", 
+                        f"-{plant} Potential Scrap", 
+                        "-Transfer Stock Value",
+                        "Remaining Stock"
+                    ],
+                    textposition = "outside",
+                    text = [
+                        f"${Total_stock_value:,.0f}", 
+                        f"-${Interested_plant_stock_value:,.0f}", 
+                        f"-${scrap_value:,.0f}", 
+                        f"-${transfer_value:,.0f}",
+                        f"${(Total_stock_value - Interested_plant_stock_value - scrap_value - transfer_value):,.0f}"
+                    ],
+                    y = [
+                        Total_stock_value, 
+                        -Interested_plant_stock_value, 
+                        -scrap_value, 
+                        -transfer_value,
+                        0
+                    ],
+                    connector = {"line":{"color":"rgb(63, 63, 63)"}},
+                    increasing = {"marker":{"color":"#10B981"}},
+                    decreasing = {"marker":{"color":"#EF4444"}},
+                    totals = {"marker":{"color":"#1E3A8A"}}
+                ))
+                waterfall_fig.update_layout(showlegend=False, margin=dict(t=10, b=10, l=10, r=10))
+                st.plotly_chart(waterfall_fig, use_container_width=True)
+
+            with col_viz4:
+                st.markdown("##### Scrap Stock Value per FASD Category")
+                if not scrap_df.empty:
+                    scrap_df['Stock Value'] = scrap_df['Stock qty'] * scrap_df['Unit price'].fillna(0)
+                    fasd_df = scrap_df.groupby('FASD')['Stock Value'].sum().reset_index()
+                    fasd_df = fasd_df.sort_values(by='Stock Value', ascending=True)
+                    
+                    fasd_bar_fig = px.bar(
+                        fasd_df,
+                        y='FASD',
+                        x='Stock Value',
+                        orientation='h',
+                        color_discrete_sequence=['#EF4444']
+                    )
+                    fasd_bar_fig.update_layout(yaxis_title="FASD Category", xaxis_title="Stock Value ($)")
+                    st.plotly_chart(fasd_bar_fig, use_container_width=True)
+                else:
+                    st.info("No data available for Scrap analysis.")
+            
+            st.markdown("---")
+        else:
+            st.info("💡 Please upload the Impacted BOM template to preview interactive visualization panels!")
 
     with tab2:
         if bom_loaded:
