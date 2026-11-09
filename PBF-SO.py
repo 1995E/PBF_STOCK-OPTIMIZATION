@@ -200,14 +200,14 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> Stock Materials</div>
             </div>
         """, unsafe_allow_html=True)
-    a = Interested_plant_stock_value-val_str
+        
     # Card 3: Selected plant stock value (e.g. DALIA / GIRASSOL)
     with kpi_cols[2]:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #F59E0B;\">
                 <div class=\"metric-label\">{plant} Stock Value</div>
                 <div class=\"metric-value\">${Interested_plant_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\">{a} Reduction after BOM analyse</div>
+                <div class=\"metric-subvalue\"> Reduction after BOM analyse</div>
             </div>
         """, unsafe_allow_html=True)
 
