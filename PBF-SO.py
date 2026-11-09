@@ -246,7 +246,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             col_left, col_right = st.columns([1.0, 1.0])
 
             with col_left:
-                st.markdown("##### 📊 Stock Allocation Overview")
+                st.markdown("##### 📊 STOCK DISTRIBUITION OVERVIEW")
 
                 # Stacked Bar Data: Selected plant and other plants are segments of the "Plant Stock Value Comparison" bar
                 bar_data = [
@@ -288,7 +288,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 st.plotly_chart(bar_fig, use_container_width=True)
 
             with col_right:
-                st.markdown("##### 📈 Stock Value per FASD Status")
+                st.markdown("##### 📈 STOCK VALUE PER FASD STATUS")
 
                 # Horizontal bar chart with scrap_df FASD Category (sorted for highest stock value)
                 if not scrap_df.empty:
@@ -298,7 +298,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
                     fasd_bar_fig = px.bar(
                         fasd_df,
-                        y='FASD',
                         x='Stock Value',
                         orientation='h',
                         color_discrete_sequence=['#1E3A8A'],
