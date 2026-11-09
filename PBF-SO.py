@@ -283,7 +283,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown(f"<div class=\"kpi-title\">{plant} STOCK vs POTENTIAL SCRAPPING VALUE</div>", unsafe_allow_html=True)
             if Interested_plant_stock_value > 0:
                 st.progress(scrap_ratio / 100.0)
-                st.markdown(f"**{scrap_ratio:.2f}%** of {plant} STOCK VALUE IDENTIFIED FOR POTENTIAL SCRAPPING")
+                st.markdown(f"**{scrap_ratio:.0f}%** of {plant} STOCK VALUE IDENTIFIED FOR POTENTIAL SCRAPPING")
             else:
                 st.info("No stock value for selected plant to calculate scrapping progress.")
 
