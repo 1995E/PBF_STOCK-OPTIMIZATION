@@ -82,7 +82,7 @@ st.markdown(f"""
         }}
         /* Optimize Progress Bar Size - Bigger, bolder height and custom look */
         .stProgress > div > div > div {{
-            height: 50px !important;
+            height: 550px !important;
             border-radius: 8px;
         }}
         /* Target Streamlit Progress Bar fill - Force custom high contrast Premium Red */
