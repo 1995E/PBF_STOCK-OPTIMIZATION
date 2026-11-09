@@ -22,11 +22,12 @@ st.markdown(f"""
         .section-gap {{
             margin-top: 50px;
             margin-bottom: 50px;
+            font-weight: 500;
         }}
         .kpi-gap {{
             margin-top: 50px;
             margin-bottom: 50px;
-            font-weight: 500;
+
         }}
         .metric-card {{
             background-color: #F8FAFC;
