@@ -11,52 +11,72 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Modern Custom CSS Styling
-st.markdown("""
+# --- SIDEBAR: LAYOUT & VISUALS CUSTOMIZATION ---
+with st.sidebar:
+    st.markdown("### 🎨 Dashboard Customization")
+    # Progress Bar Customization
+    custom_progress_title = st.text_input("KPI Progress Bar Title", value="Stock Value vs Scrapping Potential")
+    progress_color = st.selectbox(
+        "Progress Bar Color Theme",
+        options=["Blue", "Green", "Orange", "Red"]
+    )
+    # Row Spacing Customization
+    row_spacing = st.slider("Adjust Spacing Between Rows (px)", min_value=10, max_value=120, value=40, step=5)
+
+# Modern Custom CSS Styling with Dynamic Spacing
+progress_hex = {"Blue": "#3B82F6", "Green": "#10B981", "Orange": "#F59E0B", "Red": "#EF4444"}[progress_color]
+
+st.markdown(f"""
     <style>
-        .main-header {
+        .main-header {{
             font-size: 2.2rem;
             color: #1E3A8A;
             font-weight: 900;
-            margin-bottom: 2.5rem;
-        }
-        .sub-header {
-            font-size: 1.1rem;
-            color: #4B5563;
-            margin-bottom: 1.5rem;
-        }
-        .metric-card {
-            background-color: #F9FAFB;
-            padding: 1.2rem;
-            border-radius: 10px;
-            border-left: 5px solid #3B82F6;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }}
+        .section-gap {{
+            margin-top: {row_spacing}px;
+            margin-bottom: {row_spacing}px;
+        }}
+        .metric-card {{
+            background-color: #F8FAFC;
+            padding: 1.25rem;
+            border-radius: 12px;
+            border-left: 6px solid #3B82F6;
+            border-top: 1px solid #E2E8F0;
+            border-right: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
             margin-bottom: 1rem;
-            min-height: 125px;
-        }
-        .metric-label {
+            min-height: 130px;
+        }}
+        .metric-label {{
             font-size: 0.85rem;
-            color: #6B7280;
+            color: #64748B;
             text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        .metric-value {
-            font-size: 1.6rem;
-            color: #111827;
-            font-weight: 900;
+            font-weight: 700;
+            letter-spacing: 0.75px;
+        }}
+        .metric-value {{
+            font-size: 1.75rem;
+            color: #0F172A;
+            font-weight: 800;
+            margin-top: 0.25rem;
+        }}
+        .metric-subvalue {{
+            font-size: 0.9rem;
+            color: #475569;
             margin-top: 0.2rem;
-        }
-        .metric-subvalue {
-            font-size: 0.95rem;
-            color: #020094;
-            margin-top: 0.1rem;
-        }
+        }}
+        /* Progress Bar Color Override */
+        .stProgress > div > div > div > div {{
+            background-color: {progress_hex} !important;
+        }}
     </style>
 """, unsafe_allow_html=True)
 
 # Modern Title
-st.markdown("<div class=\"main-header\"> PBF STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
+st.markdown("<div class=\"main-header\">⚓ PBF STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
 
 # CHOOSE THE IMPACTED PLANT IN SIDEBAR
 with st.sidebar:
@@ -182,7 +202,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # 3. EXECUTIVE KPI CARDS
     kpi_cols = st.columns(4)
 
-    # Card 1: Total material removed in one card
+    # Card 1: Total material removed
     with kpi_cols[0]:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #1E3A8A;\">
@@ -192,7 +212,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             </div>
         """, unsafe_allow_html=True)
 
-    # Card 2: Show active stock item and total portfolio stock in the same card
+    # Card 2: Total portfolio stock
     with kpi_cols[1]:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #10B981;\">
@@ -202,7 +222,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             </div>
         """, unsafe_allow_html=True)
 
-    # Card 3: Selected plant stock value (e.g. DALIA / GIRASSOL)
+    # Card 3: Selected plant stock value
     with kpi_cols[2]:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #F59E0B;\">
@@ -212,12 +232,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
             </div>
         """, unsafe_allow_html=True)
 
-    # Card 4: Sum of (scrap proposal value + potential transfer saving) and potential transfer saving in the same card
+    # Card 4: Scrapping and transferring savings
     with kpi_cols[3]:
         scrap_val_str = f"${ scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
         sub_str = f"<b>${transfer_value:,.0f}</b> amount to be transferred in others plant" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #ff0000;\">
+            <div class=\"metric-card\" style=\"border-left-color: #EF4444;\">
                 <div class=\"metric-label\">{plant} Potential Value for Scrapping</div>
                 <div class=\"metric-value\">{scrap_val_str}</div>
                 <div class=\"metric-subvalue\">-{sub_str}</div>
@@ -225,12 +245,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
         """, unsafe_allow_html=True)
 
     # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
-    tab1, tab2 = st.tabs(["📈 Executive Visualizations", "📋 Detailed Datasets & Actions"])
+    st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
+    tab1, tab2 = st.tabs(["📊 Executive Visualizations", "📋 Detailed Datasets & Actions"])
 
     with tab1:
         if bom_loaded:
             # --------------------------- KPI PROGRESS BAR ---------------------------
-            st.markdown(f"### 📊 {plant} Stock Value vs Scrapping Potential")
+            st.markdown(f"### 📊 {custom_progress_title if custom_progress_title else 'Progress'}")
             if Interested_plant_stock_value > 0:
                 scrap_percentage = min(100.0, max(0.0, (scrap_value / Interested_plant_stock_value) * 100))
                 st.progress(scrap_percentage / 100.0)
@@ -238,17 +259,16 @@ if uploaded_materials is not None and uploaded_prices is not None:
             else:
                 st.info("No stock value for selected plant to calculate scrapping progress.")
 
-            st.markdown("---")
+            st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
 
             # --------------------------- EXECUTIVE DASHBOARD ROW ---------------------------
-
-            # Single horizontal row: Left Column for Allocation Comparison, Right Column for FASD Analysis
+            # Single horizontal row with customizable row gap built into CSS wrapper
             col_left, col_right = st.columns([1.0, 1.0])
 
             with col_left:
-                st.markdown("##### 📊 STOCK DISTRIBUITION OVERVIEW")
+                st.markdown("##### 📊 STOCK DISTRIBUTION OVERVIEW")
 
-                # Stacked Bar Data: Selected plant and other plants are segments of the "Plant Stock Value Comparison" bar
+                # Stacked Bar Data in requested display order
                 bar_data = [
                     {"Category": "Total Stock Value", "Type": "All plant", "Value": Total_stock_value},
                     {"Category": "Stock Distribution", "Type": f"{plant}", "Value": Interested_plant_stock_value},
@@ -257,10 +277,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     {"Category": f"{plant} Scrap Result", "Type": "Transferred value", "Value": transfer_value}
                 ]
                 bar_df = pd.DataFrame(bar_data)
-
-                # Explicitly define Category order so that 'Total Stock' is top, 'Stock Distribution' is middle, and '{plant} Scrap Result' is at the bottom.
-                # Plotly orientation='h' renders categories from the bottom-up of the array list.
-                # Thus, we put Scrap Result first in the array, followed by Stock Distribution, and Total Stock last.
                 sorted_cats = ["Total Stock Value", "Stock Distribution", f"{plant} Scrap Result"]
 
                 bar_fig = px.bar(
@@ -271,11 +287,11 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     orientation='h',
                     category_orders={"Category": sorted_cats},
                     color_discrete_map={
-                        "Total Value": "#1E3A5F",                          # Deep Executive Navy
-                        f"{plant}": "#2563EB",                             # Royal Blue
-                        "Others Plant": "#94A3B8",                         # Professional Slate Muted Gray
-                        f"{plant} Potential Value for Scrapping": "#D97706",# Premium Warning Red
-                        "Transferred Value": "#059669"                     # Accent Amber Orange
+                        "All plant": "#1E3A5F",
+                        f"{plant}": "#2563EB",
+                        "Others plant": "#94A3B8",
+                        f"{plant} Potential value for scrapping": "#D97706",
+                        "Transferred value": "#059669"
                     }
                 )
                 bar_fig.update_layout(
@@ -283,14 +299,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     yaxis_title=None,
                     xaxis_title="Value ($)",
                     margin=dict(t=10, b=10, l=10, r=10),
-                    legend=dict(orientation="h", y=-0.2, xanchor="center", x=0.5)
+                    legend=dict(orientation="h", y=-0.25, xanchor="center", x=0.5)
                 )
                 st.plotly_chart(bar_fig, use_container_width=True)
 
             with col_right:
                 st.markdown("##### 📈 STOCK VALUE PER FASD STATUS")
 
-                # Horizontal bar chart with scrap_df FASD Category (sorted for highest stock value)
                 if not scrap_df.empty:
                     scrap_df['Stock Value'] = scrap_df['Stock qty'] * scrap_df['Unit price'].fillna(0)
                     fasd_df = scrap_df.groupby('FASD')['Stock Value'].sum().reset_index()
@@ -306,13 +321,14 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     )
                     fasd_bar_fig.update_layout(
                         xaxis_title="Stock Value ($)",
+                        yaxis_title=None,
                         margin=dict(t=10, b=10, l=10, r=10)
                     )
                     st.plotly_chart(fasd_bar_fig, use_container_width=True)
                 else:
                     st.info("No data available.")
 
-            st.markdown("---")
+            st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
         else:
             st.info("💡 Please upload the Impacted BOM template to preview interactive visualization panels!")
 
