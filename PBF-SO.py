@@ -268,7 +268,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 }
                 # Sort descending (highest value first). Plotly orientation='h' draws categories from bottom-up of y-axis list,
                 # so to get the highest category on top, we reverse the list when supplying to category_orders.
-                sorted_cats = sorted(cat_totals, key=cat_totals.get, reverse=True)
+                sorted_cats = sorted(cat_totals, key=cat_totals.get, reverse=False)
 
                 bar_fig = px.bar(
                     bar_df,
@@ -290,7 +290,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     yaxis_title=None,
                     xaxis_title="Value ($)",
                     margin=dict(t=10, b=10, l=10, r=10),
-                    ascending=True,
                     legend=dict(orientation="h", y=-0.2, xanchor="center", x=0.5)
                 )
                 st.plotly_chart(bar_fig, use_container_width=True)
