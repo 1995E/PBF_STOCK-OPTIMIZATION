@@ -188,7 +188,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             <div class=\"metric-card\" style=\"border-left-color: #1E3A8A;\">
                 <div class=\"metric-label\">Total Material Assessed</div>
                 <div class=\"metric-value\">{Total_removed_materials:,}</div>
-                <div class=\"metric-subvalue\">stock and no-stock materials</div>
+                <div class=\"metric-subvalue\">stock and non-stocked materials</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -218,7 +218,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         scrap_val_str = f"${ scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
         sub_str = f"<b>${transfer_value:,.0f}</b> amount to be transferred" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #8B5CF6;\">
+            <div class=\"metric-card\" style=\"border-left-color: #ff0000;\">
                 <div class=\"metric-label\">{plant} Potential Value for Scrapping</div>
                 <div class=\"metric-value\">{scrap_val_str}</div>
                 <div class=\"metric-subvalue\">-{sub_str}</div>
