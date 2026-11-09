@@ -82,7 +82,7 @@ st.markdown(f"""
         }}
         /* Optimize Progress Bar Size - Bigger, bolder height and custom look */
         .stProgress > div > div > div {{
-            height: 28px !important;
+            height: 50px !important;
             border-radius: 8px;
         }}
         /* Target Streamlit Progress Bar fill - Force custom high contrast Premium Red */
@@ -266,7 +266,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
 
             # --------------------------- EXECUTIVE DASHBOARD ROW ---------------------------
-            col_left, col_right = st.columns([1.3, 0.7]) # Adjusted column ratio to make horizontal chart wider
+            col_left, col_right = st.columns([1.0, 1.0]) # Adjusted column ratio to make horizontal chart wider
 
             with col_left:
                 st.markdown("##### STOCK DISTRIBUTION OVERVIEW")
