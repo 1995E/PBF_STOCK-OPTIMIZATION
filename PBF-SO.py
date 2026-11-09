@@ -53,10 +53,7 @@ st.markdown(f"""
             color: #475569;
             margin-top: 0.2rem;
         }}
-        /* Progress Bar Color Override */
-        .stProgress > div > div > div > div {{
-            background-color: {progress_hex} !important;
-        }}
+        
     </style>
 """, unsafe_allow_html=True)
 
