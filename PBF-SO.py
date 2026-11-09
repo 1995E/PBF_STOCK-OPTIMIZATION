@@ -269,7 +269,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 <div class="metric-subvalue">{remaining_crap:.0f}% to be kept in {plant}</div>
             </div>
         """, unsafe_allow_html=True)
-
+ 
     # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
     st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
     tab1, tab2 = st.tabs(["📊 DISPLAY CHART", "📋 DETAILED DATASET"])
