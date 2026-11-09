@@ -38,7 +38,7 @@ st.markdown("""
             font-size: 0.85rem;
             color: #6B7280;
             text-transform: uppercase;
-            font-weight: 600;
+            font-weight: 900;
             letter-spacing: 0.5px;
         }
         .metric-value {
