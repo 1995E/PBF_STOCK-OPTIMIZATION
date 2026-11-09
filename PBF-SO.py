@@ -43,7 +43,7 @@ st.markdown(f"""
             font-size: 0.85rem;
             color: #64748B;
             text-transform: uppercase;
-            font-weight: 700;
+            font-weight: 500;
             letter-spacing: 0.75px;
         }}
         .metric-value {{ 
