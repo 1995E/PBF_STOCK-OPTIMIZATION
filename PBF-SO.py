@@ -308,7 +308,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_wf = go.Figure(go.Waterfall(
                     name="Stock Composition", 
                     orientation="v",
-                    measure=["relative", "relative", "relative", "total"],
+                    measure=["relative", "relative", "relative", "relative", "total"],
                     x=[f"{plant} Stock Value", "For scrapping", "Potential Transfer Value", "Potential Scrapping Value", "Unprocessed/Remaining"],
                     textposition="outside",
                     text=[f"${Interested_plant_stock_value:,.0f}", f"-${transfer_value:,.0f}", f"-${scrap_value:,.0f}", "Total"],
