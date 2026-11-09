@@ -45,9 +45,10 @@ st.markdown(f"""
             margin-bottom: 50px;
         }}
         .kpi-title {{
-            font-size: 1.30rem !important;
+            font-size: 1.45rem !important;
             font-weight: bold;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+            color: #1E3A8A;
         }}
         .metric-card {{
             background-color: #F8FAFC;
@@ -78,6 +79,11 @@ st.markdown(f"""
             font-size: 0.9rem;
             color: #475569;
             margin-top: 0.2rem;
+        }}
+        /* Optimize Progress Bar Size - Bigger, bolder height and custom look */
+        .stProgress > div > div > div {{
+            height: 28px !important;
+            border-radius: 8px;
         }}
         /* Target Streamlit Progress Bar fill - Force custom high contrast Premium Red */
         .stProgress > div > div > div > div {{
@@ -199,7 +205,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Card 1: Total material removed
     with kpi_cols[0]:
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #1E3A8A;\">
+            <div class=\"metric-card\" style=\"border-left-color: #1E3A8A\">
                 <div class=\"metric-label\">Total Material Assessed</div>
                 <div class=\"metric-value\">{Total_removed_materials:,}</div>
                 <div class=\"metric-subvalue\">stock and non-stocked materials</div>
@@ -209,7 +215,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Card 2: Total portfolio stock
     with kpi_cols[1]:
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #10B981;\">
+            <div class=\"metric-card\" style=\"border-left-color: #10B981\">
                 <div class=\"metric-label\">Total Stock Value</div>
                 <div class=\"metric-value\">${Total_stock_value:,.0f}</div>
                 <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> stock materials</div>
@@ -219,7 +225,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Card 3: Selected plant stock value
     with kpi_cols[2]:
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #F59E0B;\">
+            <div class=\"metric-card\" style=\"border-left-color: #F59E0B\">
                 <div class=\"metric-label\">{plant} Stock Value</div>
                 <div class=\"metric-value\">${Interested_plant_stock_value:,.0f}</div>
                 <div class=\"metric-subvalue\"><b>{len(Interested_plant_unique):,}</b> stock materials</div>
@@ -231,7 +237,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         scrap_val_str = f"${ scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
         sub_str = f"<b>${transfer_value:,.0f}</b> amount to be transferred in others plant" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #EF4444;\">
+            <div class=\"metric-card\" style=\"border-left-color: #EF4444\">
                 <div class=\"metric-label\">{plant} Potential Value for Scrapping</div>
                 <div class=\"metric-value\">{scrap_val_str}</div>
                 <div class=\"metric-subvalue\">-{sub_str}</div>
@@ -260,7 +266,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
 
             # --------------------------- EXECUTIVE DASHBOARD ROW ---------------------------
-            col_left, col_right = st.columns([1.0, 1.0])
+            col_left, col_right = st.columns([1.3, 0.7]) # Adjusted column ratio to make horizontal chart wider
 
             with col_left:
                 st.markdown("##### STOCK DISTRIBUTION OVERVIEW")
@@ -295,6 +301,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     barmode='stack',
                     yaxis_title=None,
                     xaxis_title="Value ($)",
+                    height=380, # Increased height to allow a highly optimized view
                     margin=dict(t=10, b=10, l=10, r=10),
                     legend=dict(orientation="h", y=-0.25, xanchor="center", x=0.5)
                 )
@@ -318,6 +325,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     )
                     fasd_bar_fig.update_layout(
                         yaxis_title=None,
+                        height=380,
                         margin=dict(t=10, b=10, l=10, r=10)
                     )
                     st.plotly_chart(fasd_bar_fig, use_container_width=True)
