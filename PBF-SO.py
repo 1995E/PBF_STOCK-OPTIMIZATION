@@ -259,16 +259,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 ]
                 bar_df = pd.DataFrame(bar_data)
 
-                # Layout Category Sorting order dynamically based on maximum value of each category
-                # Categories to sort: 'Total Stock' (Total_stock_value), 'Stock Distribution' (Total_stock_value), '{plant} Scrap Result' (scrap_value + transfer_value)
-                cat_totals = {
-                    "Total Stock": Total_stock_value,
-                    "Stock Distribution": Total_stock_value,
-                    f"{plant} Scrap Result": scrap_value + transfer_value
-                }
-                # Sort descending (highest value first). Plotly orientation='h' draws categories from bottom-up of y-axis list,
-                # so to get the highest category on top, we reverse the list when supplying to category_orders.
-                sorted_cats = sorted(cat_totals, key=cat_totals.get, reverse=False)
+                # Explicitly define Category order so that 'Total Stock' is top, 'Stock Distribution' is middle, and '{plant} Scrap Result' is at the bottom.
+                # Plotly orientation='h' renders categories from the bottom-up of the array list.
+                # Thus, we put Scrap Result first in the array, followed by Stock Distribution, and Total Stock last.
+                sorted_cats = [f"{plant} Scrap Result", "Stock Distribution", "Total Stock"]
 
                 bar_fig = px.bar(
                     bar_df,
@@ -276,7 +270,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     x="Value",
                     color="Type",
                     orientation='h',
-                    #category_orders={"Category": sorted_cats[::1]},
+                    category_orders={"Category": sorted_cats},
                     color_discrete_map={
                         "Total Value": "#1E3A8A",                          # Deep Executive Navy
                         f"{plant}": "#3B82F6",                             # Royal Blue
