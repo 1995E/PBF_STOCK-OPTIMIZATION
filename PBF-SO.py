@@ -268,7 +268,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     x="Value",
                     color="Type",
                     orientation='h',
-                    category_orders={"Category": sorted_cats[::1]},
+                    category_orders={"Category": sorted_cats[::0]},
                     color_discrete_map={
                         "Total Value": "#1E3A5F",                  # Forest Emerald Green
                         f"{plant} Stock Value": "#2563EB",          # Corporate Navy Blue
