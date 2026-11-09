@@ -252,10 +252,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # Stacked Bar Data: Selected plant and other plants are segments of the "Plant Stock Value Comparison" bar
                 bar_data = [
                     {"Category": "Total Portfolio Stock", "Type": "Total Value", "Value": Total_stock_value},
-                    {"Category": "Plant-wise Distribution", "Type": f"{plant} Stock Value", "Value": Interested_plant_stock_value},
-                    {"Category": "Plant-wise Distribution", "Type": "Others Plant Stock Value", "Value": Others_plant_stock_value},
-                    {"Category": f"{plant} Optimization", "Type": "Potential Value for Scrapping", "Value": scrap_value},
-                    {"Category": f"{plant} Optimization", "Type": "Transferred Value", "Value": transfer_value}
+                    {"Category": "Stock Distribution", "Type": f"{plant}", "Value": Interested_plant_stock_value},
+                    {"Category": "Stock Distribution", "Type": "Others Plant", "Value": Others_plant_stock_value},
+                    {"Category": f"{plant} Scrap Result", "Type": "{plant} Potential Value for Scrapping", "Value": scrap_value},
+                    {"Category": f"{plant} Scrap Result", "Type": "Transferred Value", "Value": transfer_value}
                 ]
                 bar_df = pd.DataFrame(bar_data)
 
