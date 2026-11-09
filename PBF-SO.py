@@ -12,7 +12,7 @@ st.set_page_config(
 )
 
 # Modern Custom CSS Styling
-st.markdown("""
+st.markdown(""" 
     <style>
         .main-header {
             font-size: 2.2rem;
