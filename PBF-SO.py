@@ -11,19 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- SIDEBAR: LAYOUT & VISUALS CUSTOMIZATION ---
-with st.sidebar:
-    st.markdown("### 🎨 Dashboard Customization")
-    # Progress Bar Customization
-    custom_progress_title = st.text_input("KPI Progress Bar Title", value="Stock Value vs Scrapping Potential")
-    progress_color = st.selectbox(
-        "Progress Bar Color Theme",
-        options=["Blue", "Green", "Orange", "Red"]
-    )
-
-# Modern Custom CSS Styling with Dynamic Spacing
-progress_hex = {"Blue": "#3B82F6", "Green": "#10B981", "Orange": "#F59E0B", "Red": "#EF4444"}[progress_color]
-
 st.markdown(f"""
     <style>
         .main-header {{
