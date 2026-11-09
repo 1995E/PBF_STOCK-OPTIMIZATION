@@ -26,6 +26,7 @@ st.markdown(f"""
         .kpi-gap {{
             margin-top: 50px;
             margin-bottom: 50px;
+            font-weight: 500;
         }}
         .metric-card {{
             background-color: #F8FAFC;
@@ -43,7 +44,7 @@ st.markdown(f"""
             font-size: 0.85rem;
             color: #64748B;
             text-transform: uppercase;
-            font-weight: 500;
+            font-weight: 700;
             letter-spacing: 0.75px;
         }}
         .metric-value {{ 
