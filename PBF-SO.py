@@ -260,11 +260,11 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # Card 5: NEW SPECIAL KPI showing potential scrapping value ratio against plant stock
     with kpi_cols[4]:
-        scrap_pct_str = f"{scrap_ratio:.2f}%" if bom_loaded else "N/A (Load BOM)"
+        scrap_pct_str = f"{scrap_ratio:.0f}%" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
             <div class="metric-card" style="border-left-color: #7C3AED; background-color: #FAF5FF;">
                 <div class="metric-label">Potential Scrap Ratio</div>
-                <div class="metric-value" style="color: #7C3AED;">{scrap_pct_str}</div>
+                <div class="metric-value" style="color: #EF4444;">{scrap_pct_str}</div>
                 <div class="metric-subvalue">% of plant's active stock value</div>
             </div>
         """, unsafe_allow_html=True)
