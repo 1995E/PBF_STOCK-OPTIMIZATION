@@ -24,8 +24,8 @@ st.markdown(f"""
             margin-bottom: 50px;
         }}
         .kpi-gap {{
-            margin-top: 80px;
-            margin-bottom: 80px;
+            margin-top: 50px;
+            margin-bottom: 50px;
         }}
         .metric-card {{
             background-color: #F8FAFC;
@@ -46,7 +46,6 @@ st.markdown(f"""
             font-weight: 700;
             letter-spacing: 0.75px;
         }}
-        .metric-value {{
         .metric-value {{ 
             font-size: 1.75rem;
             color: #0F172A;
@@ -58,7 +57,6 @@ st.markdown(f"""
             color: #475569;
             margin-top: 0.2rem;
         }}
-        
         /* Target Streamlit Progress Bar fill - Force custom high contrast Premium Red */
         .stProgress > div > div > div > div {{
             background-color: #EF4444 !important;
@@ -237,13 +235,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
     st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
-    tab1, tab2 = st.tabs(["📊 Executive Visualizations", "📋 Detailed Datasets & Actions"])
+    tab1, tab2 = st.tabs([" CHART", " DETAILED DATASET"])
 
     with tab1:
         if bom_loaded:
             # Increased spacing between EXECUTIVE TABS and KPI PROGRESS BAR
             st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
-
+            
             # --------------------------- KPI PROGRESS BAR ---------------------------
             st.markdown(f"### 📊 {plant} Stock Value vs Scrapping Potential")
             if Interested_plant_stock_value > 0:
@@ -253,12 +251,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
             else:
                 st.info("No stock value for selected plant to calculate scrapping progress.")
 
-            st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
             # Increased spacing between KPI PROGRESS BAR and charts
             st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
 
             # --------------------------- EXECUTIVE DASHBOARD ROW ---------------------------
-            # Single horizontal row with customizable row gap built into CSS wrapper
             col_left, col_right = st.columns([1.0, 1.0])
 
             with col_left:
@@ -271,7 +267,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     {"Category": "Stock Distribution", "Type": "Others plant", "Value": Others_plant_stock_value},
                     {"Category": f"{plant} Scrap Result", "Type": f"{plant} Potential value for scrapping", "Value": scrap_value},
                     {"Category": f"{plant} Scrap Result", "Type": "Transferred value", "Value": transfer_value}
-                    {"Category": f" {plant} Scrap Result", "Type": "Transferred value", "Value": transfer_value}
                 ]
                 bar_df = pd.DataFrame(bar_data)
                 sorted_cats = ["Total Stock Value", "Stock Distribution", f"{plant} Scrap Result"]
@@ -313,11 +308,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         y='FASD',
                         x='Stock Value',
                         orientation='h',
-                        color_discrete_sequence=['#1E3A8A'],
+                        color_discrete_sequence=['#474747'],
                         text_auto='.2s'
                     )
                     fasd_bar_fig.update_layout(
-                        xaxis_title="Stock Value ($)",
                         yaxis_title=None,
                         margin=dict(t=10, b=10, l=10, r=10)
                     )
