@@ -270,11 +270,11 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     orientation='h',
                     category_orders={"Category": sorted_cats[::1]},
                     color_discrete_map={
-                        "Total Value": "#10B981",                  # Forest Emerald Green
-                        f"{plant} Stock Value": "#1E3A8A",          # Corporate Navy Blue
-                        "Others Plant Stock Value": "#9CA3AF",      # Clean Steel Muted Gray
-                        "Potential Value for Scrapping": "#EF4444", # Vibrant Danger Red
-                        "Transferred Value": "#F59E0B"              # Professional Amber/Orange
+                        "Total Value": "#1E3A5F",                  # Forest Emerald Green
+                        f"{plant} Stock Value": "#2563EB",          # Corporate Navy Blue
+                        "Others Plant Stock Value": "#94A3B8",      # Clean Steel Muted Gray
+                        "Potential Value for Scrapping": "#D97706", # Vibrant Danger Red
+                        "Transferred Value": "#059669"              # Professional Amber/Orange
                     }
                 )
                 bar_fig.update_layout(
