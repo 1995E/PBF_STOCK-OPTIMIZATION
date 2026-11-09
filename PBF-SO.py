@@ -216,7 +216,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi_cols[3]:
         #total_savings = scrap_value + transfer_value if bom_loaded else 0.0
         scrap_val_str = f"${ scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
-        sub_str = f"<b>${transfer_value:,.0f}</b> amount to be transferred" if bom_loaded else "N/A (Load BOM)"
+        sub_str = f"<b>${transfer_value:,.0f}</b> amount to be transferred in others plant" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #ff0000;\">
                 <div class=\"metric-label\">{plant} Potential Value for Scrapping</div>
