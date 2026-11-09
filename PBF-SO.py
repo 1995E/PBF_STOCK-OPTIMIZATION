@@ -58,7 +58,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Modern Title
-st.markdown("<div class=\"main-header\">⚓ PBF STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
+st.markdown("<div class=\"main-header\"> PBF STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
 
 # CHOOSE THE IMPACTED PLANT IN SIDEBAR
 with st.sidebar:
