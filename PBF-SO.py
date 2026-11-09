@@ -37,12 +37,12 @@ st.markdown(f"""
             margin-bottom: 2rem;
         }}
         .section-gap {{
-            margin-top: 50px;
-            margin-bottom: 50px;
+            margin-top: 35px;
+            margin-bottom: 35px;
         }}
         .kpi-gap {{
-            margin-top: 50px;
-            margin-bottom: 50px;
+            margin-top: 25px;
+            margin-bottom: 25px;
         }}
         .kpi-title {{
             font-size: 1.45rem !important;
@@ -60,7 +60,7 @@ st.markdown(f"""
             border-bottom: 1px solid #E2E8F0;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
             margin-bottom: 1rem;
-            min-height: 130px;
+            min-height: 135px;
         }}
         .metric-label {{
             font-size: 0.85rem;
@@ -70,19 +70,28 @@ st.markdown(f"""
             letter-spacing: 0.75px;
         }}
         .metric-value {{
-            font-size: 1.75rem;
+            font-size: 1.65rem;
             color: #0F172A;
             font-weight: 800;
             margin-top: 0.25rem;
         }}
-        .metric-subvalue {{
-            font-size: 0.9rem;
+        .metric-subvalue {{ 
+            font-size: 0.85rem;
             color: #475569;
             margin-top: 0.2rem;
         }}
+        /* Card Container styling to create clear separation grid */
+        .chart-card {{
+            background-color: #FFFFFF;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }}
         /* Optimize Progress Bar Size - Bigger, bolder height and custom look */
         .stProgress > div > div > div {{
-            height: 550px !important;
+            height: 28px !important;
             border-radius: 8px;
         }}
         /* Target Streamlit Progress Bar fill - Force custom high contrast Premium Red */
@@ -199,54 +208,70 @@ if uploaded_materials is not None and uploaded_prices is not None:
     if 'Calculated Value' not in Interested_plant.columns and not Interested_plant.empty:
         Interested_plant['Calculated Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
 
-    # 3. EXECUTIVE KPI CARDS
-    kpi_cols = st.columns(4)
+    # Calculate Potential Scrap Ratio
+    scrap_ratio = 0.0
+    if Interested_plant_stock_value > 0:
+        scrap_ratio = (scrap_value / Interested_plant_stock_value) * 100
+
+    # 3. EXECUTIVE KPI CARDS - 5 columns for maximum high-level dashboard visual insight
+    kpi_cols = st.columns(5)
 
     # Card 1: Total material removed
     with kpi_cols[0]:
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #1E3A8A\">
-                <div class=\"metric-label\">Total Material Assessed</div>
-                <div class=\"metric-value\">{Total_removed_materials:,}</div>
-                <div class=\"metric-subvalue\">stock and non-stocked materials</div>
+            <div class="metric-card" style="border-left-color: #1E3A8A">
+                <div class="metric-label">Total Material Assessed</div>
+                <div class="metric-value">{Total_removed_materials:,}</div>
+                <div class="metric-subvalue">stock & non-stocked items</div>
             </div>
         """, unsafe_allow_html=True)
 
     # Card 2: Total portfolio stock
     with kpi_cols[1]:
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #10B981\">
-                <div class=\"metric-label\">Total Stock Value</div>
-                <div class=\"metric-value\">${Total_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> stock materials</div>
+            <div class="metric-card" style="border-left-color: #10B981">
+                <div class="metric-label">Total Stock Value</div>
+                <div class="metric-value">${Total_stock_value:,.0f}</div>
+                <div class="metric-subvalue"><b>{len(pd_v1_unique_materials):,}</b> stock items</div>
             </div>
         """, unsafe_allow_html=True)
 
     # Card 3: Selected plant stock value
     with kpi_cols[2]:
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #F59E0B\">
-                <div class=\"metric-label\">{plant} Stock Value</div>
-                <div class=\"metric-value\">${Interested_plant_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\"><b>{len(Interested_plant_unique):,}</b> stock materials</div>
+            <div class="metric-card" style="border-left-color: #F59E0B">
+                <div class="metric-label">{plant} Stock Value</div>
+                <div class="metric-value">${Interested_plant_stock_value:,.0f}</div>
+                <div class="metric-subvalue"><b>{len(Interested_plant_unique):,}</b> stock items</div>
             </div>
         """, unsafe_allow_html=True)
 
     # Card 4: Scrapping and transferring savings
     with kpi_cols[3]:
-        scrap_val_str = f"${ scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
-        sub_str = f"<b>${transfer_value:,.0f}</b> amount to be transferred in others plant" if bom_loaded else "N/A (Load BOM)"
+        scrap_val_str = f"${scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
+        sub_str = f"<b>${transfer_value:,.0f}</b> to be transferred" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #EF4444\">
-                <div class=\"metric-label\">{plant} Potential Value for Scrapping</div>
-                <div class=\"metric-value\">{scrap_val_str}</div>
-                <div class=\"metric-subvalue\">-{sub_str}</div>
+            <div class="metric-card" style="border-left-color: #EF4444">
+                <div class="metric-label">{plant} Potential Scrap</div>
+                <div class="metric-value">{scrap_val_str}</div>
+                <div class="metric-subvalue">-{sub_str}</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+    # Card 5: NEW SPECIAL KPI showing potential scrapping value ratio against plant stock
+    with kpi_cols[4]:
+        scrap_pct_str = f"{scrap_ratio:.2f}%" if bom_loaded else "N/A (Load BOM)"
+        st.markdown(f"""
+            <div class="metric-card" style="border-left-color: #7C3AED; background-color: #FAF5FF;">
+                <div class="metric-label">Potential Scrap Ratio</div>
+                <div class="metric-value" style="color: #7C3AED;">{scrap_pct_str}</div>
+                <div class="metric-subvalue">% of plant's active stock value</div>
             </div>
         """, unsafe_allow_html=True)
 
     # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
     st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
-    tab1, tab2 = st.tabs([" DISPLAY CHART", " DETAILED DATASET"])
+    tab1, tab2 = st.tabs(["📊 DISPLAY CHART", "📋 DETAILED DATASET"])
 
     with tab1:
         if bom_loaded:
@@ -256,19 +281,18 @@ if uploaded_materials is not None and uploaded_prices is not None:
             # --------------------------- KPI PROGRESS BAR ---------------------------
             st.markdown(f"<div class=\"kpi-title\">{plant} STOCK vs POTENTIAL SCRAPPING VALUE</div>", unsafe_allow_html=True)
             if Interested_plant_stock_value > 0:
-                scrap_percentage = min(100.0, max(0.0, (scrap_value / Interested_plant_stock_value) * 100))
-                st.progress(scrap_percentage / 100.0)
-                st.markdown(f"**{scrap_percentage:.2f}%** of {plant} STOCK VALUE IDENTIFIED FOR POTENTIAL SCRAPPING")
+                st.progress(scrap_ratio / 100.0)
+                st.markdown(f"**{scrap_ratio:.2f}%** of {plant} STOCK VALUE IDENTIFIED FOR POTENTIAL SCRAPPING")
             else:
                 st.info("No stock value for selected plant to calculate scrapping progress.")
 
-            # Increased spacing between KPI PROGRESS BAR and charts
-            st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
+            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px;">', unsafe_allow_html=True)
 
-            # --------------------------- EXECUTIVE DASHBOARD ROW ---------------------------
-            col_left, col_right = st.columns([1.0, 1.0]) # Adjusted column ratio to make horizontal chart wider
+            # --------------------------- EXECUTIVE DASHBOARD ROW 1 ---------------------------
+            col_left, col_right = st.columns([1.3, 0.7]) # Adjusted column ratio to make horizontal chart wider
 
             with col_left:
+                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
                 st.markdown("##### STOCK DISTRIBUTION OVERVIEW")
 
                 # Stacked Bar Data in requested display order
@@ -301,13 +325,15 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     barmode='stack',
                     yaxis_title=None,
                     xaxis_title="Value ($)",
-                    height=380, # Increased height to allow a highly optimized view
+                    height=380, 
                     margin=dict(t=10, b=10, l=10, r=10),
                     legend=dict(orientation="h", y=-0.25, xanchor="center", x=0.5)
                 )
                 st.plotly_chart(bar_fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True)
 
             with col_right:
+                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
                 st.markdown("##### STOCK VALUE PER FASD STATUS")
 
                 if not scrap_df.empty:
@@ -320,7 +346,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         y='FASD',
                         x='Stock Value',
                         orientation='h',
-                        color_discrete_sequence=['#474747'],
+                        color_discrete_sequence=['#475569'],
                         text_auto='.2s'
                     )
                     fasd_bar_fig.update_layout(
@@ -330,7 +356,53 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     )
                     st.plotly_chart(fasd_bar_fig, use_container_width=True)
                 else:
-                    st.info("No data available.")
+                    st.info("No data available for FASD breakdown.")
+                st.markdown('</div>', unsafe_allow_html=True)
+
+            # --------------------------- EXECUTIVE DASHBOARD ROW 2 ---------------------------
+            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 15px; margin-bottom: 25px;">', unsafe_allow_html=True)
+            st.markdown("### 🔍 DEEPER SCRAP VISUALS (GRID SECTION)", unsafe_allow_html=True)
+
+            col_bottom_left, col_bottom_right = st.columns([1.0, 1.0])
+
+            with col_bottom_left:
+                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+                st.markdown("##### MATERIAL DISCIPLINE DISTRIBUTION FOR SCRAPPING")
+                if not scrap_df.empty and 'Material discipline' in scrap_df.columns:
+                    discipline_df = scrap_df.groupby('Material discipline')['Stock Value'].sum().reset_index()
+                    disc_pie = px.pie(
+                        discipline_df, 
+                        values='Stock Value', 
+                        names='Material discipline', 
+                        hole=0.4,
+                        color_discrete_sequence=px.colors.qualitative.Safe
+                    )
+                    disc_pie.update_layout(height=340, margin=dict(t=20, b=20, l=20, r=20))
+                    st.plotly_chart(disc_pie, use_container_width=True)
+                else:
+                    st.info("No discipline data available.")
+                st.markdown('</div>', unsafe_allow_html=True)
+
+            with col_bottom_right:
+                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+                st.markdown("##### COMPOSITION: ACTIVE STOCK VS POTENTIAL SCRAP")
+                if Interested_plant_stock_value > 0:
+                    pie_comparison_data = pd.DataFrame({
+                        "Allocation": ["Active Keep-Stock", "Potential Scrap Value"],
+                        "Value": [Interested_plant_stock_value - scrap_value, scrap_value]
+                    })
+                    comparison_pie = px.pie(
+                        pie_comparison_data, 
+                        values='Value', 
+                        names='Allocation',
+                        hole=0.4,
+                        color_discrete_sequence=['#3B82F6', '#EF4444']
+                    )
+                    comparison_pie.update_layout(height=340, margin=dict(t=20, b=20, l=20, r=20))
+                    st.plotly_chart(comparison_pie, use_container_width=True)
+                else:
+                    st.info("No comparison data available.")
+                st.markdown('</div>', unsafe_allow_html=True)
 
             st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
         else:
