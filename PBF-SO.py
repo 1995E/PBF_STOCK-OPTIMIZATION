@@ -6,14 +6,14 @@ import numpy as np
 import io
 
 st.set_page_config(
-    page_title="PBF STOCK ANALYSE TOOL", 
+    page_title="PBF STOCK ANALYSE TOOL",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
 # Modern Custom CSS Styling
 st.markdown("""
-    <style> 
+    <style>
         .main-header {
             font-size: 2.2rem;
             color: #1E3A8A;
@@ -196,12 +196,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi_cols[1]:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #10B981;\">
-                <div class=\"metric-label\">Total Stock Value</div> 
+                <div class=\"metric-label\">Total Stock Value</div>
                 <div class=\"metric-value\">${Total_stock_value:,.0f}</div>
                 <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> stock materials</div>
             </div>
         """, unsafe_allow_html=True)
-        
+
     # Card 3: Selected plant stock value (e.g. DALIA / GIRASSOL)
     with kpi_cols[2]:
         st.markdown(f"""
@@ -214,7 +214,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # Card 4: Sum of (scrap proposal value + potential transfer saving) and potential transfer saving in the same card
     with kpi_cols[3]:
-        #total_savings = scrap_value + transfer_value if bom_loaded else 0.0
         scrap_val_str = f"${ scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
         sub_str = f"<b>${transfer_value:,.0f}</b> amount to be transferred in others plant" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
@@ -225,10 +224,102 @@ if uploaded_materials is not None and uploaded_prices is not None:
             </div>
         """, unsafe_allow_html=True)
 
-
     # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
     tab1, tab2 = st.tabs(["📈 Executive Visualizations", "📋 Detailed Datasets & Actions"])
 
+    with tab1:
+        if bom_loaded:
+            # --------------------------- KPI PROGRESS BAR ---------------------------
+            st.markdown(f"### 📊 {plant} Stock Value vs Scrapping Potential")
+            if Interested_plant_stock_value > 0:
+                scrap_percentage = min(100.0, max(0.0, (scrap_value / Interested_plant_stock_value) * 100))
+                st.progress(scrap_percentage / 100.0)
+                st.markdown(f"**{scrap_percentage:.2f}%** of {plant} Stock Value is potential for scrapping (${scrap_value:,.2f} / ${Interested_plant_stock_value:,.2f})")
+            else:
+                st.info("No stock value for selected plant to calculate scrapping progress.")
+
+            st.markdown("---")
+
+            # --------------------------- VISUALIZATION ROW 1 ---------------------------
+            st.markdown("### 🍕 Asset Distribution Analysis")
+            
+            # Pie chart with total stock in the interested plant and others plant
+            pie_fig = px.pie(
+                names=[f"{plant} Stock Value", "Others Plant Stock Value"],
+                values=[Interested_plant_stock_value, Others_plant_stock_value],
+                hole=0.4,
+                color_discrete_sequence=["#3B82F6", "#9CA3AF"]
+            )
+            pie_fig.update_traces(textinfo='value+percent')
+            st.plotly_chart(pie_fig, use_container_width=True)
+            
+            st.markdown("---")
+            
+            # --------------------------- VISUALIZATION ROW 2 ---------------------------
+            st.markdown("### 📊 Stock Allocation Overview")
+            
+            # Horizontal Bar Chart
+            # Total Stock Value, Interested plant stock value, Interested potential value for scrapping and transfer value on same bar
+            bar_data = [
+                {"Category": "Total Stock Value", "Type": "Total Value", "Value": Total_stock_value},
+                {"Category": f"{plant} Stock Value", "Type": "Total Value", "Value": Interested_plant_stock_value},
+                {"Category": f"{plant} Scrapping & Transfer", "Type": "Potential Value for Scrapping", "Value": scrap_value},
+                {"Category": f"{plant} Scrapping & Transfer", "Type": "Transferred Value", "Value": transfer_value}
+            ]
+            bar_df = pd.DataFrame(bar_data)
+            
+            # Sort categories from highest value to lowest
+            cat_totals = {
+                "Total Stock Value": Total_stock_value,
+                f"{plant} Stock Value": Interested_plant_stock_value,
+                f"{plant} Scrapping & Transfer": scrap_value + transfer_value
+            }
+            sorted_cats = sorted(cat_totals, key=cat_totals.get, reverse=True)
+            
+            bar_fig = px.bar(
+                bar_df,
+                y="Category",
+                x="Value",
+                color="Type",
+                orientation='h',
+                category_orders={"Category": sorted_cats[::-1]}, # Reverse for bottom-up drawing
+                color_discrete_map={
+                    "Total Value": "#10B981",
+                    "Potential Value for Scrapping": "#EF4444",
+                    "Transferred Value": "#3B82F6"
+                }
+            )
+            bar_fig.update_layout(barmode='stack', yaxis_title=None, xaxis_title="Value ($)")
+            st.plotly_chart(bar_fig, use_container_width=True)
+            
+            st.markdown("---")
+            
+            # --------------------------- VISUALIZATION ROW 3 ---------------------------
+            st.markdown("### 📈 Category-wise Scrap Stock Value Analysis")
+            
+            # Horizontal bar chart with scrap_df FASD Category (sorted for highest stock value)
+            if not scrap_df.empty:
+                scrap_df['Stock Value'] = scrap_df['Stock qty'] * scrap_df['Unit price'].fillna(0)
+                fasd_df = scrap_df.groupby('FASD')['Stock Value'].sum().reset_index()
+                # Sort for highest stock value
+                fasd_df = fasd_df.sort_values(by='Stock Value', ascending=True) # Ascending true for horizontal bar top-highest visual rendering
+                
+                fasd_bar_fig = px.bar(
+                    fasd_df,
+                    y='FASD',
+                    x='Stock Value',
+                    orientation='h',
+                    color_discrete_sequence=['#EF4444'],
+                    text_auto='.2s'
+                )
+                fasd_bar_fig.update_layout(yaxis_title="FASD Category", xaxis_title="Stock Value ($)")
+                st.plotly_chart(fasd_bar_fig, use_container_width=True)
+            else:
+                st.info("No data available in scrap_df for FASD Category analysis.")
+            
+            st.markdown("---")
+        else:
+            st.info("💡 Please upload the Impacted BOM template to preview interactive visualization panels!")
 
     with tab2:
         if bom_loaded:
