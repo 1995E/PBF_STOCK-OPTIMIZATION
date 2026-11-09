@@ -195,7 +195,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi_cols[1]:
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #10B981;\">
-                <div class=\"metric-label\">Total Stock Value</div>
+                <div class=\"metric-label\">Total Stock Value</div> 
                 <div class=\"metric-value\">${Total_stock_value:,.0f}</div>
                 <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> Stock Materials</div>
             </div>
