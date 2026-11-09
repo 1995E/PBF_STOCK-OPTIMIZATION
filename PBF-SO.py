@@ -11,21 +11,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- SIDEBAR: LAYOUT & VISUALS CUSTOMIZATION ---
-with st.sidebar:
-    st.markdown("### 🎨 Dashboard Customization")
-    # Progress Bar Customization
-    custom_progress_title = st.text_input("KPI Progress Bar Title", value="Stock Value vs Scrapping Potential")
-    progress_color = st.selectbox(
-        "Progress Bar Color Theme",
-        options=["Blue", "Green", "Orange", "Red"]
-    )
-    # Row Spacing Customization
-    #row_spacing = st.slider("Adjust Spacing Between Rows (px)", min_value=10, max_value=120, value=40, step=5)
-
-# Modern Custom CSS Styling with Dynamic Spacing
-progress_hex = {"Blue": "#3B82F6", "Green": "#10B981", "Orange": "#F59E0B", "Red": "#EF4444"}[progress_color]
-
 st.markdown(f"""
     <style>
         .main-header {{
@@ -37,6 +22,10 @@ st.markdown(f"""
         .section-gap {{
             margin-top: 50px;
             margin-bottom: 50px;
+        }}
+        .kpi-gap {{
+            margin-top: 80px;
+            margin-bottom: 80px;
         }}
         .metric-card {{
             background-color: #F8FAFC;
@@ -58,6 +47,7 @@ st.markdown(f"""
             letter-spacing: 0.75px;
         }}
         .metric-value {{
+        .metric-value {{ 
             font-size: 1.75rem;
             color: #0F172A;
             font-weight: 800;
@@ -68,15 +58,16 @@ st.markdown(f"""
             color: #475569;
             margin-top: 0.2rem;
         }}
-        /* Progress Bar Color Override */
+        
+        /* Target Streamlit Progress Bar fill - Force custom high contrast Premium Red */
         .stProgress > div > div > div > div {{
-            background-color: {progress_hex} !important;
+            background-color: #EF4444 !important;
         }}
     </style>
 """, unsafe_allow_html=True)
 
 # Modern Title
-st.markdown("<div class=\"main-header\">⚓ PBF STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
+st.markdown("<div class=\"main-header\"> PBF STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
 
 # CHOOSE THE IMPACTED PLANT IN SIDEBAR
 with st.sidebar:
@@ -250,8 +241,11 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     with tab1:
         if bom_loaded:
+            # Increased spacing between EXECUTIVE TABS and KPI PROGRESS BAR
+            st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
+
             # --------------------------- KPI PROGRESS BAR ---------------------------
-            st.markdown(f"### 📊 {custom_progress_title if custom_progress_title else 'Progress'}")
+            st.markdown(f"### 📊 {plant} Stock Value vs Scrapping Potential")
             if Interested_plant_stock_value > 0:
                 scrap_percentage = min(100.0, max(0.0, (scrap_value / Interested_plant_stock_value) * 100))
                 st.progress(scrap_percentage / 100.0)
@@ -260,6 +254,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 st.info("No stock value for selected plant to calculate scrapping progress.")
 
             st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
+            # Increased spacing between KPI PROGRESS BAR and charts
+            st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
 
             # --------------------------- EXECUTIVE DASHBOARD ROW ---------------------------
             # Single horizontal row with customizable row gap built into CSS wrapper
@@ -275,6 +271,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     {"Category": "Stock Distribution", "Type": "Others plant", "Value": Others_plant_stock_value},
                     {"Category": f"{plant} Scrap Result", "Type": f"{plant} Potential value for scrapping", "Value": scrap_value},
                     {"Category": f"{plant} Scrap Result", "Type": "Transferred value", "Value": transfer_value}
+                    {"Category": f" {plant} Scrap Result", "Type": "Transferred value", "Value": transfer_value}
                 ]
                 bar_df = pd.DataFrame(bar_data)
                 sorted_cats = ["Total Stock Value", "Stock Distribution", f"{plant} Scrap Result"]
