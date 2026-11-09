@@ -197,7 +197,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             <div class=\"metric-card\" style=\"border-left-color: #10B981;\">
                 <div class=\"metric-label\">Total Stock Value</div> 
                 <div class=\"metric-value\">${Total_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> Stock Materials</div>
+                <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> Stock materials</div>
             </div>
         """, unsafe_allow_html=True)
         
@@ -215,7 +215,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi_cols[3]:
         total_savings = scrap_value + transfer_value if bom_loaded else 0.0
         val_str = f"${total_savings:,.0f}" if bom_loaded else "N/A (Load BOM)"
-        sub_str = f"<b>${transfer_value:,.0f}</b> Stcok Value to be Transferred" if bom_loaded else "N/A (Load BOM)"
+        sub_str = f"<b>${transfer_value:,.0f}</b> Stock value to be transferred" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
             <div class=\"metric-card\" style=\"border-left-color: #8B5CF6;\">
                 <div class=\"metric-label\">{plant} Potential Value for Scrapping</div>
