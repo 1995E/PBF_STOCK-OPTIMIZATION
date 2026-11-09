@@ -19,16 +19,6 @@ with st.sidebar:
         ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
     )
 
-    st.markdown("### 🎨 Font Customization")
-    # Allow custom font size for the progress bar title
-    kpi_title_font_size = st.slider(
-        "KPI Progress Bar Title Font Size (rem)",
-        min_value=1.0,
-        max_value=3.5,
-        value=1.75,
-        step=0.1
-    )
-
 # 1. FILE UPLOADERS IN SIDEBAR
 with st.sidebar:
     st.header("📂 Data Source Configuration")
@@ -55,7 +45,7 @@ st.markdown(f"""
             margin-bottom: 50px;
         }}
         .kpi-title {{
-            font-size: {kpi_title_font_size}rem !important;
+            font-size: 1.30rem !important;
             font-weight: bold;
             margin-bottom: 0.5rem;
         }}
