@@ -212,7 +212,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     scrap_ratio = 0.0
     if Interested_plant_stock_value > 0:
         scrap_ratio = (scrap_value / Interested_plant_stock_value) * 100
-        remaining_crap = 1-scrap_ratio
+        remaining_crap = 100-scrap_ratio
 
     # 3. EXECUTIVE KPI CARDS - 5 columns for maximum high-level dashboard visual insight
     kpi_cols = st.columns(5)
@@ -266,7 +266,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             <div class="metric-card" style="border-left-color: #7C3AED; background-color: #FAF5FF;">
                 <div class="metric-label">Potential Scrap Ratio</div>
                 <div class="metric-value" style="color: #EF4444;">{scrap_pct_str}</div>
-                <div class="metric-subvalue">{remaining_crap} to be kept in {plant} as it's also used in others BOM</div>
+                <div class="metric-subvalue">{remaining_crap:.0f} to be kept in {plant} as it's also used in others BOM</div>
             </div>
         """, unsafe_allow_html=True)
 
