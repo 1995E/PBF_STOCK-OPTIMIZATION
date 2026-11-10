@@ -93,7 +93,7 @@ st.markdown(f"""
             height: 20px !important;
             border-radius: 6px;
         }}
-        .stProgress > div > div > div > div {{
+        .stProgress > div > div > div > div {{ 
             background-color: #EF4444 !important;
         }}
     </style>
@@ -139,7 +139,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # INTELLIGENT DESCRIPTION CHARACTERISTIC GROUPING
     if not Interested_plant.empty:
-        # Parse base keywords for each row
         parsed_records = []
         for idx, row in Interested_plant.iterrows():
             desc = row['Material description']
@@ -163,9 +162,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
         
         parsed_df = pd.DataFrame(parsed_records)
         
-        # Group analysis implementation:
-        # For each first keyword, determine if all entries have the same second keyword.
-        # If yes, we use 'FIRST SECOND'. If different, we group them only by 'FIRST'.
+        # Advanced dynamic grouping logic based on user request:
+        # For each unique 'first' keyword, check if all associated items share the exact same 'second' keyword.
+        # If yes, group under 'FIRST SECOND'. If they have different 'second' keywords, group them under only 'FIRST'.
         char_mapping = {}
         for first_val, group in parsed_df.groupby('first'):
             unique_seconds = group['second'].unique()
@@ -254,7 +253,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     scrap_ratio = 0.0
     if Interested_plant_stock_value > 0:
         scrap_ratio = (scrap_value / Interested_plant_stock_value) * 100
-        remaining_crap = 100-scrap_ratio
+        remaining_crap = 100 - scrap_ratio
 
     # 3. EXECUTIVE KPI CARDS
     kpi_cols = st.columns(5)
