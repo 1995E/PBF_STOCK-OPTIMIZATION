@@ -41,7 +41,7 @@ st.markdown(f"""
             margin-top: 35px;
             margin-bottom: 35px;
         }}
-        .kpi-gap {{
+        .kpi-gap {{ 
             margin-top: 25px;
             margin-bottom: 25px;
         }}
@@ -76,7 +76,7 @@ st.markdown(f"""
             font-weight: 800;
             margin-top: 0.25rem;
         }}
-        .metric-subvalue {{ 
+        .metric-subvalue {{
             font-size: 0.85rem;
             color: #475569;
             margin-top: 0.2rem;
@@ -103,7 +103,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Modern Title
-st.markdown("<div class=\"main-header\"> STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
+st.markdown("<div class=\"main-header\"> STREAMLIT STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
@@ -140,35 +140,53 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Interested_plant_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
     Others_plant_stock_value = Total_stock_value - Interested_plant_stock_value
 
-    # ROBUST GROUPING BY DESCRIPTION CHARACTERISTIC (First keyword & second keyword after comma)
-    def extract_robust_characteristic(desc):
-        if pd.isna(desc):
-            return 'UNKNOWN'
-        
-        desc_str = str(desc).upper()
-        parts = desc_str.split(',')
-        
-        # First keyword before any comma
-        first_part = parts[0]
-        first_tokens = [t.strip() for t in re.sub(r'[^A-Z0-9\s-]', ' ', first_part).split() if len(t.strip()) > 2]
-        first_key = first_tokens[0] if len(first_tokens) > 0 else ''
-        
-        # Second keyword after the first comma
-        second_key = ''
-        if len(parts) > 1:
-            second_part = parts[1]
-            second_tokens = [t.strip() for t in re.sub(r'[^A-Z0-9\s-]', ' ', second_part).split() if len(t.strip()) > 2]
-            second_key = second_tokens[0] if len(second_tokens) > 0 else ''
+    # DYNAMIC GROUPING BY DESCRIPTION CHARACTERISTIC
+    if not Interested_plant.empty:
+        parsed_records = []
+        for idx, row in Interested_plant.iterrows():
+            desc = row['Material description']
+            if pd.isna(desc):
+                parsed_records.append({'idx': idx, 'first': 'UNKNOWN', 'second': ''})
+                continue
+            desc_str = str(desc).upper()
+            parts = desc_str.split(',')
             
-        # Combine them beautifully
-        if first_key and second_key:
-            return f"{first_key} {second_key}"
-        elif first_key:
-            return first_key
-        else:
-            return 'OTHER'
+            # First keyword before first comma
+            first_part = parts[0]
+            first_tokens = [t.strip() for t in re.sub(r'[^A-Z0-9\s-]', ' ', first_part).split() if len(t.strip()) > 2]
+            first_key = first_tokens[0] if len(first_tokens) > 0 else 'OTHER'
+            
+            # Second keyword after first comma
+            second_key = ''
+            if len(parts) > 1:
+                second_part = parts[1]
+                second_tokens = [t.strip() for t in re.sub(r'[^A-Z0-9\s-]', ' ', second_part).split() if len(t.strip()) > 2]
+                second_key = second_tokens[0] if len(second_tokens) > 0 else ''
+            
+            parsed_records.append({'idx': idx, 'first': first_key, 'second': second_key})
+        
+        parsed_df = pd.DataFrame(parsed_records)
+        
+        # If first keyword is identical, check second keyword.
+        # If second keyword is also identical across all of them, group under "FIRST SECOND".
+        # If second keyword differs across any, group under purely "FIRST".
+        char_mapping = {}
+        for first_val, group in parsed_df.groupby('first'):
+            unique_seconds = group['second'].unique()
+            valid_seconds = [s for s in unique_seconds if s != '']
+            
+            if len(valid_seconds) == 1:
+                mapped_name = f"{first_val} {valid_seconds[0]}"
+            else:
+                mapped_name = first_val
+            
+            for row_idx in group['idx']:
+                char_mapping[row_idx] = mapped_name
+        
+        Interested_plant['Description Characteristic'] = Interested_plant.index.map(char_mapping).fillna('OTHER')
+    else:
+        Interested_plant['Description Characteristic'] = pd.Series(dtype='str')
 
-    Interested_plant['Description Characteristic'] = Interested_plant['Material description'].apply(extract_robust_characteristic)
     Interested_plant['Stock Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
 
     # UPDATE INTERESTED PLANT DATAFRAME WITH ACTION COLUMN FROM IMPACTED BOM BEFORE DISPLAYING KPIs
@@ -244,7 +262,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     scrap_ratio = 0.0
     if Interested_plant_stock_value > 0:
         scrap_ratio = (scrap_value / Interested_plant_stock_value) * 100
-        remaining_crap = 100-scrap_ratio
+        remaining_crap = 100 - scrap_ratio
 
     # 3. EXECUTIVE KPI CARDS - 5 columns for maximum high-level dashboard visual insight
     kpi_cols = st.columns(5)
@@ -294,11 +312,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Card 5: NEW SPECIAL KPI showing potential scrapping value ratio against plant stock
     with kpi_cols[4]:
         scrap_pct_str = f"{scrap_ratio:.0f}%" if bom_loaded else "N/A (Load BOM)"
+        remaining_pct_val = remaining_crap if bom_loaded else 0.0
         st.markdown(f"""
             <div class="metric-card" style="border-left-color: #7C3AED; background-color: #FAF5FF;">
                 <div class="metric-label">Potential Scrap Ratio</div>
                 <div class="metric-value" style="color: #EF4444;">{scrap_pct_str}</div>
-                <div class="metric-subvalue">{remaining_crap:.0f}% to be kept in {plant}</div>
+                <div class="metric-subvalue">{remaining_pct_val:.0f}% to be kept in {plant}</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -320,80 +339,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
             st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px;">', unsafe_allow_html=True)
 
-            # --------------------------- EXECUTIVE DASHBOARD ROW 1 ---------------------------
-            col_left, col_right = st.columns([1.0, 1.0])
-
-            with col_left:
-                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
-                st.markdown("##### STOCK DISTRIBUTION OVERVIEW")
-
-                # Stacked Bar Data in requested display order
-                bar_data = [
-                    {"Category": "Total Stock Value", "Type": "All plant", "Value": Total_stock_value},
-                    {"Category": "Stock Distribution", "Type": f"{plant}", "Value": Interested_plant_stock_value},
-                    {"Category": "Stock Distribution", "Type": "Others plant", "Value": Others_plant_stock_value},
-                    {"Category": f"{plant} Scrap Result", "Type": f"{plant} Potential value for scrapping", "Value": scrap_value},
-                    {"Category": f"{plant} Scrap Result", "Type": "Transferred value", "Value": transfer_value}
-                ]
-                bar_df = pd.DataFrame(bar_data)
-                sorted_cats = ["Total Stock Value", "Stock Distribution", f"{plant} Scrap Result"]
-
-                bar_fig = px.bar(
-                    bar_df,
-                    y="Category",
-                    x="Value",
-                    color="Type",
-                    orientation='h',
-                    category_orders={"Category": sorted_cats},
-                    color_discrete_map={ 
-                        "All plant": "#1E3A5F",
-                        f"{plant}": "#2563EB",
-                        "Others plant": "#94A3B8",
-                        f"{plant} Potential value for scrapping": "#D97706",
-                        "Transferred value": "#059669"
-                    }
-                )
-                bar_fig.update_layout(
-                    barmode='stack',
-                    yaxis_title=None,
-                    xaxis_title="Value ($)",
-                    height=380,
-                    margin=dict(t=10, b=10, l=10, r=10),
-                    legend=dict(orientation="h", y=-0.25, xanchor="center", x=0.5)
-                )
-                st.plotly_chart(bar_fig, use_container_width=True)
-                st.markdown('</div>', unsafe_allow_html=True)
-
-            with col_right:
-                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
-                st.markdown("##### STOCK VALUE PER FASD STATUS")
-
-                if not scrap_df.empty:
-                    scrap_df['Stock Value'] = scrap_df['Stock qty'] * scrap_df['Unit price'].fillna(0)
-                    fasd_df = scrap_df.groupby('FASD')['Stock Value'].sum().reset_index()
-                    fasd_df = fasd_df.sort_values(by='Stock Value', ascending=True)
-
-                    fasd_bar_fig = px.bar(
-                        fasd_df,
-                        y='FASD',
-                        x='Stock Value',
-                        orientation='h',
-                        color_discrete_sequence=['#475569'],
-                        text_auto='.2s'
-                    )
-                    fasd_bar_fig.update_layout(
-                        yaxis_title=None,
-                        height=380,
-                        margin=dict(t=10, b=10, l=10, r=10)
-                    )
-                    st.plotly_chart(fasd_bar_fig, use_container_width=True)
-                else:
-                    st.info("No data available for FASD breakdown.")
-                st.markdown('</div>', unsafe_allow_html=True)
-
             # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS (SINGLE ROW) ---------------------------
-            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px;">', unsafe_allow_html=True)
-            
             if not Interested_plant.empty:
                 col_sel_left, col_sel_right = st.columns([1.0, 2.0])
                 
@@ -446,6 +392,79 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 st.info("No data to display group analysis.")
                 selected_char = None
                 filtered_by_char = pd.DataFrame()
+
+            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px;">', unsafe_allow_html=True)
+
+            # --------------------------- EXECUTIVE DASHBOARD ROW 2 ---------------------------
+            col_left, col_right = st.columns([1.0, 1.0])
+
+            with col_left:
+                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+                st.markdown("##### STOCK DISTRIBUTION OVERVIEW")
+
+                # Stacked Bar Data in requested display order
+                bar_data = [
+                    {"Category": "Total Stock Value", "Type": "All plant", "Value": Total_stock_value},
+                    {"Category": "Stock Distribution", "Type": f"{plant}", "Value": Interested_plant_stock_value},
+                    {"Category": "Stock Distribution", "Type": "Others plant", "Value": Others_plant_stock_value},
+                    {"Category": f"{plant} Scrap Result", "Type": f"{plant} Potential value for scrapping", "Value": scrap_value},
+                    {"Category": f"{plant} Scrap Result", "Type": "Transferred value", "Value": transfer_value}
+                ]
+                bar_df = pd.DataFrame(bar_data)
+                sorted_cats = ["Total Stock Value", "Stock Distribution", f"{plant} Scrap Result"]
+
+                bar_fig = px.bar(
+                    bar_df,
+                    y="Category",
+                    x="Value",
+                    color="Type",
+                    orientation='h',
+                    category_orders={"Category": sorted_cats},
+                    color_discrete_map={
+                        "All plant": "#1E3A5F",
+                        f"{plant}": "#2563EB",
+                        "Others plant": "#94A3B8",
+                        f"{plant} Potential value for scrapping": "#D97706",
+                        "Transferred value": "#059669"
+                    }
+                )
+                bar_fig.update_layout(
+                    barmode='stack',
+                    yaxis_title=None,
+                    xaxis_title="Value ($)",
+                    height=380,
+                    margin=dict(t=10, b=10, l=10, r=10),
+                    legend=dict(orientation="h", y=-0.25, xanchor="center", x=0.5)
+                )
+                st.plotly_chart(bar_fig, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+
+            with col_right:
+                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+                st.markdown("##### STOCK VALUE PER FASD STATUS")
+
+                if not scrap_df.empty:
+                    scrap_df['Stock Value'] = scrap_df['Stock qty'] * scrap_df['Unit price'].fillna(0)
+                    fasd_df = scrap_df.groupby('FASD')['Stock Value'].sum().reset_index()
+                    fasd_df = fasd_df.sort_values(by='Stock Value', ascending=True)
+
+                    fasd_bar_fig = px.bar(
+                        fasd_df,
+                        y='FASD',
+                        x='Stock Value',
+                        orientation='h',
+                        color_discrete_sequence=['#475569'],
+                        text_auto='.2s'
+                    )
+                    fasd_bar_fig.update_layout(
+                        yaxis_title=None,
+                        height=380,
+                        margin=dict(t=10, b=10, l=10, r=10)
+                    )
+                    st.plotly_chart(fasd_bar_fig, use_container_width=True)
+                else:
+                    st.info("No data available for FASD breakdown.")
+                st.markdown('</div>', unsafe_allow_html=True)
 
             st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
         else:
