@@ -388,7 +388,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-            st.markdown("### 🔄 {plant} Potential materials to be transferred from {plant} ")
+            st.markdown("### 🔄 Potential materials to be transferred from" {plant})
             if not materials_to_transfer.empty:
                 st.dataframe(materials_to_transfer, use_container_width=True)
 
