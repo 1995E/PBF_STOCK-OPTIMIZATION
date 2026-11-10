@@ -383,7 +383,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                             color='FASD',
                             color_discrete_sequence=px.colors.qualitative.Pastel
                         )
-                        bar_grp_fig.update_traces(width=0.5)
+                        bar_grp_fig.update_traces(width=0.1)
                         bar_grp_fig.update_layout(height=300, margin=dict(t=10, b=10, l=5, r=5))
                         st.plotly_chart(bar_grp_fig, use_container_width=True)
                     else:
