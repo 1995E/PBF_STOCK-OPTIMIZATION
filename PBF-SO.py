@@ -489,7 +489,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 st.markdown(f"### 📋 Materials in selected Group: **{selected_char}**")
                 st.dataframe(filtered_by_char, use_container_width=True)
 
-            st.markdown(f"### 📋 {plant} potential material list for scrapping")
+            #st.markdown(f"### 📋 {plant} potential material list for scrapping")
             display_columns = [
                 'Material n°', 'Material description', 'Material discipline',
                 'Plant code', 'Plant', 'Storage bin', 'FASD', 'Blocking status',
@@ -511,7 +511,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-            st.markdown(f"### 🔄 Potential materials to be transferred from {plant}")
+            #st.markdown(f"### 🔄 Potential materials to be transferred from {plant}")
             if not materials_to_transfer.empty:
                 st.dataframe(materials_to_transfer, use_container_width=True)
 
