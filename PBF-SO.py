@@ -103,7 +103,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Modern Title
-st.markdown("<div class=\"main-header\"> STREAMLIT STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
+st.markdown("<div class=\"main-header\"> STOCK ANALYSE TOOL</div>", unsafe_allow_html=True)
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
