@@ -42,8 +42,8 @@ st.markdown(f"""
             margin-bottom: 35px;
         }}
         .kpi-gap {{ 
-            margin-top: 25px;
-            margin-bottom: 25px;
+            margin-top: 15px;
+            margin-bottom: 15px;
         }}
         .kpi-title {{
             font-size: 1.45rem !important;
