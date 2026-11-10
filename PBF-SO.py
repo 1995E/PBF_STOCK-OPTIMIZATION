@@ -223,7 +223,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             <div class="metric-card" style="border-left-color: #1E3A8A">
                 <div class="metric-label">Total Material Assessed</div>
                 <div class="metric-value">{Total_removed_materials:,}</div>
-                <div class="metric-subvalue">stock & non-stocked materials</div>
+                <div class="metric-subvalue">stock and non-stocked materials</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -388,7 +388,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-            st.markdown("### 🔄 Potential materials to be Transferred from {plant}")
+            st.markdown("### 🔄 Potential materials to be transferred from {plant} ")
             if not materials_to_transfer.empty:
                 st.dataframe(materials_to_transfer, use_container_width=True)
 
