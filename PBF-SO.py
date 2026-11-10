@@ -341,7 +341,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
             # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS (SINGLE ROW) ---------------------------
             if not Interested_plant.empty:
-                col_sel_left, col_sel_right = st.columns([1.0, 1.0])
+                col_sel_left, col_sel_right = st.columns([1.0, 2.0])
                 
                 with col_sel_left:
                     st.markdown('<div class="chart-card" style="min-height: 5px;">', unsafe_allow_html=True)
@@ -383,7 +383,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                             color='FASD',
                             color_discrete_sequence=px.colors.qualitative.Pastel
                         )
-                        bar_grp_fig.update_traces(width=0.25)
+                        bar_grp_fig.update_traces(width=0.5)
                         bar_grp_fig.update_layout(height=300, margin=dict(t=10, b=10, l=5, r=5))
                         st.plotly_chart(bar_grp_fig, use_container_width=True)
                     else:
@@ -437,7 +437,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     margin=dict(t=10, b=10, l=10, r=10),
                     legend=dict(orientation="h", y=-0.25, xanchor="center", x=0.5)
                 )
-                bar_fig.update_traces(width=0.5)
+                bar_fig.update_traces(width=0.8)
                 st.plotly_chart(bar_fig, use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -458,7 +458,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         color_discrete_sequence=['#475569'],
                         text_auto='.2s'
                     )
-                    bar_grp_fig.update_traces(width=0.25)
+                    bar_grp_fig.update_traces(width=0.8)
                     fasd_bar_fig.update_layout(
                         yaxis_title=None,
                         height=380,
