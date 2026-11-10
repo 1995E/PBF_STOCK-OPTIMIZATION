@@ -341,7 +341,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
             # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS (SINGLE ROW) ---------------------------
             if not Interested_plant.empty:
-                col_sel_left, col_sel_right = st.columns([1.0, 2.0])
+                col_sel_left, col_sel_right = st.columns([1.0, 1.0])
                 
                 with col_sel_left:
                     st.markdown('<div class="chart-card" style="min-height: 10px;">', unsafe_allow_html=True)
