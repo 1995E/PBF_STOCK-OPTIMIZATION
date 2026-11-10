@@ -32,8 +32,8 @@ st.markdown(f"""
     <style>
         .main-header {{
             font-size: 2.2rem;
-            color: #000000;
-            font-weight: 900;
+            color: #2f5182;
+            font-weight: 800;
             margin-bottom: 2rem;
         }}
         .section-gap {{
