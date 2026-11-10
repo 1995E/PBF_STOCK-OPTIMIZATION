@@ -458,6 +458,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         color_discrete_sequence=['#475569'],
                         text_auto='.2s'
                     )
+                    bar_grp_fig.update_traces(width=0.25)
                     fasd_bar_fig.update_layout(
                         yaxis_title=None,
                         height=380,
