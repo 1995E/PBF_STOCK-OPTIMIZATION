@@ -32,7 +32,7 @@ st.markdown(f"""
     <style>
         .main-header {{
             font-size: 2.2rem;
-            color: #1E3A8A;
+            color: #0040ff;
             font-weight: 900;
             margin-bottom: 2rem;
         }}
@@ -223,7 +223,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             <div class="metric-card" style="border-left-color: #1E3A8A">
                 <div class="metric-label">Total Material Assessed</div>
                 <div class="metric-value">{Total_removed_materials:,}</div>
-                <div class="metric-subvalue">stock & non-stocked items</div>
+                <div class="metric-subvalue">stock & non-stocked materials</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -233,7 +233,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             <div class="metric-card" style="border-left-color: #10B981">
                 <div class="metric-label">Total Stock Value</div>
                 <div class="metric-value">${Total_stock_value:,.0f}</div>
-                <div class="metric-subvalue"><b>{len(pd_v1_unique_materials):,}</b> stock items</div>
+                <div class="metric-subvalue"><b>{len(pd_v1_unique_materials):,}</b> stock materials</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -243,7 +243,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             <div class="metric-card" style="border-left-color: #F59E0B">
                 <div class="metric-label">{plant} Stock Value</div>
                 <div class="metric-value">${Interested_plant_stock_value:,.0f}</div>
-                <div class="metric-subvalue"><b>{len(Interested_plant_unique):,}</b> stock items</div>
+                <div class="metric-subvalue"><b>{len(Interested_plant_unique):,}</b> stock materials</div>
             </div>
         """, unsafe_allow_html=True)
 
