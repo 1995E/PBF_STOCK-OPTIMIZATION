@@ -32,7 +32,7 @@ st.markdown(f"""
     <style>
         .main-header {{
             font-size: 2.2rem;
-            color: #0040ff;
+            color: #000000;
             font-weight: 900;
             margin-bottom: 2rem;
         }}
