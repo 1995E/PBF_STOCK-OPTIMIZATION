@@ -437,7 +437,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     margin=dict(t=10, b=10, l=10, r=10),
                     legend=dict(orientation="h", y=-0.25, xanchor="center", x=0.5)
                 )
-                bar_fig.update_traces(width=0.3)
+                bar_fig.update_traces(width=0.5)
                 st.plotly_chart(bar_fig, use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
 
