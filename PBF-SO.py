@@ -36,7 +36,7 @@ st.markdown(f"""
             color: #303947;
             font-weight: 800;
             margin-bottom: 2rem;
-            font-family: serif;
+            font-family: cursive;
         }}
         .section-gap {{
             margin-top: 35px;
