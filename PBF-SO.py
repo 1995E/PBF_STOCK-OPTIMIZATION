@@ -398,7 +398,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 col_sel_left, col_sel_right = st.columns([1.0, 2.0])
                 
                 with col_sel_left:
-                    st.markdown('<div class="chart-card" style="min-height: 400px;">', unsafe_allow_html=True)
+                    st.markdown('<div class="chart-card" style="min-height: 20px;">', unsafe_allow_html=True)
                     st.markdown("##### 🔍 FILTER BY CHARACTERISTIC")
                     unique_characteristics = sorted(list(Interested_plant['Description Characteristic'].dropna().unique()))
                     selected_char = st.selectbox(
