@@ -494,7 +494,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 'Material n°', 'Material description', 'Material discipline',
                 'Plant code', 'Plant', 'Storage bin', 'FASD', 'Blocking status',
                 'MRP Type', 'Stock qty', 'Blocked Stock Qty', 'Safety', 'Min',
-                'Max', 'Unit price', 'Action', 'Optimization Status', 'Description Characteristic'
+                'Max', 'Unit price', 'Action', 'Optimization Status'
             ]
             existing_display_cols = [col for col in display_columns if col in Interested_plant.columns]
             Interested_plant_display = Interested_plant[existing_display_cols]
