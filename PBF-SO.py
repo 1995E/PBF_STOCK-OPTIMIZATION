@@ -486,7 +486,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         if bom_loaded:
             # Display the selected characteristic's subset of materials at the top of the detailed tab
             if selected_char and not filtered_by_char.empty:
-                st.markdown(f"### 📋 Materials in selected Group: **{selected_char}**")
+                #st.markdown(f"### 📋 Materials in selected Group: **{selected_char}**")
                 st.markdown(f"""
                     <div style="margin-top: 20px;">
                         <p style="margin-bottom:2px; font-weight:bold; color:#64748B;">ASSOCIATED STOCK VALUE</p>
