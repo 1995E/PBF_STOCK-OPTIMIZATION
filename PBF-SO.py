@@ -348,7 +348,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     st.markdown("##### 🔍 FILTER BY CHARACTERISTIC")
                     unique_characteristics = sorted(list(Interested_plant['Description Characteristic'].dropna().unique()))
                     selected_char = st.selectbox(
-                        "Choose a Description Characteristic:",
+                        "Choose a material group:",
                         options=unique_characteristics,
                         index=0,
                         key="char_select_dashboard"
@@ -361,7 +361,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         pred_fasd = filtered_by_char.groupby('FASD')['Stock qty'].sum().idxmax() if not filtered_by_char.dropna(subset=['FASD']).empty else 'N/A'
                         st.markdown(f"""
                             <div style="margin-top: 20px;">
-                                <p style="margin-bottom:2px; font-weight:bold; color:#64748B;">TOTAL GROUP STOCK VALUE</p>
+                                <p style="margin-bottom:2px; font-weight:bold; color:#64748B;">ASSOCIATED STOCK VALUE</p>
                                 <h3 style="margin-top:0px; color:#1E3A8A;">${grp_stock_val:,.2f}</h3>
                                 <p style="margin-bottom:2px; font-weight:bold; color:#64748B;">PREDOMINANT FASD STATUS</p>
                                 <h4 style="margin-top:0px; color:#EF4444;">{pred_fasd}</h4>
@@ -372,7 +372,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 with col_sel_right:
                     st.markdown('<div class="chart-card" style="min-height: 5px;">', unsafe_allow_html=True)
                     if not filtered_by_char.empty:
-                        st.markdown(f"##### BAR CHART: STOCK VALUE FOR {selected_char}")
+                        st.markdown(f"##### STOCK VALUE FOR {selected_char}")
                         char_fasd_data = filtered_by_char.groupby('FASD')['Stock Value'].sum().reset_index()
                         
                         bar_grp_fig = px.bar(
@@ -385,7 +385,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         )
                         bar_grp_fig.update_traces(width=0.25)
                         bar_grp_fig.update_layout(height=300, margin=dict(t=10, b=10, l=5, r=5))
-                        st.plotly_chart(bar_grp_fig, use_container_width=False)
+                        st.plotly_chart(bar_grp_fig, use_container_width=True)
                     else:
                         st.info("No data available for the chosen group.")
                     st.markdown('</div>', unsafe_allow_html=True)
