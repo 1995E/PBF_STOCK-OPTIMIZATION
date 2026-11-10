@@ -41,7 +41,7 @@ st.markdown(f"""
             margin-top: 35px;
             margin-bottom: 35px;
         }}
-        .kpi-gap {{ 
+        .kpi-gap {{
             margin-top: 25px;
             margin-bottom: 25px;
         }}
@@ -150,23 +150,23 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 continue
             desc_str = str(desc).upper()
             parts = desc_str.split(',')
-            
+
             # First keyword before first comma
             first_part = parts[0]
             first_tokens = [t.strip() for t in re.sub(r'[^A-Z0-9\s-]', ' ', first_part).split() if len(t.strip()) > 2]
             first_key = first_tokens[0] if len(first_tokens) > 0 else 'OTHER'
-            
+
             # Second keyword after first comma
             second_key = ''
             if len(parts) > 1:
                 second_part = parts[1]
                 second_tokens = [t.strip() for t in re.sub(r'[^A-Z0-9\s-]', ' ', second_part).split() if len(t.strip()) > 2]
                 second_key = second_tokens[0] if len(second_tokens) > 0 else ''
-            
+
             parsed_records.append({'idx': idx, 'first': first_key, 'second': second_key})
-        
+
         parsed_df = pd.DataFrame(parsed_records)
-        
+
         # If first keyword is identical, check second keyword.
         # If second keyword is also identical across all of them, group under "FIRST SECOND".
         # If second keyword differs across any, group under purely "FIRST".
@@ -174,15 +174,15 @@ if uploaded_materials is not None and uploaded_prices is not None:
         for first_val, group in parsed_df.groupby('first'):
             unique_seconds = group['second'].unique()
             valid_seconds = [s for s in unique_seconds if s != '']
-            
+
             if len(valid_seconds) == 1:
                 mapped_name = f"{first_val} {valid_seconds[0]}"
             else:
                 mapped_name = first_val
-            
+
             for row_idx in group['idx']:
                 char_mapping[row_idx] = mapped_name
-        
+
         Interested_plant['Description Characteristic'] = Interested_plant.index.map(char_mapping).fillna('OTHER')
     else:
         Interested_plant['Description Characteristic'] = pd.Series(dtype='str')
@@ -323,7 +323,17 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
     st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
-    tab1, tab2 = st.tabs(["📊 DISPLAY CHARTS", "📋 DETAILED DATASET"])
+    tab1, tab2, tab3 = st.tabs(["📊 DISPLAY CHARTS", "🔍 CHARTS FOR MATERIAL GROUP", "📋 DETAILED DATASET"])
+
+    # Initialize global state variables for filtered values to pass correctly across tabs
+    selected_char = None
+    filtered_by_char = pd.DataFrame()
+
+    if not Interested_plant.empty:
+        unique_characteristics = sorted(list(Interested_plant['Description Characteristic'].dropna().unique()))
+        if unique_characteristics:
+            selected_char = unique_characteristics[0]
+            filtered_by_char = Interested_plant[Interested_plant['Description Characteristic'] == selected_char].copy()
 
     with tab1:
         if bom_loaded:
@@ -339,64 +349,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
             st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 20px; margin-bottom: 15px;">', unsafe_allow_html=True)
 
-            # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS (SINGLE ROW) ---------------------------
-            if not Interested_plant.empty:
-                col_sel_left, col_sel_right = st.columns([1.0, 2.0])
-                
-                with col_sel_left:
-                    st.markdown('<div class="chart-card" style="min-height: 5px;">', unsafe_allow_html=True)
-                    st.markdown("##### 🔍 FILTER BY CHARACTERISTIC")
-                    unique_characteristics = sorted(list(Interested_plant['Description Characteristic'].dropna().unique()))
-                    selected_char = st.selectbox(
-                        "Choose a material group:",
-                        options=unique_characteristics,
-                        index=0,
-                        key="char_select_dashboard"
-                    )
-                    filtered_by_char = Interested_plant[Interested_plant['Description Characteristic'] == selected_char].copy()
-                    
-                    # Display simple overview metrics of the selected group
-                    if not filtered_by_char.empty:
-                        grp_stock_val = filtered_by_char['Stock Value'].sum()
-                        pred_fasd = filtered_by_char.groupby('FASD')['Stock qty'].sum().idxmax() if not filtered_by_char.dropna(subset=['FASD']).empty else 'N/A'
-                        st.markdown(f"""
-                            <div style="margin-top: 20px;">
-                                <p style="margin-bottom:2px; font-weight:bold; color:#64748B;">ASSOCIATED STOCK VALUE</p>
-                                <h3 style="margin-top:0px; color:#1E3A8A;">${grp_stock_val:,.2f}</h3>
-                                <p style="margin-bottom:2px; font-weight:bold; color:#64748B;">PREDOMINANT FASD STATUS</p>
-                                <h4 style="margin-top:0px; color:#EF4444;">{pred_fasd}</h4> 
-                            </div>
-                        """, unsafe_allow_html=True)
-                    st.markdown('</div>', unsafe_allow_html=True)
-                    
-                with col_sel_right:
-                    st.markdown('<div class="chart-card" style="min-height: 5px;">', unsafe_allow_html=True)
-                    if not filtered_by_char.empty:
-                        st.markdown(f"##### STOCK VALUE FOR {selected_char}")
-                        char_fasd_data = filtered_by_char.groupby('FASD')['Stock Value'].sum().reset_index()
-                        
-                        bar_grp_fig = px.bar(
-                            char_fasd_data,
-                            x='FASD',
-                            y='Stock Value',
-                            labels={'Stock Value': 'Total Stock Value ($)'},
-                            color='FASD',
-                            color_discrete_sequence=px.colors.qualitative.Pastel
-                        )
-                        bar_grp_fig.update_traces(width=0.2)
-                        bar_grp_fig.update_layout(height=250, margin=dict(t=10, b=10, l=5, r=5))
-                        st.plotly_chart(bar_grp_fig, use_container_width=True)
-                    else:
-                        st.info("No data available for the chosen group.")
-                    st.markdown('</div>', unsafe_allow_html=True)
-            else:
-                st.info("No data to display group analysis.")
-                selected_char = None
-                filtered_by_char = pd.DataFrame()
-
-            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px;">', unsafe_allow_html=True)
-
-            # --------------------------- EXECUTIVE DASHBOARD ROW 2 ---------------------------
+            # --------------------------- EXECUTIVE DASHBOARD ROW 1 (FORMERLY ROW 2) ---------------------------
             col_left, col_right = st.columns([1.0, 1.0])
 
             with col_left:
@@ -458,7 +411,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         color_discrete_sequence=['#475569'],
                         text_auto='.2s'
                     )
-                    bar_grp_fig.update_traces(width=0.8)
                     fasd_bar_fig.update_layout(
                         yaxis_title=None,
                         height=380,
@@ -472,13 +424,68 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
         else:
             st.info("💡 Please upload the Impacted BOM template to preview interactive visualization panels!")
-            selected_char = None
-            filtered_by_char = pd.DataFrame()
 
     with tab2:
         if bom_loaded:
+            # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS (DEDICATED TAB) ---------------------------
+            if not Interested_plant.empty:
+                col_sel_left, col_sel_right = st.columns([1.0, 2.0])
+                
+                with col_sel_left:
+                    st.markdown('<div class="chart-card" style="min-height: 5px;">', unsafe_allow_html=True)
+                    st.markdown("##### 🔍 FILTER BY CHARACTERISTIC")
+                    unique_characteristics = sorted(list(Interested_plant['Description Characteristic'].dropna().unique()))
+                    selected_char = st.selectbox(
+                        "Choose a material group:",
+                        options=unique_characteristics,
+                        index=0,
+                        key="char_select_tab_dedicated"
+                    )
+                    filtered_by_char = Interested_plant[Interested_plant['Description Characteristic'] == selected_char].copy()
+                    
+                    # Display simple overview metrics of the selected group
+                    if not filtered_by_char.empty:
+                        grp_stock_val = filtered_by_char['Stock Value'].sum()
+                        pred_fasd = filtered_by_char.groupby('FASD')['Stock qty'].sum().idxmax() if not filtered_by_char.dropna(subset=['FASD']).empty else 'N/A'
+                        st.markdown(f"""
+                            <div style="margin-top: 20px;">
+                                <p style="margin-bottom:2px; font-weight:bold; color:#64748B;">ASSOCIATED STOCK VALUE</p>
+                                <h3 style="margin-top:0px; color:#1E3A8A;">${grp_stock_val:,.2f}</h3>
+                                <p style="margin-bottom:2px; font-weight:bold; color:#64748B;">PREDOMINANT FASD STATUS</p>
+                                <h4 style="margin-top:0px; color:#EF4444;">{pred_fasd}</h4> 
+                            </div>
+                        """, unsafe_allow_html=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
+                    
+                with col_sel_right:
+                    st.markdown('<div class="chart-card" style="min-height: 5px;">', unsafe_allow_html=True)
+                    if not filtered_by_char.empty:
+                        st.markdown(f"##### STOCK VALUE FOR {selected_char}")
+                        char_fasd_data = filtered_by_char.groupby('FASD')['Stock Value'].sum().reset_index()
+                        
+                        bar_grp_fig = px.bar(
+                            char_fasd_data,
+                            x='FASD',
+                            y='Stock Value',
+                            labels={'Stock Value': 'Total Stock Value ($)'},
+                            color='FASD',
+                            color_discrete_sequence=px.colors.qualitative.Pastel
+                        )
+                        bar_grp_fig.update_traces(width=0.2)
+                        bar_grp_fig.update_layout(height=250, margin=dict(t=10, b=10, l=5, r=5))
+                        st.plotly_chart(bar_grp_fig, use_container_width=True)
+                    else:
+                        st.info("No data available for the chosen group.")
+                    st.markdown('</div>', unsafe_allow_html=True)
+            else:
+                st.info("No data to display group analysis.")
+        else:
+            st.info("💡 Please upload the Impacted BOM template to preview interactive visualization panels!")
+
+    with tab3:
+        if bom_loaded:
             # Display the selected characteristic's subset of materials at the top of the detailed tab
-            if selected_char:
+            if selected_char and not filtered_by_char.empty:
                 st.markdown(f"### 📋 Materials in selected Group: **{selected_char}**")
                 st.dataframe(filtered_by_char, use_container_width=True)
 
