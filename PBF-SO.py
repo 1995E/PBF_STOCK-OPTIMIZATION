@@ -388,7 +388,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS ---------------------------
             st.markdown(f"### 📊 Selected Group Analysis: {selected_char}")
             if not filtered_by_char.empty:
-                col_char_left, col_char_right = st.columns([1.0, 1.0])
+                col_char_left, col_char_right = st.columns([1.0])
 
                 # Predominant FASD status
                 predominant_fasd = filtered_by_char.groupby('FASD')['Stock qty'].sum().idxmax() if not filtered_by_char.dropna(subset=['FASD']).empty else 'N/A'
