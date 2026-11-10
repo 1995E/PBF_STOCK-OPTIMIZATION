@@ -364,7 +364,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                                 <p style="margin-bottom:2px; font-weight:bold; color:#64748B;">ASSOCIATED STOCK VALUE</p>
                                 <h3 style="margin-top:0px; color:#1E3A8A;">${grp_stock_val:,.2f}</h3>
                                 <p style="margin-bottom:2px; font-weight:bold; color:#64748B;">PREDOMINANT FASD STATUS</p>
-                                <h4 style="margin-top:0px; color:#EF4444;">{pred_fasd}</h4>
+                                <h4 style="margin-top:0px; color:#EF4444;">{pred_fasd}</h4> 
                             </div>
                         """, unsafe_allow_html=True)
                     st.markdown('</div>', unsafe_allow_html=True)
