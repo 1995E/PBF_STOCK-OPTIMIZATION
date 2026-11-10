@@ -366,7 +366,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     with tab2:
         if bom_loaded:
-            st.markdown(f"### 📋 Interested Plant Materials for {plant}")
+            st.markdown(f"### 📋 {plant} potential material list for scrapping")
             display_columns = [
                 'Material n°', 'Material description', 'Material discipline',
                 'Plant code', 'Plant', 'Storage bin', 'FASD', 'Blocking status',
@@ -382,13 +382,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
             with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
                 Interested_plant_display.to_excel(writer, index=False, sheet_name='Interested Plant')
             st.download_button(
-                label="📥 Download Interested Plant Excel",
+                label="📥 Download Excel file",
                 data=buffer_interested.getvalue(),
                 file_name=f"Interested_Plant_{plant}.xlsx",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-            st.markdown("### 🔄 Materials to be Transferred")
+            st.markdown("### 🔄 Potential materials to be Transferred from {plant}")
             if not materials_to_transfer.empty:
                 st.dataframe(materials_to_transfer, use_container_width=True)
 
@@ -397,7 +397,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 with pd.ExcelWriter(buffer_transfer, engine='openpyxl') as writer:
                     materials_to_transfer.to_excel(writer, index=False, sheet_name='Materials to Transfer')
                 st.download_button(
-                    label="📥 Download Materials to Transfer Excel",
+                    label="📥 Download Excel file",
                     data=buffer_transfer.getvalue(),
                     file_name=f"Materials_to_Transfer_{plant}.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
