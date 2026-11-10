@@ -4,6 +4,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 import numpy as np
 import io
+import re
 
 st.set_page_config(
     page_title="PBF STOCK ANALYSE TOOL",
@@ -40,7 +41,7 @@ st.markdown(f"""
             margin-top: 35px;
             margin-bottom: 35px;
         }}
-        .kpi-gap {{
+        .kpi-gap {{ 
             margin-top: 25px;
             margin-bottom: 25px;
         }}
@@ -95,7 +96,7 @@ st.markdown(f"""
             border-radius: 8px;
         }}
         /* Target Streamlit Progress Bar fill - Force custom high contrast Premium Red */
-        .stProgress > div > div > div > div {{
+        .stProgress > div > div > div > div {{ 
             background-color: #EF4444 !important;
         }}
     </style>
@@ -139,15 +140,17 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Interested_plant_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
     Others_plant_stock_value = Total_stock_value - Interested_plant_stock_value
 
-    # Create Description Characteristic grouping column (first word of description)
-    def extract_characteristic(desc):
+    # ROBUST GROUPING BY DESCRIPTION CHARACTERISTIC
+    def extract_robust_characteristic(desc):
         if pd.isna(desc):
             return 'UNKNOWN'
-        clean_desc = str(desc).replace(',', ' ').replace(';', ' ').strip()
-        parts = clean_desc.split()
-        return parts[0].upper() if len(parts) > 0 else 'UNKNOWN'
+        # Convert to upper, clean non-alphanumeric separators, split
+        cleaned = re.sub(r'[^A-Z0-9\s-]', ' ', str(desc).upper())
+        tokens = [t.strip() for t in cleaned.split() if len(t.strip()) > 2]
+        # Get the first descriptive key token if available
+        return tokens[0] if len(tokens) > 0 else 'OTHER'
 
-    Interested_plant['Description Characteristic'] = Interested_plant['Material description'].apply(extract_characteristic)
+    Interested_plant['Description Characteristic'] = Interested_plant['Material description'].apply(extract_robust_characteristic)
     Interested_plant['Stock Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
 
     # UPDATE INTERESTED PLANT DATAFRAME WITH ACTION COLUMN FROM IMPACTED BOM BEFORE DISPLAYING KPIs
@@ -223,9 +226,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     scrap_ratio = 0.0
     if Interested_plant_stock_value > 0:
         scrap_ratio = (scrap_value / Interested_plant_stock_value) * 100
-        remaining_crap = 100 - scrap_ratio
-    else:
-        remaining_crap = 100
+        remaining_crap = 100-scrap_ratio
 
     # 3. EXECUTIVE KPI CARDS - 5 columns for maximum high-level dashboard visual insight
     kpi_cols = st.columns(5)
@@ -233,30 +234,30 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Card 1: Total material removed
     with kpi_cols[0]:
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #1E3A8A\">
-                <div class=\"metric-label\">Total Material Assessed</div>
-                <div class=\"metric-value\">{Total_removed_materials:,}</div>
-                <div class=\"metric-subvalue\">stock and non-stocked materials</div>
+            <div class="metric-card" style="border-left-color: #1E3A8A">
+                <div class="metric-label">Total Material Assessed</div>
+                <div class="metric-value">{Total_removed_materials:,}</div>
+                <div class="metric-subvalue">stock and non-stocked materials</div>
             </div>
         """, unsafe_allow_html=True)
 
     # Card 2: Total portfolio stock
     with kpi_cols[1]:
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #10B981\">
-                <div class=\"metric-label\">Total Stock Value</div>
-                <div class=\"metric-value\">${Total_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\"><b>{len(pd_v1_unique_materials):,}</b> stock materials</div>
+            <div class="metric-card" style="border-left-color: #10B981">
+                <div class="metric-label">Total Stock Value</div>
+                <div class="metric-value">${Total_stock_value:,.0f}</div>
+                <div class="metric-subvalue"><b>{len(pd_v1_unique_materials):,}</b> stock materials</div>
             </div>
         """, unsafe_allow_html=True)
 
     # Card 3: Selected plant stock value
     with kpi_cols[2]:
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #F59E0B\">
-                <div class=\"metric-label\">{plant} Stock Value</div>
-                <div class=\"metric-value\">${Interested_plant_stock_value:,.0f}</div>
-                <div class=\"metric-subvalue\"><b>{len(Interested_plant_unique):,}</b> stock materials</div>
+            <div class="metric-card" style="border-left-color: #F59E0B">
+                <div class="metric-label">{plant} Stock Value</div>
+                <div class="metric-value">${Interested_plant_stock_value:,.0f}</div>
+                <div class="metric-subvalue"><b>{len(Interested_plant_unique):,}</b> stock materials</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -265,10 +266,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
         scrap_val_str = f"${scrap_value:,.0f}" if bom_loaded else "N/A (Load BOM)"
         sub_str = f"<b>${transfer_value:,.0f}</b> to be transferred" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #EF4444\">
-                <div class=\"metric-label\">{plant} Potential Scrap</div>
-                <div class=\"metric-value\">{scrap_val_str}</div>
-                <div class=\"metric-subvalue\">-{sub_str}</div>
+            <div class="metric-card" style="border-left-color: #EF4444">
+                <div class="metric-label">{plant} Potential Scrap</div>
+                <div class="metric-value">{scrap_val_str}</div>
+                <div class="metric-subvalue">-{sub_str}</div>
             </div>
         """, unsafe_allow_html=True)
 
@@ -276,19 +277,19 @@ if uploaded_materials is not None and uploaded_prices is not None:
     with kpi_cols[4]:
         scrap_pct_str = f"{scrap_ratio:.0f}%" if bom_loaded else "N/A (Load BOM)"
         st.markdown(f"""
-            <div class=\"metric-card\" style=\"border-left-color: #7C3AED; background-color: #FAF5FF;\">
-                <div class=\"metric-label\">Potential Scrap Ratio</div>
-                <div class=\"metric-value\" style=\"color: #EF4444;\">{scrap_pct_str}</div>
-                <div class=\"metric-subvalue\">{remaining_crap:.0f}% to be kept in {plant}</div>
+            <div class="metric-card" style="border-left-color: #7C3AED; background-color: #FAF5FF;">
+                <div class="metric-label">Potential Scrap Ratio</div>
+                <div class="metric-value" style="color: #EF4444;">{scrap_pct_str}</div>
+                <div class="metric-subvalue">{remaining_crap:.0f}% to be kept in {plant}</div>
             </div>
         """, unsafe_allow_html=True)
 
     # INTERACTIVE DROPDOWN: Characteristic Selectbox
     if not Interested_plant.empty:
-        st.markdown("### 🔍 Filter by Material Description Characteristic")
+        st.markdown("### 🔍 Filter by Material Description Characteristic Group")
         unique_characteristics = sorted(list(Interested_plant['Description Characteristic'].dropna().unique()))
         selected_char = st.selectbox(
-            "Choose Description Characteristic:",
+            "Choose a Description Characteristic:",
             options=unique_characteristics,
             index=0
         )
@@ -303,6 +304,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     with tab1:
         if bom_loaded:
+            # Increased spacing between EXECUTIVE TABS and KPI PROGRESS BAR
             st.markdown('<div class="kpi-gap"></div>', unsafe_allow_html=True)
 
             # --------------------------- KPI PROGRESS BAR ---------------------------
@@ -386,19 +388,20 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 st.markdown('</div>', unsafe_allow_html=True)
 
             # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS ---------------------------
-            st.markdown(f"### 📊 Selected Group Analysis: {selected_char}")
-            if not filtered_by_char.empty:
-                col_char_left, col_char_right = st.columns([1.0])
-
-                # Predominant FASD status
+            if selected_char and not filtered_by_char.empty:
+                st.markdown(f"### 📊 Selected Group Analysis: {selected_char}")
+                
+                # Compute values
+                char_fasd_data = filtered_by_char.groupby('FASD')['Stock Value'].sum().reset_index()
                 predominant_fasd = filtered_by_char.groupby('FASD')['Stock qty'].sum().idxmax() if not filtered_by_char.dropna(subset=['FASD']).empty else 'N/A'
-                group_fasd_data = filtered_by_char.groupby('FASD')['Stock Value'].sum().reset_index()
-
+                
+                col_char_left, col_char_right = st.columns([1.0, 1.0])
+                
                 with col_char_left:
                     st.markdown('<div class="chart-card">', unsafe_allow_html=True)
                     st.markdown(f"##### BAR CHART: TOTAL ASSOCIATED STOCK VALUE FOR {selected_char}")
                     bar_grp_fig = px.bar(
-                        group_fasd_data,
+                        char_fasd_data,
                         x='FASD',
                         y='Stock Value',
                         labels={'Stock Value': 'Total Stock Value ($)'},
@@ -408,9 +411,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     bar_grp_fig.update_layout(height=350, margin=dict(t=10, b=10, l=10, r=10))
                     st.plotly_chart(bar_grp_fig, use_container_width=True)
                     st.markdown('</div>', unsafe_allow_html=True)
-                    
+
+                with col_char_right:
+                    st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+                    st.markdown(f"##### PIE CHART (PROPOSED): STOCK VALUE DISTRIBUTION & PREDOMINANT FASD: {predominant_fasd}")
+                    pie_grp_fig = px.pie(
+                        char_fasd_data,
+                        names='FASD',
+                        values='Stock Value',
+                        color_discrete_sequence=px.colors.qualitative.Safe
+                    )
+                    pie_grp_fig.update_layout(height=350, margin=dict(t=10, b=10, l=10, r=10))
+                    st.plotly_chart(pie_grp_fig, use_container_width=True)
+                    st.markdown('</div>', unsafe_allow_html=True)
             else:
-                st.info("No data available for this characteristic group.")
+                st.info("Select a valid characteristic group from the dropdown to see breakdown visual charts.")
 
             st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
         else:
@@ -418,11 +433,11 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     with tab2:
         if bom_loaded:
-            # Show filtered characteristic dataset
+            # Display the selected characteristic's subset of materials at the top of the detailed tab
             if selected_char:
                 st.markdown(f"### 📋 Materials in selected Group: **{selected_char}**")
                 st.dataframe(filtered_by_char, use_container_width=True)
-
+                
             st.markdown(f"### 📋 {plant} potential material list for scrapping")
             display_columns = [
                 'Material n°', 'Material description', 'Material discipline',
