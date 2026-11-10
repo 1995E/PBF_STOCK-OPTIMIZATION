@@ -433,7 +433,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     barmode='stack',
                     yaxis_title=None,
                     xaxis_title="Value ($)",
-                    height=300,
+                    height=380,
                     margin=dict(t=10, b=10, l=10, r=10),
                     legend=dict(orientation="h", y=-0.25, xanchor="center", x=0.5)
                 )
