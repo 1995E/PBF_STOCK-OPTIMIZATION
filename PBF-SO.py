@@ -323,7 +323,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # 4. EXECUTIVE TABS FOR HIGH LEVEL MANAGEMENT
     st.markdown('<div class="section-gap"></div>', unsafe_allow_html=True)
-    tab1, tab2 = st.tabs(["📊 DISPLAY CHART", "📋 DETAILED DATASET"])
+    tab1, tab2 = st.tabs(["📊 DISPLAY CHARTS", "📋 DETAILED DATASET"])
 
     with tab1:
         if bom_loaded:
@@ -344,7 +344,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 col_sel_left, col_sel_right = st.columns([1.0, 2.0])
                 
                 with col_sel_left:
-                    st.markdown('<div class="chart-card" style="min-height: 20px;">', unsafe_allow_html=True)
+                    st.markdown('<div class="chart-card" style="min-height: 10px;">', unsafe_allow_html=True)
                     st.markdown("##### 🔍 FILTER BY CHARACTERISTIC")
                     unique_characteristics = sorted(list(Interested_plant['Description Characteristic'].dropna().unique()))
                     selected_char = st.selectbox(
@@ -370,7 +370,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     st.markdown('</div>', unsafe_allow_html=True)
                     
                 with col_sel_right:
-                    st.markdown('<div class="chart-card" style="min-height: 20px;">', unsafe_allow_html=True)
+                    st.markdown('<div class="chart-card" style="min-height: 10px;">', unsafe_allow_html=True)
                     if not filtered_by_char.empty:
                         st.markdown(f"##### BAR CHART: STOCK VALUE FOR {selected_char}")
                         char_fasd_data = filtered_by_char.groupby('FASD')['Stock Value'].sum().reset_index()
