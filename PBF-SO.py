@@ -392,7 +392,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 st.markdown('</div>', unsafe_allow_html=True)
 
             # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS (SINGLE ROW) ---------------------------
-            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 2px; margin-bottom: 2px;">', unsafe_allow_html=True)
+            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px;">', unsafe_allow_html=True)
             
             if not Interested_plant.empty:
                 col_sel_left, col_sel_right = st.columns([1.0, 2.0])
@@ -424,7 +424,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     st.markdown('</div>', unsafe_allow_html=True)
                     
                 with col_sel_right:
-                    st.markdown('<div class="chart-card" style="min-height: 400px;">', unsafe_allow_html=True)
+                    st.markdown('<div class="chart-card" style="min-height: 20px;">', unsafe_allow_html=True)
                     if not filtered_by_char.empty:
                         st.markdown(f"##### BAR CHART: STOCK VALUE FOR {selected_char}")
                         char_fasd_data = filtered_by_char.groupby('FASD')['Stock Value'].sum().reset_index()
