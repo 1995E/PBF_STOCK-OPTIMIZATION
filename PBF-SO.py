@@ -392,7 +392,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 st.markdown('</div>', unsafe_allow_html=True)
 
             # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS (SINGLE ROW) ---------------------------
-            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px;">', unsafe_allow_html=True)
+            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 2px; margin-bottom: 2px;">', unsafe_allow_html=True)
             
             if not Interested_plant.empty:
                 col_sel_left, col_sel_right = st.columns([1.0, 2.0])
