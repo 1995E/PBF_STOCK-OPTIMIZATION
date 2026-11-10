@@ -337,7 +337,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             else:
                 st.info("No stock value for selected plant to calculate scrapping progress.")
 
-            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px; style="min-height: 50px">', unsafe_allow_html=True)
+            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px; style="min-height: 30px">', unsafe_allow_html=True)
 
             # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS (SINGLE ROW) ---------------------------
             if not Interested_plant.empty:
