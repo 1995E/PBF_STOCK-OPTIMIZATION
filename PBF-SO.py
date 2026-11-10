@@ -429,7 +429,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         if bom_loaded:
             # --------------------------- INTERACTIVE SELECTED CHARACTERISTIC ANALYSIS (DEDICATED TAB) ---------------------------
             if not Interested_plant.empty:
-                col_sel_left, col_sel_right = st.columns([1.0, 2.0])
+                col_sel_left, col_sel_right = st.columns([1.5, 2.0])
                 
                 with col_sel_left:
                     st.markdown('<div class="chart-card" style="min-height: 5px;">', unsafe_allow_html=True)
@@ -458,7 +458,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     st.markdown('</div>', unsafe_allow_html=True)
                     
                 with col_sel_right:
-                    st.markdown('<div class="chart-card" style="min-height: 5px;">', unsafe_allow_html=True)
+                    st.markdown('<div class="chart-card" style="min-height: 10px;">', unsafe_allow_html=True)
                     if not filtered_by_char.empty:
                         st.markdown(f"##### STOCK VALUE FOR {selected_char}")
                         char_fasd_data = filtered_by_char.groupby('FASD')['Stock Value'].sum().reset_index()
@@ -472,7 +472,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                             color_discrete_sequence=px.colors.qualitative.Pastel
                         )
                         bar_grp_fig.update_traces(width=0.2)
-                        bar_grp_fig.update_layout(height=250, margin=dict(t=10, b=10, l=5, r=5))
+                        bar_grp_fig.update_layout(height=350, margin=dict(t=10, b=10, l=5, r=5))
                         st.plotly_chart(bar_grp_fig, use_container_width=True)
                     else:
                         st.info("No data available for the chosen group.")
