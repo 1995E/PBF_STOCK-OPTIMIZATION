@@ -408,19 +408,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     bar_grp_fig.update_layout(height=350, margin=dict(t=10, b=10, l=10, r=10))
                     st.plotly_chart(bar_grp_fig, use_container_width=True)
                     st.markdown('</div>', unsafe_allow_html=True)
-
-                with col_char_right:
-                    st.markdown('<div class="chart-card">', unsafe_allow_html=True)
-                    st.markdown(f"##### PIE CHART (PROPOSED): STOCK VALUE DISTRIBUTION & PREDOMINANT FASD: {predominant_fasd}")
-                    pie_grp_fig = px.pie(
-                        group_fasd_data,
-                        names='FASD',
-                        values='Stock Value',
-                        color_discrete_sequence=px.colors.qualitative.Safe
-                    )
-                    pie_grp_fig.update_layout(height=350, margin=dict(t=10, b=10, l=10, r=10))
-                    st.plotly_chart(pie_grp_fig, use_container_width=True)
-                    st.markdown('</div>', unsafe_allow_html=True)
+                    
             else:
                 st.info("No data available for this characteristic group.")
 
