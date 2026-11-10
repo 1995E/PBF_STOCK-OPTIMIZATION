@@ -370,7 +370,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     st.markdown('</div>', unsafe_allow_html=True)
                     
                 with col_sel_right:
-                    st.markdown('<div class="chart-card" style="min-height: 10px;">', unsafe_allow_html=True)
+                    st.markdown('<div class="chart-card" style="min-height: 5px;">', unsafe_allow_html=True)
                     if not filtered_by_char.empty:
                         st.markdown(f"##### BAR CHART: STOCK VALUE FOR {selected_char}")
                         char_fasd_data = filtered_by_char.groupby('FASD')['Stock Value'].sum().reset_index()
@@ -383,7 +383,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                             color='FASD',
                             color_discrete_sequence=px.colors.qualitative.Pastel
                         )
-                        bar_grp_fig.update_layout(height=300, margin=dict(t=10, b=10, l=10, r=10))
+                        bar_grp_fig.update_layout(height=300, margin=dict(t=10, b=10, l=5, r=5))
                         st.plotly_chart(bar_grp_fig, use_container_width=False)
                     else:
                         st.info("No data available for the chosen group.")
