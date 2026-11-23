@@ -14,7 +14,7 @@ st.set_page_config(
 
 # CHOOSE THE IMPACTED PLANT IN SIDEBAR
 with st.sidebar:
-    #st.markdown("### 🚢 Plant Selection")
+    st.markdown("### 🚢 Plant Selection")
     plant = st.selectbox(
         "Select the impacted Plant:",
         ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
@@ -22,7 +22,7 @@ with st.sidebar:
 
 # 1. FILE UPLOADERS IN SIDEBAR
 with st.sidebar: 
-    #st.header("📂 Data Source Configuration")
+    st.header("📂 Data Source Configuration")
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
