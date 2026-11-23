@@ -76,7 +76,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Interested_plant['Stock Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
 
     # Modern Title
-    st.markdown("<h1 style='color: #1E3A8A; font-family: sans-serif; text-align: center;'>PBF Stock Analyse Dashboard</h1>", unsafe_allow_html=True)
     st.markdown("---")
 
     # Display charts side-by-side
