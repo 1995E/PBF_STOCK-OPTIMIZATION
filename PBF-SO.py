@@ -62,8 +62,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Count simplified Gest status (first two characters) from pd_v1_unique_materials
     gest_counts = pd.DataFrame(columns=['Gest Status', 'Count'])
     if 'Gest' in pd_v1_unique_materials.columns:
-        pd_v1_unique_materials['Gest_2L'] = pd_v1_unique_materials['Gest'].astype(str).str[:2]
-        gest_counts = pd_v1_unique_materials['Gest_2L'].value_counts().reset_index()
+        pd_v1_df['Gest_2L'] = pd_v1_df['Gest'].astype(str).str[:2]
+        gest_counts = pd_v1_df['Gest_2L'].value_counts().reset_index()
         gest_counts.columns = ['Gest Status', 'Count']
 
     stock_greater_zero = pd_v1_df[pd_v1_df['Stock qty'] > 0].copy()
