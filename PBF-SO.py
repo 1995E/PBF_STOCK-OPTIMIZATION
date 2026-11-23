@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import plotly.express as px 
+import plotly.express as px
 import numpy as np
 import io
 import re
@@ -21,7 +21,7 @@ with st.sidebar:
     )
 
 # 1. FILE UPLOADERS IN SIDEBAR
-with st.sidebar:
+with st.sidebar: 
     st.header("📂 Data Source Configuration")
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
@@ -42,8 +42,7 @@ st.markdown(f"""
             margin-top: 35px;
             margin-bottom: 35px;
         }}
-        .kpi-gap {{
-            margin-top: 25px;
+        .kpi-gap {{            margin-top: 25px;
             margin-bottom: 25px;
         }}
         .kpi-title {{
@@ -77,12 +76,11 @@ st.markdown(f"""
             font-weight: 800;
             margin-top: 0.25rem;
         }}
-        .metric-subvalue {{
+        .metric-subvalue {{ 
             font-size: 0.85rem;
             color: #475569;
             margin-top: 0.2rem;
         }}
-        /* Card Container styling */
         .chart-card {{
             background-color: #FFFFFF;
             padding: 1.5rem;
@@ -91,12 +89,10 @@ st.markdown(f"""
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
             margin-bottom: 1.5rem;
         }}
-        /* Optimize Progress Bar Size */
         .stProgress > div > div > div {{
             height: 28px !important;
             border-radius: 8px;
         }}
-        /* Target Streamlit Progress Bar fill */
         .stProgress > div > div > div > div {{
             background-color: #EF4444 !important;
         }}
@@ -104,7 +100,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Modern Title
-st.markdown("<div class=\"main-header\"> Lorem Ipsum </div>", unsafe_allow_html=True)
+st.markdown("<div class=\"main-header\"> PBF Stock Analyse Tool </div>", unsafe_allow_html=True)
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
@@ -341,6 +337,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
             st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 20px; margin-bottom: 15px;">', unsafe_allow_html=True)
 
+            # Original Dashboard Charts Row
             col_left, col_right = st.columns([1.0, 1.0])
             with col_left:
                 st.markdown('<div class="chart-card">', unsafe_allow_html=True)
@@ -409,8 +406,107 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 else:
                     st.info("No data available for FASD breakdown.")
                 st.markdown('</div>', unsafe_allow_html=True)
+
+            # --- SUNBURST & PIE CHART ---
+            st.markdown('<hr style="border: 1px solid #E2E8F0; margin-top: 25px; margin-bottom: 25px;">', unsafe_allow_html=True)
+            st.markdown("#### 📈 HIGH-LEVEL ASSESSMENTS & VALUE SHARE")
+            
+            col_sunburst, col_pie = st.columns([1.1, 0.9])
+            
+            with col_sunburst:
+                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+                st.markdown("##### MATERIAL ASSESSMENT STRUCTURE (SUNBURST CHART)")
+                
+                total_assessed = df['Material n°'].nunique()
+                is_stock = df['MRP Type'].isin(['PD', 'V1'])
+                stock_mats = df[is_stock]
+                non_stock_mats = df[~is_stock]
+                
+                cnt_stock_total = stock_mats['Material n°'].nunique()
+                cnt_non_stock_total = total_assessed - cnt_stock_total
+                
+                stock_discipline_counts = stock_mats[stock_mats['Material discipline'].isin(['SE', 'SU', 'MM'])].groupby('Material discipline')['Material n°'].nunique().to_dict()
+                non_stock_discipline_counts = non_stock_mats[non_stock_mats['Material discipline'].isin(['SE', 'SU', 'MM'])].groupby('Material discipline')['Material n°'].nunique().to_dict()
+                
+                stock_se = stock_discipline_counts.get('SE', 0)
+                stock_su = stock_discipline_counts.get('SU', 0)
+                stock_mm = stock_discipline_counts.get('MM', 0)
+                stock_other = cnt_stock_total - (stock_se + stock_su + stock_mm)
+                
+                ns_se = non_stock_discipline_counts.get('SE', 0)
+                ns_su = non_stock_discipline_counts.get('SU', 0)
+                ns_mm = non_stock_discipline_counts.get('MM', 0)
+                ns_other = cnt_non_stock_total - (ns_se + ns_su + ns_mm)
+                
+                ids = [
+                    "Total Assessed",
+                    "Stock Materials", "Non-Stock Materials",
+                    "Stock_SE", "Stock_SU", "Stock_MM", "Stock_Other",
+                    "NS_SE", "NS_SU", "NS_MM", "NS_Other"
+                ]
+                labels = [
+                    f"Total Assessed<br>({total_assessed:,})",
+                    f"Stock Materials<br>({cnt_stock_total:,})", f"Non-Stock Materials<br>({cnt_non_stock_total:,})",
+                    f"SE ({stock_se})", f"SU ({stock_su})", f"MM ({stock_mm})", f"Other ({max(0, stock_other)})",
+                    f"SE ({ns_se})", f"SU ({ns_su})", f"MM ({ns_mm})", f"Other ({max(0, ns_other)})"
+                ]
+                parents = [
+                    "",
+                    "Total Assessed", "Total Assessed",
+                    "Stock Materials", "Stock Materials", "Stock Materials", "Stock Materials",
+                    "Non-Stock Materials", "Non-Stock Materials", "Non-Stock Materials", "Non-Stock Materials"
+                ]
+                values = [
+                    total_assessed,
+                    cnt_stock_total, cnt_non_stock_total,
+                    stock_se, stock_su, stock_mm, max(0, stock_other),
+                    ns_se, ns_su, ns_mm, max(0, ns_other)
+                ]
+                
+                fig_sunburst = go.Figure(go.Sunburst(
+                    ids=ids,
+                    labels=labels,
+                    parents=parents,
+                    values=values,
+                    branchvalues="total",
+                    marker=dict(colors=px.colors.qualitative.Pastel)
+                ))
+                fig_sunburst.update_layout(
+                    height=450,
+                    margin=dict(t=20, l=10, r=10, b=10)
+                )
+                st.plotly_chart(fig_sunburst, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+                
+            with col_pie:
+                st.markdown('<div class="chart-card">', unsafe_allow_html=True)
+                st.markdown("##### STOCK VALUE SHARE PER PLANT (PIE CHART)")
+                
+                if not stock_greater_zero.empty:
+                    stock_greater_zero['Calculated Value'] = stock_greater_zero['Stock qty'] * stock_greater_zero['Unit price'].fillna(0)
+                    plant_shares = stock_greater_zero.groupby('Plant')['Calculated Value'].sum().reset_index()
+                    
+                    fig_pie = px.pie(
+                        plant_shares,
+                        values='Calculated Value',
+                        names='Plant',
+                        color='Plant',
+                        hole=0.4,
+                        color_discrete_sequence=px.colors.qualitative.Safe
+                    )
+                    fig_pie.update_traces(textposition='inside', textinfo='percent+label')
+                    fig_pie.update_layout(
+                        height=450,
+                        margin=dict(t=20, l=10, r=10, b=10),
+                        legend=dict(orientation="h", y=-0.1, xanchor="center", x=0.5)
+                    )
+                    st.plotly_chart(fig_pie, use_container_width=True)
+                else:
+                    st.info("No stock values available to render the plant pie chart distribution.")
+                st.markdown('</div>', unsafe_allow_html=True)
+                
         else:
-            st.info("💡 Please upload the Impacted BOM template to preview interactive visualization panels!")
+            st.info("💡 Please upload the Impacted BOM template to preview interactive panels!")
 
     with tab2:
         if bom_loaded:
@@ -463,21 +559,17 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         st.info("No data available for the chosen group.")
                     st.markdown('</div>', unsafe_allow_html=True)
 
-                # DISPLAY SUBSET OF MATERIALS HERE IN THE GROUP TAB
                 if not filtered_by_char.empty:
                     st.markdown(f"##### 📋 Materials belonging to group: **{selected_char}**")
                     st.dataframe(filtered_by_char, use_container_width=True)
             else:
                 st.info("No data to display group analysis.")
         else:
-            st.info("💡 Please upload the Impacted BOM template to preview interactive visualization panels!")
+            st.info("💡 Please upload the Impacted BOM template to preview interactive panels!")
 
     with tab3:
         if bom_loaded:
-            # CUSTOMIZABLE POTENTIAL SCRAP LIST
             st.markdown(f"### 📋 {plant} potential material list for scrapping")
-
-            # Add interactive search filter for scrap list
             with st.expander("🔍 Customize Scrap List Filters", expanded=False):
                 col_sc1, col_sc2 = st.columns(2)
                 with col_sc1:
@@ -495,7 +587,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
             existing_display_cols = [col for col in display_columns if col in Interested_plant.columns]
             Interested_plant_display = Interested_plant[existing_display_cols].copy()
 
-            # Apply user customizations
             if scrap_search:
                 Interested_plant_display = Interested_plant_display[
                     Interested_plant_display['Material n°'].astype(str).str.contains(scrap_search, case=False) |
@@ -506,7 +597,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
             st.dataframe(Interested_plant_display, use_container_width=True)
 
-            # Export Option
             buffer_interested = io.BytesIO()
             with pd.ExcelWriter(buffer_interested, engine='openpyxl') as writer:
                 Interested_plant_display.to_excel(writer, index=False, sheet_name='Interested Plant')
@@ -517,10 +607,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             )
 
-            # CUSTOMIZABLE TRANSFER LIST
             st.markdown(f"### 🔄 Potential materials to be transferred from {plant}")
             if not materials_to_transfer.empty:
-                # Add interactive search filter for transfer list
                 with st.expander("🔍 Customize Transfer List Filters", expanded=False):
                     col_tf1, col_tf2 = st.columns(2)
                     with col_tf1:
@@ -540,7 +628,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
                 st.dataframe(materials_to_transfer_display, use_container_width=True)
 
-                # Export Option
                 buffer_transfer = io.BytesIO()
                 with pd.ExcelWriter(buffer_transfer, engine='openpyxl') as writer:
                     materials_to_transfer_display.to_excel(writer, index=False, sheet_name='Materials to Transfer')
