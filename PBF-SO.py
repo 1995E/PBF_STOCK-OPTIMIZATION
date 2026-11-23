@@ -152,22 +152,5 @@ if uploaded_materials is not None and uploaded_prices is not None:
         else:
             st.info("No stock items with a quantity greater than zero to display.")
 
-    # 3. DISPLAY DATAFRAME WITH GEST_2L AND EXPORT OPTION
-    st.markdown("---")
-    st.markdown("### 📋 Materials Dataset")
-    st.dataframe(df, use_container_width=True)
-
-    # Download options in Excel format
-    excel_buffer = io.BytesIO()
-    with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='Materials')
-    
-    st.download_button(
-        label="📥 Download Materials Dataset (Excel)",
-        data=excel_buffer.getvalue(),
-        file_name="materials_dataset_with_gest2l.xlsx",
-        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
-
 else:
     st.info("💡 Please upload both files in the sidebar to configure the dashboard!")
