@@ -46,6 +46,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
     existing_columns = [col for col in requested_columns if col in removed_materials_df.columns]
     df = removed_materials_df[existing_columns].copy()
 
+    # Filter out "GENERAL DIVISION" from df
+    if 'Plant' in df.columns:
+        df = df[df['Plant'] != 'GENERAL DIVISION'].copy()
+
     # Perform calculations
     Total_removed_materials = df['Material n°'].nunique()
     pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
