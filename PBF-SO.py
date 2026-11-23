@@ -159,7 +159,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     # Download options
     csv_buffer = io.StringIO()
-    df.to_excel(excel_buffer, index=False)
+    df.to_excel(csv_buffer, index=False)
     st.download_button(
         label="📥 Download Materials Dataset (CSV)",
         data=csv_buffer.getvalue(),
