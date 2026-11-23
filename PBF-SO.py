@@ -60,7 +60,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Total_removed_materials = df['Material n°'].nunique()
     pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
     pd_v1_unique_materials = pd_v1_df.drop_duplicates(subset=['Material n°']).copy()
-    
+
     # Number of materials that are not PD/V1 (ND)
     cnt_pd_v1 = pd_v1_unique_materials['Material n°'].nunique()
     cnt_nd = max(0, Total_removed_materials - cnt_pd_v1)
@@ -93,12 +93,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     with col1:
         st.markdown("### 📊 Material Assessment Structure")
-        
+
         # Prepare Sunburst components hierarchically:
         # Level 0: Total removed materials
         # Level 1: PD/V1 vs ND (Not PD/V1)
         # Level 2: Under PD/V1, we split by simplified Gest status counts
-        
+
         ids = ["Total Materials", "PD_V1", "ND"]
         labels = [
             f"Total Materials<br>({Total_removed_materials:,})",
@@ -107,7 +107,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         ]
         parents = ["", "Total Materials", "Total Materials"]
         values = [Total_removed_materials, cnt_pd_v1, cnt_nd]
-        
+
         # Add Gest statuses under the PD_V1 branch
         for idx, row in gest_counts.iterrows():
             gest_status = row['Gest Status']
@@ -116,7 +116,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             labels.append(f"{gest_status}<br>({count:,})")
             parents.append("PD_V1")
             values.append(count)
-            
+
         fig_sunburst = go.Figure(go.Sunburst(
             ids=ids,
             labels=labels,
@@ -130,7 +130,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     with col2:
         st.markdown("### 🍕 Stock Value Share per Plant")
-        
+
         if not stock_greater_zero.empty:
             stock_greater_zero['Calculated Value'] = stock_greater_zero['Stock qty'] * stock_greater_zero['Unit price'].fillna(0)
             plant_shares = stock_greater_zero.groupby('Plant')['Calculated Value'].sum().reset_index()
@@ -157,14 +157,16 @@ if uploaded_materials is not None and uploaded_prices is not None:
     st.markdown("### 📋 Materials Dataset")
     st.dataframe(df, use_container_width=True)
 
-    # Download options
-    csv_buffer = io.StringIO()
-    df.to_excel(csv_buffer, index=False)
+    # Download options in Excel format
+    excel_buffer = io.BytesIO()
+    with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+        df.to_excel(writer, index=False, sheet_name='Materials')
+    
     st.download_button(
-        label="📥 Download Materials Dataset (CSV)",
-        data=csv_buffer.getvalue(),
-        file_name="materials_dataset_with_gest2l.csv",
-        mime="text/csv"
+        label="📥 Download Materials Dataset (Excel)",
+        data=excel_buffer.getvalue(),
+        file_name="materials_dataset_with_gest2l.xlsx",
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )
 
 else:
