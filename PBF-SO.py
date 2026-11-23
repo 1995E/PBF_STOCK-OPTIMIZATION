@@ -117,7 +117,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             parents.append("PD_V1")
             values.append(count)
 
-        fig_sunburst = go.Figure(go.Sunburst(
+        fig_sunburst = go.Figure(go.Sunburst( 
             ids=ids,
             labels=labels,
             parents=parents,
