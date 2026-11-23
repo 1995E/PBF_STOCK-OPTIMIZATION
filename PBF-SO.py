@@ -50,6 +50,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Total_removed_materials = df['Material n°'].nunique()
     pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
     pd_v1_unique_materials = pd_v1_df.drop_duplicates(subset=['Material n°']).copy()
+    nd_df = Total_removed_materials - pd_v1_unique_materials
 
     # Count simplified Gest status (first two characters) from pd_v1_unique_materials
     if 'Gest' in pd_v1_unique_materials.columns:
