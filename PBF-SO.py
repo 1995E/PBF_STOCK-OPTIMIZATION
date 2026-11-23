@@ -26,8 +26,6 @@ with st.sidebar:
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
-    Bom_template = st.file_uploader("Impacted Bom (Excel)", type=["xlsx"])
-    st.markdown("---")
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
