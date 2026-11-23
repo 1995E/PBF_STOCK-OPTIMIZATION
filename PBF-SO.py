@@ -17,7 +17,7 @@ with st.sidebar:
     st.markdown("### 🚢 Plant Selection")
     plant = st.selectbox(
         "Select the impacted Plant:",
-        ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV', 'GENERAL DIVISION'],
+        ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV'],
     )
 
 # 1. FILE UPLOADERS IN SIDEBAR
