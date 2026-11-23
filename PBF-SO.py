@@ -50,6 +50,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
     if 'Plant' in df.columns:
         df = df[df['Plant'] != 'GENERAL DIVISION'].copy()
 
+    # Add Gest_2L column directly to df
+    if 'Gest' in df.columns:
+        df['Gest_2L'] = df['Gest'].astype(str).str[:2]
+    else:
+        df['Gest_2L'] = ""
+
     # Perform calculations
     Total_removed_materials = df['Material n°'].nunique()
     pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
@@ -58,7 +64,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Number of materials that are not PD/V1 (ND)
     cnt_pd_v1 = pd_v1_unique_materials['Material n°'].nunique()
     cnt_nd = max(0, Total_removed_materials - cnt_pd_v1)
-    
+
+    # Count simplified Gest status (first two characters) from pd_v1_unique_materials
     gest_counts = pd.DataFrame(columns=['Gest Status', 'Count'])
     if 'Gest' in pd_v1_unique_materials.columns:
         pd_v1_unique_materials['Gest_2L'] = pd_v1_unique_materials['Gest'].astype(str).str[:2]
@@ -82,7 +89,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     st.markdown("---")
 
     # Display charts side-by-side
-    col1, col2 = st.columns(2) 
+    col1, col2 = st.columns(2)
 
     with col1:
         st.markdown("### 📊 Material Assessment Structure")
@@ -144,6 +151,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.plotly_chart(fig_pie, use_container_width=True)
         else:
             st.info("No stock items with a quantity greater than zero to display.")
+
+    # 3. DISPLAY DATAFRAME WITH GEST_2L AND EXPORT OPTION
+    st.markdown("---")
+    st.markdown("### 📋 Materials Dataset")
+    st.dataframe(df, use_container_width=True)
+
+    # Download options
+    csv_buffer = io.StringIO()
+    df.to_csv(csv_buffer, index=False)
+    st.download_button(
+        label="📥 Download Materials Dataset (CSV)",
+        data=csv_buffer.getvalue(),
+        file_name="materials_dataset_with_gest2l.csv",
+        mime="text/csv"
+    )
 
 else:
     st.info("💡 Please upload both files in the sidebar to configure the dashboard!")
