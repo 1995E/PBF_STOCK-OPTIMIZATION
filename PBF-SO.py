@@ -9,7 +9,7 @@ import re
 st.set_page_config(
     page_title="PBF STOCK ANALYSE TOOL",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="expanded" 
 )
 
 # CHOOSE THE IMPACTED PLANT IN SIDEBAR
