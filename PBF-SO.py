@@ -159,13 +159,5 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 st.plotly_chart(fig_pie, use_container_width=True)
             else:
                 st.info("No active stock materials to calculate plant value distribution.")
-
-    with tab2:
-        st.markdown("### 🔍 Group Assessment Filters")
-        st.info("Choose a material category or classification from the sidebar or select a specific material group to display metrics here.")
-
-    with tab3:
-        st.markdown("### 📋 Materials Database Overview")
-        st.dataframe(df, use_container_width=True)
 else:
     st.info("💡 Please upload both 'Material Overview per Plant' and 'Material Overview per Price' Excel files in the sidebar to get started!")
