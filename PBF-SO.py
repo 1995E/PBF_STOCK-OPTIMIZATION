@@ -21,7 +21,7 @@ with st.sidebar:
     )
 
 # 1. FILE UPLOADERS IN SIDEBAR
-with st.sidebar: 
+with st.sidebar:
     st.header("📂 Data Source Configuration")
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
@@ -49,7 +49,14 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Perform calculations
     Total_removed_materials = df['Material n°'].nunique()
     pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
-    pd_v1_unique_materials = pd_v1_df.drop_duplicates(subset=['Material n°'])
+    pd_v1_unique_materials = pd_v1_df.drop_duplicates(subset=['Material n°']).copy()
+
+    # Count simplified Gest status (first two characters) from pd_v1_unique_materials
+    if 'Gest' in pd_v1_unique_materials.columns:
+        pd_v1_unique_materials['Gest_2L'] = pd_v1_unique_materials['Gest'].astype(str).str[:2]
+        gest_counts = pd_v1_unique_materials['Gest_2L'].value_counts().reset_index()
+        gest_counts.columns = ['Gest Status', 'Count']
+
     stock_greater_zero = pd_v1_df[pd_v1_df['Stock qty'] > 0]
 
     Interested_plant = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
@@ -62,5 +69,3 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Interested_plant_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
     Others_plant_stock_value = Total_stock_value - Interested_plant_stock_value
     Interested_plant['Stock Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
-
-    
