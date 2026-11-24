@@ -12,14 +12,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# CHOOSE THE IMPACTED PLANT IN SIDEBAR
-with st.sidebar:
-    st.markdown("### 🚢 Plant Selection")
-    plant = st.selectbox(
-        "Select the impacted Plant:",
-        ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV'],
-    )
-
 priority = st.select_slider(
     "Priority Level",
     options=["Low", "Medium", "High", "Critical"]
