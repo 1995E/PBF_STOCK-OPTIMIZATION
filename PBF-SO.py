@@ -56,22 +56,41 @@ if uploaded_materials is not None and uploaded_prices is not None:
     else:
         df['Gest_2L'] = ""
 
-    # Perform calculations
-    Total_removed_materials = df['Material n°'].nunique()
-    pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
-    pd_v1_unique_materials = pd_v1_df.drop_duplicates(subset=['Material n°']).copy()
+    # Add a sidebar widget to filter the plant ONLY for the Sunburst chart
+    with st.sidebar:
+        st.markdown("### 📊 Sunburst Chart Plant Filter")
+        available_plants = sorted([p for p in df['Plant'].dropna().unique() if p != ''])
+        selected_sunburst_plants = st.multiselect(
+            "Filter Plant(s) for Sunburst:",
+            options=available_plants,
+            default=available_plants,
+            help="This selection only impacts the Sunburst Chart below."
+        )
+
+    # Filter data for Sunburst calculation
+    if selected_sunburst_plants:
+        sunburst_df = df[df['Plant'].isin(selected_sunburst_plants)].copy()
+    else:
+        sunburst_df = df.copy()
+
+    # Perform calculations for Sunburst Chart using sunburst_df
+    Total_removed_materials = sunburst_df['Material n°'].nunique()
+    pd_v1_df_sb = sunburst_df[sunburst_df['MRP Type'].isin(['PD', 'V1'])].copy()
+    pd_v1_unique_materials_sb = pd_v1_df_sb.drop_duplicates(subset=['Material n°']).copy()
 
     # Number of materials that are not PD/V1 (ND)
-    cnt_pd_v1 = pd_v1_unique_materials['Material n°'].nunique()
+    cnt_pd_v1 = pd_v1_unique_materials_sb['Material n°'].nunique()
     cnt_nd = max(0, Total_removed_materials - cnt_pd_v1)
 
-    # Count simplified Gest status (first two characters) from pd_v1_unique_materials
+    # Count simplified Gest status (first two characters) from pd_v1_unique_materials_sb
     gest_counts = pd.DataFrame(columns=['Gest Status', 'Count'])
-    if 'Gest' in pd_v1_unique_materials.columns:
-        pd_v1_unique_materials['Gest_2L'] = pd_v1_unique_materials['Gest'].astype(str).str[:2]
-        gest_counts = pd_v1_unique_materials['Gest_2L'].value_counts().reset_index()
+    if 'Gest' in pd_v1_unique_materials_sb.columns:
+        pd_v1_unique_materials_sb['Gest_2L'] = pd_v1_unique_materials_sb['Gest'].astype(str).str[:2]
+        gest_counts = pd_v1_unique_materials_sb['Gest_2L'].value_counts().reset_index()
         gest_counts.columns = ['Gest Status', 'Count']
 
+    # Standard unmodified calculations for other dependencies
+    pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
     stock_greater_zero = pd_v1_df[pd_v1_df['Stock qty'] > 0].copy()
 
     Interested_plant = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
@@ -117,7 +136,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             parents.append("PD_V1")
             values.append(count)
 
-        fig_sunburst = go.Figure(go.Sunburst( 
+        fig_sunburst = go.Figure(go.Sunburst(
             ids=ids,
             labels=labels,
             parents=parents,
