@@ -20,6 +20,13 @@ with st.sidebar:
         ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV'],
     )
 
+
+stock_status = st.radio(
+    "Stock Status",
+    ["All", "Stock", "Non-Stock"]
+)
+
+st.write("Selected:", stock_status)
 # 1. FILE UPLOADERS IN SIDEBAR
 with st.sidebar:
     st.header("📂 Data Source Configuration")
