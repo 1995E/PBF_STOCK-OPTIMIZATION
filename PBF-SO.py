@@ -85,7 +85,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
     stock_greater_zero = pd_v1_df[pd_v1_df['Stock qty'] > 0].copy()
 
-    Interested_plant = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
+    Interested_plant = stock_greater_zero[stock_greater_zero['Plant'] == selected_sunburst_plants].copy()
     Interested_plant_unique = Interested_plant.drop_duplicates(subset=['Material n°']).copy()
 
     Others_plant = pd_v1_df[pd_v1_df['Plant'] != plant].copy()
