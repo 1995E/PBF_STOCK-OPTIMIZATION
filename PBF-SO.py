@@ -17,17 +17,6 @@ critical_only = st.toggle("Show Critical Materials Only")
 if critical_only:
     st.write("Displaying only critical materials")
 
-selected = st.pills(
-    "Material Type",
-    ["Stock", "Non-Stock", "Critical"]
-)
-
-selected = st.pills(
-    "GEST",
-    ["SE", "SU", "MM"],
-    selection_mode="multi"
-)
-
 stock_status = st.segmented_control(
     "Stock Status",
     ["All", "Stock", "Non-Stock"]
