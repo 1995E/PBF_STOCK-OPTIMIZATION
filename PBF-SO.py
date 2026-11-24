@@ -19,6 +19,10 @@ with st.sidebar:
         "Select the impacted Plant:",
         ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV'],
     )
+critical_only = st.toggle("Show Critical Materials Only")
+
+if critical_only:
+    st.write("Displaying only critical materials")
 
 
 stock_status = st.radio(
