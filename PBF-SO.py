@@ -33,16 +33,6 @@ stock_status = st.segmented_control(
     ["All", "Stock", "Non-Stock"]
 )
 
-    if stock_status == "Stock":
-        filtered_df = df[df["Stock_Qty"] > 0]
-    
-    elif stock_status == "Non-Stock":
-        filtered_df = df[df["Stock_Qty"] == 0]
-    stock_status = st.segmented_control(
-        "Stock Status",
-        ["All", "Stock", "Non-Stock"]
-)
-
 stock_status = st.radio(
     "Stock Status",
     ["All", "Stock", "Non-Stock"]
