@@ -7,7 +7,7 @@ import io
 import re
 
 st.set_page_config(
-    page_title="PBF STOCK ANALYSE TOOL",
+    page_title="PBF STOCK ANALYSE TOOL", 
     layout="wide",
     initial_sidebar_state="expanded"
 )
