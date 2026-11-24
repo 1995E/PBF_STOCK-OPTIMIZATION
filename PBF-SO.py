@@ -12,8 +12,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-st.write("Selected:", priority)
-
 critical_only = st.toggle("Show Critical Materials Only")
 
 if critical_only:
