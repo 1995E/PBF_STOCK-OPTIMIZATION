@@ -12,11 +12,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-priority = st.select_slider(
-    "Priority Level",
-    options=["Low", "Medium", "High", "Critical"]
-)
-
 st.write("Selected:", priority)
 
 critical_only = st.toggle("Show Critical Materials Only")
@@ -31,12 +26,14 @@ stock_status = st.radio(
 )
 
 st.write("Selected:", stock_status)
+
 # 1. FILE UPLOADERS IN SIDEBAR
 with st.sidebar:
     st.header("📂 Data Source Configuration")
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
+    st.divider()
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
