@@ -17,6 +17,31 @@ critical_only = st.toggle("Show Critical Materials Only")
 if critical_only:
     st.write("Displaying only critical materials")
 
+selected = st.pills(
+    "Material Type",
+    ["Stock", "Non-Stock", "Critical"]
+)
+
+selected = st.pills(
+    "GEST",
+    ["SE", "SU", "MM"],
+    selection_mode="multi"
+)
+
+stock_status = st.segmented_control(
+    "Stock Status",
+    ["All", "Stock", "Non-Stock"]
+)
+
+if stock_status == "Stock":
+    filtered_df = df[df["Stock_Qty"] > 0]
+
+elif stock_status == "Non-Stock":
+    filtered_df = df[df["Stock_Qty"] == 0]
+stock_status = st.segmented_control(
+    "Stock Status",
+    ["All", "Stock", "Non-Stock"]
+)
 
 stock_status = st.radio(
     "Stock Status",
@@ -27,12 +52,11 @@ st.write("Selected:", stock_status)
 
 # 1. FILE UPLOADERS IN SIDEBAR
 with st.sidebar:
-    st.header("📂 Data Source Configuration")
+    st.header("Data Source Configuration")
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
-    st.divider()
-
+    
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
     removed_materials_df = pd.read_excel(uploaded_materials)
