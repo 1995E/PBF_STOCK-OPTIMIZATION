@@ -19,6 +19,14 @@ with st.sidebar:
         "Select the impacted Plant:",
         ['GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV'],
     )
+
+priority = st.select_slider(
+    "Priority Level",
+    options=["Low", "Medium", "High", "Critical"]
+)
+
+st.write("Selected:", priority)
+
 critical_only = st.toggle("Show Critical Materials Only")
 
 if critical_only:
