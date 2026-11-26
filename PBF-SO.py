@@ -208,17 +208,17 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # Split Column 3 into sub-columns: left for slider, right for chart
                 sub_col_left, sub_col_right = st.columns([0.1, 0.90])
 
-           
-                # Slider controlling Y-axis max value range dynamically
-                max_possible_y = float(discipline_totals['Stock Value'].max()) if not discipline_totals.empty else 1000.0
-                y_limit = st.slider(
-                    "Y Zoom",
-                    min_value=1.0,
-                    max_value=max_possible_y,
-                    value=max_possible_y,
-                    step=max(1.0, max_possible_y / 10),
-                    key="y_axis_slider"
-                )
+               with sub_col_left:
+                    # Slider controlling Y-axis max value range dynamically
+                    max_possible_y = float(discipline_totals['Stock Value'].max()) if not discipline_totals.empty else 1000.0
+                    y_limit = st.slider(
+                        "Y Zoom",
+                        min_value=1.0,
+                        max_value=max_possible_y,
+                        value=max_possible_y,
+                        step=max(1.0, max_possible_y / 10),
+                        key="y_axis_slider"
+                    )
 
                 with sub_col_right:
                     # Create vertical stacked column chart with custom aesthetics and stack value labels
