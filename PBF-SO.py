@@ -168,6 +168,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.plotly_chart(fig_fasd, use_container_width=True)
 
         with col3:
+            # Styled title matching Plotly's default title font size, weight and style
+            st.markdown(
+                "<div style='padding-top: 10px; padding-bottom: 30px;'><span style='font-family: sans-serif; font-size: 17px; font-weight: bold; color: rgb(49, 51, 63);'>Material Breakdown Flow</span></div>",
+                unsafe_allow_html=True
+            )
+
             # Use a wrapper with CSS flex centering to horizontally align the Graphviz chart
             st.markdown(
                 """
@@ -177,12 +183,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     justify-content: center;
                     align-items: center;
                     width: 100%;
+                    margin: 0 auto;
                 }
                 </style>
                 """,
                 unsafe_allow_html=True
             )
-            
+
             dot_code = f"""
             digraph G {{
                 graph [rankdir=LR, size="8,5", bgcolor="transparent", splines=ortho, nodesep=0.4, ranksep=0.6];
@@ -228,7 +235,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 ];
 
                 SE [
-                    label="SE: {sum_se}\\Stock value: ${val_se:,.2f}",
+                    label="SE: {sum_se}\\nStock value: ${val_se:,.2f}",
                     fillcolor="#FDF2F8",
                     color="#EC4899",
                     fontcolor="#9D174D",
@@ -256,7 +263,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 PD_V1 -> MM [color="#10B981"];
             }}
             """
-            
+
             # Embed the graph within a centered container block
             st.markdown('<div class="centered-graphviz">', unsafe_allow_html=True)
             st.graphviz_chart(dot_code, use_container_width=True)
