@@ -98,12 +98,20 @@ if uploaded_materials is not None and uploaded_prices is not None:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Stock overview", "lorepsum 1", "lorepsum 2", "lorepsum 3", "lorepsum 4"])
 
     with tab1:
+        # Ensure uniform control bar on top to align everything horizontally
+        col_toggle1, col_toggle2, col_toggle3 = st.columns([0.8, 0.8, 0.9])
+        with col_toggle1:
+            chart_mode_plant = st.toggle("Show Donut Chart (Plant)", value=False, key="toggle_plant")
+        with col_toggle2:
+            chart_mode_fasd = st.toggle("Show Donut Chart (FASD)", value=False, key="toggle_fasd")
+        with col_toggle3:
+            show_discipline_chart = st.toggle("Show FASD Stock Value by Discipline", value=False, key="toggle_col3_view")
+
+        st.markdown("<hr style='margin-top: 5px; margin-bottom: 15px;' />", unsafe_allow_html=True)
+
         col1, col2, col3 = st.columns([0.8, 0.8, 0.9])
 
         with col1:
-            # Toggle option on top
-            chart_mode_plant = st.toggle("Show Donut Chart (Plant)", value=False, key="toggle_plant")
-
             # Group by plant
             plant_stock_df = stock_greater_zero.groupby('Plant', as_index=False)['Stock Value'].sum()
             plant_stock_df = plant_stock_df.sort_values(by='Stock Value', ascending=True)
@@ -172,9 +180,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.plotly_chart(fig_plant, use_container_width=True)
 
         with col2:
-            # Toggle option on top
-            chart_mode_fasd = st.toggle("Show Donut Chart (FASD)", value=False, key="toggle_fasd")
-
             # Apply plant filter if one is selected and not 'All'
             if plant and plant != 'All':
                 filtered_stock_fasd = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
@@ -257,9 +262,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.plotly_chart(fig_fasd, use_container_width=True)
 
         with col3:
-            # Toggle to switch between flowchart and FASD bar chart
-            show_discipline_chart = st.toggle("Show FASD Stock Value by Discipline", value=False, key="toggle_col3_view")
-
             if show_discipline_chart:
                 # Filter based on the selected plant if not 'All'
                 if plant and plant != 'All':
@@ -334,13 +336,15 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         yaxis={'gridcolor': 'rgba(235,235,235,1)', 'range': [0, y_limit]},
                         plot_bgcolor='rgba(0,0,0,0)',
                         paper_bgcolor='rgba(0,0,0,0)',
-                        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                        height=350,
+                        margin=dict(t=50, b=10, l=10, r=10)
                     )
                     st.plotly_chart(fig_disp, use_container_width=True)
             else:
-                # Render the original Graphviz flowchart
+                # Render the original Graphviz flowchart with top padding adjusted to match adjacent titles baseline
                 st.markdown(
-                    "<div style='padding-top: 30px; padding-bottom: 1px;'><span style='font-family: sans-serif; font-size: 17px; font-weight: bold; color: rgb(49, 51, 63);'>Material Breakdown Flow</span></div>",
+                    "<div style='padding-top: 13px; padding-bottom: 22px;'><span style='font-family: sans-serif; font-size: 15px; font-weight: bold; color: #1F2937;'>Material Breakdown Flow</span></div>",
                     unsafe_allow_html=True
                 )
 
