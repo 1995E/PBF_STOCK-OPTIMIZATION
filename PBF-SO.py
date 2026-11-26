@@ -203,7 +203,30 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
                 # Group data to ensure individual stack labels display properly
                 col3_grouped = col3_df.groupby(['Material discipline', 'FASD'], as_index=False)['Stock Value'].sum()
-                col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0] # Filter out zeros for cleaner text labels
+                col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0]
+
+                # Inject CSS to completely hide the slider's current value label and tooltip
+                st.markdown(
+                    """
+                    <style>
+                    /* Target the numerical value display directly above the slider track */
+                    div[data-testid="stSlider"] div[data-testid="stWidgetValue"] {
+                        display: none !important;
+                        visibility: hidden !important;
+                    }
+                    /* Target the sliding numeric tooltip overlay */
+                    div[role="slider"] div {
+                        display: none !important;
+                        visibility: hidden !important;
+                    }
+                    /* Ensure the inner slider tracking bar label wrapper is empty or hidden */
+                    div[data-baseweb="slider"] div {
+                        color: transparent !important;
+                    }
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
 
                 # Split Column 3 into sub-columns: left for slider, right for chart
                 sub_col_left, sub_col_right = st.columns([0.1, 0.90])
