@@ -185,17 +185,24 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # Enforce desired order: Fast, Active, Slow, Dead
                 fasd_v_order = ['Fast', 'Active', 'Slow', 'Dead']
                 col3_df['FASD'] = pd.Categorical(col3_df['FASD'], categories=fasd_v_order, ordered=True)
-                col3_df = col3_df.sort_values('FASD')
 
-                # Create vertical bar chart grouped by FASD ordered correctly
+                # Group by discipline to identify the descending sort order from highest total stock value to lowest
+                discipline_totals = col3_df.groupby('Material discipline')['Stock Value'].sum().reset_index()
+                discipline_totals = discipline_totals.sort_values(by='Stock Value', ascending=False)
+                ordered_disciplines = discipline_totals['Material discipline'].tolist()
+
+                # Create vertical stacked column chart
                 fig_disp = px.bar(
                     col3_df,
                     x='Material discipline',
                     y='Stock Value',
                     color='FASD',
-                    category_orders={"FASD": fasd_v_order},
+                    category_orders={
+                        "FASD": fasd_v_order,
+                        "Material discipline": ordered_disciplines
+                    },
                     title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
-                    barmode='group'
+                    barmode='stack'
                 )
                 fig_disp.update_layout(
                     xaxis_title="Material Discipline",
