@@ -208,7 +208,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # CSS overrides are omitted here to ensure the standard Streamlit value label is completely visible
 
                 # Split Column 3 into sub-columns: left for slider, right for chart
-                sub_col_left, sub_col_right = st.columns([0.15, 0.85])
+                sub_col_left, sub_col_right = st.columns([0.1, 0.90])
 
                 with sub_col_left:
                     # Convert the maximum value to millions to present a clean scale on the slider
