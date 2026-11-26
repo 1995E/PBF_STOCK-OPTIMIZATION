@@ -65,11 +65,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
     cnt_nd = max(0, Total_removed_materials - cnt_pd_v1)
 
     # Count simplified Gest status (first two characters) from pd_v1_unique_materials
-    gest_counts = pd.DataFrame(columns=['Gest Status', 'Count'])
-    if 'Gest' in pd_v1_unique_materials.columns:
-        pd_v1_unique_materials['Gest_2L'] = pd_v1_unique_materials['Gest'].astype(str).str[:2]
-        gest_counts = pd_v1_unique_materials['Gest_2L'].value_counts().reset_index()
-        gest_counts.columns = ['Gest Status', 'Count']
+    gest_counts_series = pd_v1_unique_materials['Gest_2L'].value_counts() if 'Gest_2L' in pd_v1_unique_materials.columns else pd.Series(dtype=int)
+    sum_se = int(gest_counts_series.get('SE', 0))
+    sum_su = int(gest_counts_series.get('SU', 0))
+    sum_mm = int(gest_counts_series.get('MM', 0))
 
     stock_greater_zero = pd_v1_df[pd_v1_df['Stock qty'] > 0].copy()
     stock_greater_zero['Stock Value'] = stock_greater_zero['Stock qty'] * stock_greater_zero['Unit price'].fillna(0)
@@ -82,7 +81,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Stock overview", "lorepsum 1", "lorepsum 2", "lorepsum 3", "lorepsum 4"])
 
     with tab1:
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             # Toggle option on top
@@ -150,3 +149,28 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 )
                 fig_fasd.update_layout(yaxis={'categoryorder': 'array', 'categoryarray': fasd_order})
             st.plotly_chart(fig_fasd, use_container_width=True)
+
+        with col3:
+            st.subheader("Material Breakdown Flow")
+            dot_code = f"""
+            digraph G {{
+                graph [rankdir=TB, size="8,5", bgcolor="transparent"];
+                node [shape=box, style="filled,rounded", color="#4B5563", fillcolor="#F3F4F6", fontname="Helvetica", fontsize=11, fontcolor="#1F2937"];
+                edge [color="#9CA3AF", fontname="Helvetica", fontsize=9];
+                
+                Total [label="Total Removed Materials\n({Total_removed_materials})", fillcolor="#3B82F6", fontcolor="white"];
+                PD_V1 [label="Stocked (PD/V1)\n({cnt_pd_v1})", fillcolor="#10B981", fontcolor="white"];
+                ND [label="Non-stocked (ND)\n({cnt_nd})", fillcolor="#F59E0B", fontcolor="white"];
+                
+                SE [label="SE Sum\n({sum_se})", fillcolor="#EC4899", fontcolor="white"];
+                SU [label="SU Sum\n({sum_su})", fillcolor="#8B5CF6", fontcolor="white"];
+                MM [label="MM Sum\n({sum_mm})", fillcolor="#6366F1", fontcolor="white"];
+                
+                Total -> PD_V1;
+                Total -> ND;
+                PD_V1 -> SE;
+                PD_V1 -> SU;
+                PD_V1 -> MM;
+            }}
+            """
+            st.graphviz_chart(dot_code, use_container_width=True)
