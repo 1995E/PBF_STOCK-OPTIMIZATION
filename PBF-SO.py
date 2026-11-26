@@ -244,7 +244,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 MM [
-                    label="MM: {sum_mm}\\nValue: ${val_mm:,.2f}",
+                    label="MM: {sum_mm}\\nStcok value: ${val_mm:,.2f}",
                     fillcolor="#EEF2FF",
                     color="#6366F1",
                     fontcolor="#3730A3",
