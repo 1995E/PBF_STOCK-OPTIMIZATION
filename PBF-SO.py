@@ -176,7 +176,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 branchvalues="total",
                 marker=dict(colors=px.colors.qualitative.Pastel)
             ))
-            fig_sunburst.update_layout(height=350, margin=dict(t=20, l=10, r=10, b=10))
+            fig_sunburst.update_layout(height=400, margin=dict(t=10, l=10, r=10, b=10))
             st.plotly_chart(fig_sunburst, use_container_width=True)
 
   
