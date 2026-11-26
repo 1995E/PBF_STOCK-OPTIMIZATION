@@ -18,8 +18,8 @@ if critical_only:
     st.write("Displaying only critical materials")
 
 stock_status = st.segmented_control(
-    "Stock Status",
-    ["All", "Stock", "Non-Stock"]
+    "Select plant",
+    ["All", 'GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV']
 )
 
 stock_status = st.radio(
