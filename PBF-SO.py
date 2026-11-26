@@ -205,6 +205,23 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 col3_grouped = col3_df.groupby(['Material discipline', 'FASD'], as_index=False)['Stock Value'].sum()
                 col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0] # Filter out zeros for cleaner text labels
 
+                # Hide the value of st.slider via CSS injection
+                st.markdown(
+                    """
+                    <style>
+                    /* Hide numeric value representation above the slider */
+                    div[data-testid="stSlider"] div[data-baseweb="slider"] div {
+                        color: transparent !important;
+                    }
+                    /* Alternatively hide the actual number output label completely */
+                    div[data-testid="stSlider"] div[role="slider"] div {
+                        display: none !important;
+                    }
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
+
                 # Split Column 3 into sub-columns: left for slider, right for chart
                 sub_col_left, sub_col_right = st.columns([0.1, 0.90])
 
