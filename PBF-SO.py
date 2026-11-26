@@ -217,6 +217,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     
                     # Display current value explicitly formatted in Millions (e.g., 2.5M)
                     y_limit_m = st.slider(
+                        "Zoom",
                         min_value=0.0,
                         max_value=max_possible_y_m,
                         value=max_possible_y_m,
