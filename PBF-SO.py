@@ -55,9 +55,15 @@ if uploaded_materials is not None and uploaded_prices is not None:
     else:
         df['Gest_2L'] = ""
 
-    # Perform calculations
-    Total_removed_materials = df['Material n°'].nunique()
-    pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
+    # Filter data based on selected plant before calculations to make the flowchart dynamic
+    if plant and plant != "All" and 'Plant' in df.columns:
+        chart_df = df[df['Plant'] == plant].copy()
+    else:
+        chart_df = df.copy()
+
+    # Perform calculations using filtered data for the flowchart
+    Total_removed_materials = chart_df['Material n°'].nunique()
+    pd_v1_df = chart_df[chart_df['MRP Type'].isin(['PD', 'V1'])].copy()
     pd_v1_unique_materials = pd_v1_df.drop_duplicates(subset=['Material n°']).copy()
 
     # Number of materials that are not PD/V1 (ND)
@@ -70,7 +76,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
     sum_su = int(gest_counts_series.get('SU', 0))
     sum_mm = int(gest_counts_series.get('MM', 0))
 
-    stock_greater_zero = pd_v1_df[pd_v1_df['Stock qty'] > 0].copy()
+    # Prepare stock overview data (always based on entire dataset and conditionally filtered in layout)
+    full_pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
+    stock_greater_zero = full_pd_v1_df[full_pd_v1_df['Stock qty'] > 0].copy()
     stock_greater_zero['Stock Value'] = stock_greater_zero['Stock qty'] * stock_greater_zero['Unit price'].fillna(0)
 
     # Remap "Never been consumed" to "Dead" in FASD column
@@ -78,7 +86,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         stock_greater_zero['FASD'] = stock_greater_zero['FASD'].replace('Never been consumed', 'Dead')
 
     # Tab configuration
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["STOCK OVERVIEW", "LOREPSUM 1", "LOREPSUM 2", "LOREPSUM 3", "LOREPSUM 4"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Stock overview", "lorepsum 1", "lorepsum 2", "lorepsum 3", "lorepsum 4"])
 
     with tab1:
         col1, col2, col3 = st.columns(3)
@@ -156,42 +164,42 @@ if uploaded_materials is not None and uploaded_prices is not None:
             digraph G {{
                 graph [rankdir=LR, size="8,5", bgcolor="transparent", splines=ortho, nodesep=0.4, ranksep=0.6];
                 node [
-                    shape=box, 
-                    style="filled,rounded", 
-                    color="#D1D5DB", 
-                    fillcolor="#F9FAFB", 
-                    fontname="Segoe UI, Helvetica, Arial, sans-serif", 
-                    fontsize=11, 
+                    shape=box,
+                    style="filled,rounded",
+                    color="#D1D5DB",
+                    fillcolor="#F9FAFB",
+                    fontname="Segoe UI, Helvetica, Arial, sans-serif",
+                    fontsize=11,
                     fontcolor="#1F2937",
                     penwidth=1.5,
                     margin="0.2,0.15"
                 ];
                 edge [
-                    color="#9CA3AF", 
-                    penwidth=1.5, 
-                    arrowsize=0.8, 
-                    fontname="Segoe UI, Helvetica, Arial, sans-serif", 
+                    color="#9CA3AF",
+                    penwidth=1.5,
+                    arrowsize=0.8,
+                    fontname="Segoe UI, Helvetica, Arial, sans-serif",
                     fontsize=9
                 ];
 
                 Total [
-                    label="Total Removed Materials\n{Total_removed_materials}", 
-                    fillcolor="#EFF6FF", 
-                    color="#3B82F6", 
+                    label="Total Removed Materials ({plant if plant else 'All'})\n{Total_removed_materials}",
+                    fillcolor="#EFF6FF",
+                    color="#3B82F6",
                     fontcolor="#1E40AF",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 PD_V1 [
-                    label="Stocked (PD/V1)\n{cnt_pd_v1}", 
-                    fillcolor="#ECFDF5", 
-                    color="#10B981", 
+                    label="Stocked (PD/V1)\n{cnt_pd_v1}",
+                    fillcolor="#ECFDF5",
+                    color="#10B981",
                     fontcolor="#065F46",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 ND [
-                    label="Non-stocked (ND)\n{cnt_nd}", 
-                    fillcolor="#FFFBEB", 
-                    color="#F59E0B", 
+                    label="Non-stocked (ND)\n{cnt_nd}",
+                    fillcolor="#FFFBEB",
+                    color="#F59E0B",
                     fontcolor="#92400E",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
