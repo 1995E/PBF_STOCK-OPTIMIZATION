@@ -208,7 +208,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # CSS overrides are omitted here to ensure the standard Streamlit value label is completely visible
 
                 # Split Column 3 into sub-columns: left for slider, right for chart
-                sub_col_left, sub_col_right = st.columns([0.1, 0.90])
+                sub_col_left, sub_col_right = st.columns([0.11, 0.89])
 
                 with sub_col_left:
                     # Convert the maximum value to millions to present a clean scale on the slider
@@ -217,7 +217,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     
                     # Display current value explicitly formatted in Millions (e.g., 2.5M)
                     y_limit_m = st.slider(
-                        "Y Zoom (M)",
                         min_value=0.0,
                         max_value=max_possible_y_m,
                         value=max_possible_y_m,
