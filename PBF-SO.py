@@ -206,7 +206,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             else:
                 # Render the original Graphviz flowchart
                 st.markdown(
-                    "<div style='padding-top: 10px; padding-bottom: 50px;'><span style='font-family: sans-serif; font-size: 17px; font-weight: bold; color: rgb(49, 51, 63);'>Material Breakdown Flow</span></div>",
+                    "<div style='padding-top: 5px; padding-bottom: 30px;'><span style='font-family: sans-serif; font-size: 17px; font-weight: bold; color: rgb(49, 51, 63);'>Material Breakdown Flow</span></div>",
                     unsafe_allow_html=True
                 )
 
