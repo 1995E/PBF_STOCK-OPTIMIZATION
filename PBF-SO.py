@@ -78,7 +78,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         stock_greater_zero['FASD'] = stock_greater_zero['FASD'].replace('Never been consumed', 'Dead')
 
     # Tab configuration
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Stock overview", "lorepsum 1", "lorepsum 2", "lorepsum 3", "lorepsum 4"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["STOCK OVERVIEW", "LOREPSUM 1", "LOREPSUM 2", "LOREPSUM 3", "LOREPSUM 4"])
 
     with tab1:
         col1, col2, col3 = st.columns(3)
