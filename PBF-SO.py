@@ -81,74 +81,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     Interested_plant_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
     Others_plant_stock_value = Total_stock_value - Interested_plant_stock_value
     Interested_plant['Stock Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
-
+st.write( Interested_plant)
     # Modern Title
     st.markdown("---")
-
-# Display charts side-by-side
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.markdown("### 📊 Material Assessment Structure")
-
-        # Prepare Sunburst components hierarchically:
-        # Level 0: Total removed materials
-        # Level 1: PD/V1 vs ND (Not PD/V1)
-        # Level 2: Under PD/V1, we split by simplified Gest status counts
-
-        ids = ["Total Materials", "PD_V1", "ND"]
-        labels = [
-            f"Total Materials<br>({Total_removed_materials:,})",
-            f"PD/V1 Materials<br>({cnt_pd_v1:,})",
-            f"ND Materials<br>({cnt_nd:,})"
-        ]
-        parents = ["", "Total Materials", "Total Materials"]
-        values = [Total_removed_materials, cnt_pd_v1, cnt_nd]
-
-        # Add Gest statuses under the PD_V1 branch
-        for idx, row in gest_counts.iterrows():
-            gest_status = row['Gest Status']
-            count = row['Count']
-            ids.append(f"Gest_{gest_status}")
-            labels.append(f"{gest_status}<br>({count:,})")
-            parents.append("PD_V1")
-            values.append(count)
-
-        fig_sunburst = go.Figure(go.Sunburst( 
-            ids=ids,
-            labels=labels,
-            parents=parents,
-            values=values,
-            branchvalues="total",
-            marker=dict(colors=px.colors.qualitative.Pastel)
-        ))
-        fig_sunburst.update_layout(height=500, margin=dict(t=20, l=10, r=10, b=10))
-        st.plotly_chart(fig_sunburst, use_container_width=True)
-
-    with col2:
-        st.markdown("### 🍕 Stock Value Share per Plant")
-
-        if not stock_greater_zero.empty:
-            stock_greater_zero['Calculated Value'] = stock_greater_zero['Stock qty'] * stock_greater_zero['Unit price'].fillna(0)
-            plant_shares = stock_greater_zero.groupby('Plant')['Calculated Value'].sum().reset_index()
-
-            fig_pie = px.pie(
-                plant_shares,
-                values='Calculated Value',
-                names='Plant',
-                hole=0.4,
-                color_discrete_sequence=px.colors.qualitative.Safe
-            )
-            fig_pie.update_traces(textposition='inside', textinfo='percent+label')
-            fig_pie.update_layout(
-                height=500,
-                margin=dict(t=20, l=10, r=10, b=10),
-                legend=dict(orientation="h", y=-0.1, xanchor="center", x=0.5)
-            )
-            st.plotly_chart(fig_pie, use_container_width=True)
-        else:
-            st.info("No stock items with a quantity greater than zero to display.")
-
-else:
-    st.info("💡 Please upload both files in the sidebar to configure the dashboard!")
 
