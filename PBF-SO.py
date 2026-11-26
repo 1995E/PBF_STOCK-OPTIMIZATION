@@ -205,47 +205,53 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 col3_grouped = col3_df.groupby(['Material discipline', 'FASD'], as_index=False)['Stock Value'].sum()
                 col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0] # Filter out zeros for cleaner text labels
 
-                # Slider controlling Y-axis max value range dynamically
-                max_possible_y = float(discipline_totals['Stock Value'].max()) if not discipline_totals.empty else 1000.0
-                y_limit = st.slider(
-                    "Y-axis Max Limit (Stock Value Zoom)",
-                    min_value=0.0,
-                    max_value=max_possible_y,
-                    value=max_possible_y,
-                    step=max(1.0, max_possible_y / 100)
-                )
+                # Split Column 3 into sub-columns: left for slider, right for chart
+                sub_col_left, sub_col_right = st.columns([0.25, 0.75])
 
-                # Create vertical stacked column chart with custom aesthetics and stack value labels
-                fig_disp = px.bar(
-                    col3_grouped,
-                    x='Material discipline',
-                    y='Stock Value',
-                    color='FASD',
-                    text='Stock Value',
-                    category_orders={ 
-                        "FASD": fasd_v_order,
-                        "Material discipline": ordered_disciplines
-                    },
-                    title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
-                    barmode='stack',
-                    color_discrete_sequence=px.colors.qualitative.Antique
-                )
-                fig_disp.update_traces(
-                    texttemplate='$%{text:,.2s}',
-                    textposition='inside',
-                    insidetextanchor='middle'
-                )
-                fig_disp.update_layout(
-                    xaxis_title="Material Discipline",
-                    yaxis_title="Stock Value",
-                    legend_title="FASD Status",
-                    xaxis={'showgrid': False},
-                    yaxis={'gridcolor': 'rgba(235,235,235,1)', 'range': [0, y_limit]},
-                    plot_bgcolor='rgba(0,0,0,0)',
-                    paper_bgcolor='rgba(0,0,0,0)',
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-                )
-                st.plotly_chart(fig_disp, use_container_width=True)
+                with sub_col_left:
+                    # Slider controlling Y-axis max value range dynamically
+                    max_possible_y = float(discipline_totals['Stock Value'].max()) if not discipline_totals.empty else 1000.0
+                    y_limit = st.slider(
+                        "Y Zoom",
+                        min_value=0.0,
+                        max_value=max_possible_y,
+                        value=max_possible_y,
+                        step=max(1.0, max_possible_y / 100),
+                        key="y_axis_slider"
+                    )
+
+                with sub_col_right:
+                    # Create vertical stacked column chart with custom aesthetics and stack value labels
+                    fig_disp = px.bar(
+                        col3_grouped,
+                        x='Material discipline',
+                        y='Stock Value',
+                        color='FASD',
+                        text='Stock Value',
+                        category_orders={
+                            "FASD": fasd_v_order,
+                            "Material discipline": ordered_disciplines
+                        },
+                        title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
+                        barmode='stack',
+                        color_discrete_sequence=px.colors.qualitative.Antique
+                    )
+                    fig_disp.update_traces(
+                        texttemplate='$%{text:,.2s}',
+                        textposition='inside',
+                        insidetextanchor='middle'
+                    )
+                    fig_disp.update_layout(
+                        xaxis_title="Material Discipline",
+                        yaxis_title="Stock Value",
+                        legend_title="FASD Status",
+                        xaxis={'showgrid': False},
+                        yaxis={'gridcolor': 'rgba(235,235,235,1)', 'range': [0, y_limit]},
+                        plot_bgcolor='rgba(0,0,0,0)',
+                        paper_bgcolor='rgba(0,0,0,0)',
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+                    )
+                    st.plotly_chart(fig_disp, use_container_width=True)
             else:
                 # Render the original Graphviz flowchart
                 st.markdown(
