@@ -230,21 +230,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 ];
 
                 SE [
-                    label="SE: {sum_se}\\nValue: ${val_se:,.2f}",
+                    label="SE: {sum_se}\\Stock value: ${val_se:,.2f}",
                     fillcolor="#FDF2F8",
                     color="#EC4899",
                     fontcolor="#9D174D",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 SU [
-                    label="SU: {sum_su}\\nValue: ${val_su:,.2f}",
+                    label="SU: {sum_su}\\nStock value: ${val_su:,.2f}",
                     fillcolor="#F5F3FF",
                     color="#8B5CF6",
                     fontcolor="#5B21B6",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 MM [
-                    label="MM: {sum_mm}\\nStcok value: ${val_mm:,.2f}",
+                    label="MM: {sum_mm}\\nStock value: ${val_mm:,.2f}",
                     fillcolor="#EEF2FF",
                     color="#6366F1",
                     fontcolor="#3730A3",
