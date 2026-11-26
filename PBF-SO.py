@@ -12,11 +12,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-critical_only = st.toggle("Show Critical Materials Only")
-
-if critical_only:
-    st.write("Displaying only critical materials")
-
 plant = st.segmented_control(
     "Select plant",
     ["All", 'GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV']
