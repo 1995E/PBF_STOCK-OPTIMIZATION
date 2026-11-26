@@ -215,7 +215,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         "Y Zoom",
                         min_value=0.0,
                         max_value=max_possible_y,
-                        #value=max_possible_y,
+                        value=max_possible_y,
                         step=max(1.0, max_possible_y / 10),
                         key="y_axis_slider"
                     )
@@ -233,7 +233,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                             "Material discipline": ordered_disciplines
                         },
                         title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
-                        barmode='stack',
+                        barmode='group',
                         color_discrete_sequence=px.colors.qualitative.Antique
                     )
                     fig_disp.update_traces(
