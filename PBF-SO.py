@@ -64,6 +64,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Perform calculations using filtered data for the flowchart
     Total_removed_materials = chart_df['Material n°'].nunique()
     pd_v1_df = chart_df[chart_df['MRP Type'].isin(['PD', 'V1'])].copy()
+    
+    # Calculate Stock Value for materials in the filtered dataset
+    pd_v1_df['Stock Value'] = pd_v1_df['Stock qty'].fillna(0) * pd_v1_df['Unit price'].fillna(0)
+    
     pd_v1_unique_materials = pd_v1_df.drop_duplicates(subset=['Material n°']).copy()
 
     # Number of materials that are not PD/V1 (ND)
@@ -75,6 +79,11 @@ if uploaded_materials is not None and uploaded_prices is not None:
     sum_se = int(gest_counts_series.get('SE', 0))
     sum_su = int(gest_counts_series.get('SU', 0))
     sum_mm = int(gest_counts_series.get('MM', 0))
+
+    # Calculate the Total Stock Value for SE, SU, and MM groups in the current selection
+    val_se = pd_v1_df[pd_v1_df['Gest_2L'] == 'SE']['Stock Value'].sum()
+    val_su = pd_v1_df[pd_v1_df['Gest_2L'] == 'SU']['Stock Value'].sum()
+    val_mm = pd_v1_df[pd_v1_df['Gest_2L'] == 'MM']['Stock Value'].sum()
 
     # Prepare stock overview data (always based on entire dataset and conditionally filtered in layout)
     full_pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
@@ -204,9 +213,27 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
 
-                SE [label="SE Sum\n{sum_se}", fillcolor="#FDF2F8", color="#EC4899", fontcolor="#9D174D"];
-                SU [label="SU Sum\n{sum_su}", fillcolor="#F5F3FF", color="#8B5CF6", fontcolor="#5B21B6"];
-                MM [label="MM Sum\n{sum_mm}", fillcolor="#EEF2FF", color="#6366F1", fontcolor="#3730A3"];
+                SE [
+                    label="SE Sum: {sum_se}\nValue: ${val_se:,.2f}",
+                    fillcolor="#FDF2F8",
+                    color="#EC4899",
+                    fontcolor="#9D174D",
+                    fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
+                ];
+                SU [
+                    label="SU Sum: {sum_su}\nValue: ${val_su:,.2f}",
+                    fillcolor="#F5F3FF",
+                    color="#8B5CF6",
+                    fontcolor="#5B21B6",
+                    fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
+                ];
+                MM [
+                    label="MM Sum: {sum_mm}\nValue: ${val_mm:,.2f}",
+                    fillcolor="#EEF2FF",
+                    color="#6366F1",
+                    fontcolor="#3730A3",
+                    fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
+                ];
 
                 Total -> PD_V1 [color="#3B82F6"];
                 Total -> ND [color="#F59E0B"];
