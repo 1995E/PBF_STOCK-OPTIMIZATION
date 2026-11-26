@@ -78,7 +78,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Stock overview", "lorepsum 1", "lorepsum 2", "lorepsum 3", "lorepsum 4"])
 
     with tab1:
-        col1, col2, col3 = st.columns(3)
+        col1, col2 = st.columns(2)
 
         with col1:
             # Toggle option on top
@@ -116,6 +116,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
             else:
                 filtered_stock_fasd = stock_greater_zero.copy()
                 
+            # Drop null and empty FASD status values
+            filtered_stock_fasd = filtered_stock_fasd.dropna(subset=['FASD'])
+            filtered_stock_fasd = filtered_stock_fasd[filtered_stock_fasd['FASD'].astype(str).str.strip() != '']
+                
             # Group by FASD status
             fasd_stock_df = filtered_stock_fasd.groupby('FASD', as_index=False)['Stock Value'].sum()
             
@@ -142,41 +146,3 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 )
                 fig_fasd.update_layout(yaxis={'categoryorder': 'array', 'categoryarray': fasd_order})
             st.plotly_chart(fig_fasd, use_container_width=True)
-       
-        with col3:
-            
-            # Prepare Sunburst components hierarchically:
-            # Level 0: Total removed materials
-            # Level 1: PD/V1 vs ND (Not PD/V1)
-            # Level 2: Under PD/V1, we split by simplified Gest status counts
-
-            ids = ["Total Materials", "PD_V1", "ND"]
-            labels = [
-                f"Total Materials<br>({Total_removed_materials:,})",
-                f"PD/V1 Materials<br>({cnt_pd_v1:,})",
-                f"ND Materials<br>({cnt_nd:,})"
-            ]
-            parents = ["", "Total Materials", "Total Materials"]
-            values = [Total_removed_materials, cnt_pd_v1, cnt_nd]
-
-            # Add Gest statuses under the PD_V1 branch
-            for idx, row in gest_counts.iterrows():
-                gest_status = row['Gest Status']
-                count = row['Count']
-                ids.append(f"Gest_{gest_status}")
-                labels.append(f"{gest_status}<br>({count:,})")
-                parents.append("PD_V1")
-                values.append(count)
-
-            fig_sunburst = go.Figure(go.Sunburst( 
-                ids=ids,
-                labels=labels,
-                parents=parents,
-                values=values,
-                branchvalues="total",
-                marker=dict(colors=px.colors.qualitative.Pastel)
-            ))
-            fig_sunburst.update_layout(height=400, margin=dict(t=10, l=10, r=10, b=10))
-            st.plotly_chart(fig_sunburst, use_container_width=True)
-
-  
