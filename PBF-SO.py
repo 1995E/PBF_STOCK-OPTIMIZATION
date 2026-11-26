@@ -85,7 +85,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     val_su = pd_v1_df[pd_v1_df['Gest_2L'] == 'SU']['Stock Value'].sum()
     val_mm = pd_v1_df[pd_v1_df['Gest_2L'] == 'MM']['Stock Value'].sum()
 
-    # Prepare stock overview data (always based on entire dataset and conditionally filtered in layout)
+    # Prepare stock overview data
     full_pd_v1_df = df[df['MRP Type'].isin(['PD', 'V1'])].copy()
     stock_greater_zero = full_pd_v1_df[full_pd_v1_df['Stock qty'] > 0].copy()
     stock_greater_zero['Stock Value'] = stock_greater_zero['Stock qty'] * stock_greater_zero['Unit price'].fillna(0)
@@ -98,7 +98,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Stock overview", "lorepsum 1", "lorepsum 2", "lorepsum 3", "lorepsum 4"])
 
     with tab1:
-        col1, col2, col3 = st.columns([0.8,0.8,0.9])
+        col1, col2, col3 = st.columns([0.8, 0.8, 0.9])
 
         with col1:
             # Toggle option on top
@@ -106,14 +106,34 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
             # Group by plant
             plant_stock_df = stock_greater_zero.groupby('Plant', as_index=False)['Stock Value'].sum()
+            plant_stock_df = plant_stock_df.sort_values(by='Stock Value', ascending=True)
+            total_plant_val = plant_stock_df['Stock Value'].sum()
 
             if chart_mode_plant:
                 fig_plant = px.pie(
                     plant_stock_df,
                     values='Stock Value',
                     names='Plant',
-                    hole=0.4,
-                    title='Stock Value by Plant'
+                    hole=0.55,
+                    color_discrete_sequence=px.colors.sequential.Tealgrn_r
+                )
+                fig_plant.update_traces(
+                    textposition='outside',
+                    textinfo='percent+label',
+                    hovertemplate="<b>%{label}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
+                )
+                fig_plant.update_layout(
+                    title=dict(
+                        text='<b>Stock Value distribution by Plant</b>',
+                        font=dict(size=15, color='#1F2937')
+                    ),
+                    annotations=[dict(
+                        text=f"<b>Total</b><br>${total_plant_val/1e6:.1f}M",
+                        x=0.5, y=0.5, font_size=13, showarrow=False, font_color='#111827'
+                    )],
+                    showlegend=False,
+                    margin=dict(t=50, b=10, l=10, r=10),
+                    height=350
                 )
             else:
                 fig_plant = px.bar(
@@ -122,13 +142,33 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     y='Plant',
                     text='Stock Value',
                     orientation='h',
-                    title='Stock Value by Plant'
+                    color='Stock Value',
+                    color_continuous_scale=px.colors.sequential.Tealgrn
                 )
                 fig_plant.update_traces(
                     texttemplate='$%{text:,.2s}',
-                    textposition='inside'
+                    textposition='outside',
+                    hovertemplate="<b>%{y}</b><br>Stock Value: $%{{x:,.2f}}<extra></extra>"
                 )
-                fig_plant.update_layout(yaxis={'categoryorder': 'total ascending'})
+                fig_plant.update_layout(
+                    title=dict(
+                        text='<b>Stock Value by Plant</b>',
+                        font=dict(size=15, color='#1F2937')
+                    ),
+                    xaxis_title=None,
+                    yaxis_title=None,
+                    coloraxis_showscale=False,
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    xaxis=dict(
+                        showgrid=True,
+                        gridcolor='rgba(235,235,235,1)',
+                        tickformat="$.2s"
+                    ),
+                    yaxis=dict(categoryorder='total ascending'),
+                    margin=dict(t=50, b=10, l=10, r=10),
+                    height=350
+                )
             st.plotly_chart(fig_plant, use_container_width=True)
 
         with col2:
@@ -152,14 +192,33 @@ if uploaded_materials is not None and uploaded_prices is not None:
             fasd_order = ['Dead', 'Slow', 'Active', 'Fast']
             fasd_stock_df['FASD'] = pd.Categorical(fasd_stock_df['FASD'], categories=fasd_order, ordered=True)
             fasd_stock_df = fasd_stock_df.sort_values('FASD', ascending=True)
+            total_fasd_val = fasd_stock_df['Stock Value'].sum()
 
             if chart_mode_fasd:
                 fig_fasd = px.pie(
                     fasd_stock_df,
                     values='Stock Value',
                     names='FASD',
-                    hole=0.4,
-                    title=f'Stock Value by FASD Status ({plant if plant else "All"})'
+                    hole=0.55,
+                    color_discrete_sequence=px.colors.sequential.Mint_r
+                )
+                fig_fasd.update_traces(
+                    textposition='outside',
+                    textinfo='percent+label',
+                    hovertemplate="<b>%{label}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
+                )
+                fig_fasd.update_layout(
+                    title=dict(
+                        text=f'<b>FASD Status Distribution ({plant if plant else "All"})</b>',
+                        font=dict(size=15, color='#1F2937')
+                    ),
+                    annotations=[dict(
+                        text=f"<b>Total</b><br>${total_fasd_val/1e6:.1f}M",
+                        x=0.5, y=0.5, font_size=13, showarrow=False, font_color='#111827'
+                    )],
+                    showlegend=False,
+                    margin=dict(t=50, b=10, l=10, r=10),
+                    height=350
                 )
             else:
                 fig_fasd = px.bar(
@@ -168,13 +227,33 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     y='FASD',
                     text='Stock Value',
                     orientation='h',
-                    title=f'Stock Value by FASD Status ({plant if plant else "All"})'
+                    color='Stock Value',
+                    color_continuous_scale=px.colors.sequential.Mint
                 )
                 fig_fasd.update_traces(
                     texttemplate='$%{text:,.2s}',
-                    textposition='inside'
+                    textposition='outside',
+                    hovertemplate="<b>%{y}</b><br>Stock Value: $%{{x:,.2f}}<extra></extra>"
                 )
-                fig_fasd.update_layout(yaxis={'categoryorder': 'array', 'categoryarray': fasd_order})
+                fig_fasd.update_layout(
+                    title=dict(
+                        text=f'<b>FASD Status ({plant if plant else "All"})</b>',
+                        font=dict(size=15, color='#1F2937')
+                    ),
+                    xaxis_title=None,
+                    yaxis_title=None,
+                    coloraxis_showscale=False,
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    xaxis=dict(
+                        showgrid=True,
+                        gridcolor='rgba(235,235,235,1)',
+                        tickformat="$.2s"
+                    ),
+                    yaxis=dict(categoryorder='array', categoryarray=fasd_order),
+                    margin=dict(t=50, b=10, l=10, r=10),
+                    height=350
+                )
             st.plotly_chart(fig_fasd, use_container_width=True)
 
         with col3:
@@ -204,8 +283,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # Group data to ensure individual stack labels display properly
                 col3_grouped = col3_df.groupby(['Material discipline', 'FASD'], as_index=False)['Stock Value'].sum()
                 col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0]
-
-                # CSS overrides are omitted here to ensure the standard Streamlit value label is completely visible
 
                 # Split Column 3 into sub-columns: left for slider, right for chart
                 sub_col_left, sub_col_right = st.columns([0.11, 0.89])
@@ -267,7 +344,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     unsafe_allow_html=True
                 )
 
-                # Use a wrapper with CSS flex centering to horizontally align the Graphviz chart
                 st.markdown(
                     """
                     <style>
@@ -357,7 +433,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 }}
                 """
 
-                # Embed the graph within a centered container block
                 st.markdown('<div class="centered-graphviz">', unsafe_allow_html=True)
                 st.graphviz_chart(dot_code, use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
