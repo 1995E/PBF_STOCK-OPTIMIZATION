@@ -213,7 +213,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     max_possible_y = float(discipline_totals['Stock Value'].max()) if not discipline_totals.empty else 1000.0
                     y_limit = st.slider(
                         "Y Zoom",
-                        min_value=0.0,
+                        min_value=1.0,
                         max_value=max_possible_y,
                         value=max_possible_y,
                         step=max(1.0, max_possible_y / 10),
