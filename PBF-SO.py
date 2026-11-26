@@ -86,10 +86,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
         with col1:
             # Toggle option on top
             chart_mode_plant = st.toggle("Show Donut Chart (Plant)", value=False, key="toggle_plant")
-            
+
             # Group by plant
             plant_stock_df = stock_greater_zero.groupby('Plant', as_index=False)['Stock Value'].sum()
-            
+
             if chart_mode_plant:
                 fig_plant = px.pie(
                     plant_stock_df,
@@ -112,25 +112,25 @@ if uploaded_materials is not None and uploaded_prices is not None:
         with col2:
             # Toggle option on top
             chart_mode_fasd = st.toggle("Show Donut Chart (FASD)", value=False, key="toggle_fasd")
-            
+
             # Apply plant filter if one is selected and not 'All'
             if plant and plant != 'All':
                 filtered_stock_fasd = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
             else:
                 filtered_stock_fasd = stock_greater_zero.copy()
-                
+
             # Drop null and empty FASD status values
             filtered_stock_fasd = filtered_stock_fasd.dropna(subset=['FASD'])
             filtered_stock_fasd = filtered_stock_fasd[filtered_stock_fasd['FASD'].astype(str).str.strip() != '']
-                
+
             # Group by FASD status
             fasd_stock_df = filtered_stock_fasd.groupby('FASD', as_index=False)['Stock Value'].sum()
-            
+
             # Define desired order: Fast, Active, Slow, Dead (from top to bottom)
             fasd_order = ['Dead', 'Slow', 'Active', 'Fast']
             fasd_stock_df['FASD'] = pd.Categorical(fasd_stock_df['FASD'], categories=fasd_order, ordered=True)
             fasd_stock_df = fasd_stock_df.sort_values('FASD', ascending=True)
-            
+
             if chart_mode_fasd:
                 fig_fasd = px.pie(
                     fasd_stock_df,
@@ -154,23 +154,57 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.subheader("Material Breakdown Flow")
             dot_code = f"""
             digraph G {{
-                graph [rankdir=TB, size="8,5", bgcolor="transparent"];
-                node [shape=box, style="filled,rounded", color="#4B5563", fillcolor="#F3F4F6", fontname="Helvetica", fontsize=11, fontcolor="#1F2937"];
-                edge [color="#9CA3AF", fontname="Helvetica", fontsize=9];
-                
-                Total [label="Total Removed Materials\n({Total_removed_materials})", fillcolor="#3B82F6", fontcolor="white"];
-                PD_V1 [label="Stocked (PD/V1)\n({cnt_pd_v1})", fillcolor="#10B981", fontcolor="white"];
-                ND [label="Non-stocked (ND)\n({cnt_nd})", fillcolor="#F59E0B", fontcolor="white"];
-                
-                SE [label="SE Sum\n({sum_se})", fillcolor="#EC4899", fontcolor="white"];
-                SU [label="SU Sum\n({sum_su})", fillcolor="#8B5CF6", fontcolor="white"];
-                MM [label="MM Sum\n({sum_mm})", fillcolor="#6366F1", fontcolor="white"];
-                
-                Total -> PD_V1;
-                Total -> ND;
-                PD_V1 -> SE;
-                PD_V1 -> SU;
-                PD_V1 -> MM;
+                graph [rankdir=LR, size="8,5", bgcolor="transparent", splines=ortho, nodesep=0.4, ranksep=0.6];
+                node [
+                    shape=box, 
+                    style="filled,rounded", 
+                    color="#D1D5DB", 
+                    fillcolor="#F9FAFB", 
+                    fontname="Segoe UI, Helvetica, Arial, sans-serif", 
+                    fontsize=11, 
+                    fontcolor="#1F2937",
+                    penwidth=1.5,
+                    margin="0.2,0.15"
+                ];
+                edge [
+                    color="#9CA3AF", 
+                    penwidth=1.5, 
+                    arrowsize=0.8, 
+                    fontname="Segoe UI, Helvetica, Arial, sans-serif", 
+                    fontsize=9
+                ];
+
+                Total [
+                    label="Total Removed Materials\n{Total_removed_materials}", 
+                    fillcolor="#EFF6FF", 
+                    color="#3B82F6", 
+                    fontcolor="#1E40AF",
+                    fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
+                ];
+                PD_V1 [
+                    label="Stocked (PD/V1)\n{cnt_pd_v1}", 
+                    fillcolor="#ECFDF5", 
+                    color="#10B981", 
+                    fontcolor="#065F46",
+                    fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
+                ];
+                ND [
+                    label="Non-stocked (ND)\n{cnt_nd}", 
+                    fillcolor="#FFFBEB", 
+                    color="#F59E0B", 
+                    fontcolor="#92400E",
+                    fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
+                ];
+
+                SE [label="SE Sum\n{sum_se}", fillcolor="#FDF2F8", color="#EC4899", fontcolor="#9D174D"];
+                SU [label="SU Sum\n{sum_su}", fillcolor="#F5F3FF", color="#8B5CF6", fontcolor="#5B21B6"];
+                MM [label="MM Sum\n{sum_mm}", fillcolor="#EEF2FF", color="#6366F1", fontcolor="#3730A3"];
+
+                Total -> PD_V1 [color="#3B82F6"];
+                Total -> ND [color="#F59E0B"];
+                PD_V1 -> SE [color="#10B981"];
+                PD_V1 -> SU [color="#10B981"];
+                PD_V1 -> MM [color="#10B981"];
             }}
             """
             st.graphviz_chart(dot_code, use_container_width=True)
