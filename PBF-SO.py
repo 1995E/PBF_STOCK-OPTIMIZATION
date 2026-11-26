@@ -186,7 +186,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             
             dot_code = f"""
             digraph G {{
-                graph [rankdir=LR, size="8,5", bgcolor="transparent", splines=ortho, nodesep=0.4, ranksep=0.6, labe="Material breakdown"];
+                graph [rankdir=LR, size="8,5", bgcolor="transparent", splines=ortho, nodesep=0.4, ranksep=0.6, label="Material breakdown"];
                 node [
                     shape=box,
                     style="filled,rounded",
