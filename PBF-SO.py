@@ -35,7 +35,86 @@ with st.sidebar:
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
-    
+
+
+st.markdown(f"""
+    <style>
+        .main-header {{
+            font-size: 2.2rem;
+            color: #303947;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            font-family: serif;
+        }}
+        .section-gap {{
+            margin-top: 35px;
+            margin-bottom: 35px;
+        }}
+        .kpi-gap {{
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }}
+        .kpi-title {{
+            font-size: 1.45rem !important;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            color: #1E3A8A;
+        }}
+        .metric-card {{
+            background-color: #F8FAFC;
+            padding: 1.25rem;
+            border-radius: 12px;
+            border-left: 6px solid #3B82F6;
+            border-top: 1px solid #E2E8F0;
+            border-right: 1px solid #E2E8F0;
+            border-bottom: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            margin-bottom: 1rem;
+            min-height: 135px;
+        }}
+        .metric-label {{
+            font-size: 0.85rem;
+            color: #64748B;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.75px;
+        }}
+        .metric-value {{
+            font-size: 1.65rem;
+            color: #0F172A;
+            font-weight: 800;
+            margin-top: 0.25rem;
+        }}
+        .metric-subvalue {{
+            font-size: 0.85rem;
+            color: #475569;
+            margin-top: 0.2rem;
+        }}
+        /* Card Container styling */
+        .chart-card {{
+            background-color: #FFFFFF;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            margin-bottom: 1.5rem;
+        }}
+        /* Optimize Progress Bar Size */
+        .stProgress > div > div > div {{
+            height: 28px !important;
+            border-radius: 8px;
+        }}
+        /* Target Streamlit Progress Bar fill */
+        .stProgress > div > div > div > div {{
+            background-color: #EF4444 !important;
+        }}
+    </style>
+""", unsafe_allow_html=True)
+
+
+
+
+
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
     removed_materials_df = pd.read_excel(uploaded_materials)
