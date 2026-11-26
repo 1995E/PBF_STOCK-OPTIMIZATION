@@ -144,8 +144,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.plotly_chart(fig_fasd, use_container_width=True)
        
         with col3:
-            st.markdown("### 📊 Material Assessment Structure")
-
+            
             # Prepare Sunburst components hierarchically:
             # Level 0: Total removed materials
             # Level 1: PD/V1 vs ND (Not PD/V1)
