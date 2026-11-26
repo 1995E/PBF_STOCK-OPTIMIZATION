@@ -72,19 +72,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
         gest_counts.columns = ['Gest Status', 'Count']
 
     stock_greater_zero = pd_v1_df[pd_v1_df['Stock qty'] > 0].copy()
-
-    Interested_plant = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
-    Interested_plant_unique = Interested_plant.drop_duplicates(subset=['Material n°']).copy()
-
-    Others_plant = pd_v1_df[pd_v1_df['Plant'] != plant].copy()
-    Others_plant_unique = Others_plant.drop_duplicates(subset=['Material n°']).copy()
-
-    Total_stock_value = (stock_greater_zero['Stock qty'] *  stock_greater_zero['Unit price']).sum()
-    Interested_plant_stock_value = (Interested_plant['Stock qty'] * Interested_plant['Unit price']).sum()
-    Others_plant_stock_value = Total_stock_value - Interested_plant_stock_value
-    Interested_plant['Stock Value'] = Interested_plant['Stock qty'] * Interested_plant['Unit price'].fillna(0)
-    
-    # Calculate stock value for stock_greater_zero
     stock_greater_zero['Stock Value'] = stock_greater_zero['Stock qty'] * stock_greater_zero['Unit price'].fillna(0)
 
     # Tab configuration
@@ -95,7 +82,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
         with col1:
             # Toggle option on top
-            chart_mode_plant = st.toggle("Show Pie Chart (Plant)", value=False, key="toggle_plant")
+            chart_mode_plant = st.toggle("Show Donut Chart (Plant)", value=False, key="toggle_plant")
             
             # Group by plant
             plant_stock_df = stock_greater_zero.groupby('Plant', as_index=False)['Stock Value'].sum()
@@ -105,6 +92,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     plant_stock_df,
                     values='Stock Value',
                     names='Plant',
+                    hole=0.4,
                     title='Stock Value by Plant'
                 )
             else:
@@ -120,13 +108,18 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
         with col2:
             # Toggle option on top
-            chart_mode_fasd = st.toggle("Show Pie Chart (FASD)", value=False, key="toggle_fasd")
+            chart_mode_fasd = st.toggle("Show Donut Chart (FASD)", value=False, key="toggle_fasd")
             
+            # Apply plant filter if one is selected and not 'All'
+            if plant and plant != 'All':
+                filtered_stock_fasd = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
+            else:
+                filtered_stock_fasd = stock_greater_zero.copy()
+                
             # Group by FASD status
-            fasd_stock_df = stock_greater_zero.groupby('FASD', as_index=False)['Stock Value'].sum()
+            fasd_stock_df = filtered_stock_fasd.groupby('FASD', as_index=False)['Stock Value'].sum()
             
-            # Define desired order: Fast, Active, Slow, Dead (from top to bottom in horizontal bar chart means last in categorical lists)
-            # We sort descending based on this categorical order index so 'Fast' sits on top
+            # Define desired order: Fast, Active, Slow, Dead (from top to bottom)
             fasd_order = ['Dead', 'Slow', 'Active', 'Fast']
             fasd_stock_df['FASD'] = pd.Categorical(fasd_stock_df['FASD'], categories=fasd_order, ordered=True)
             fasd_stock_df = fasd_stock_df.sort_values('FASD', ascending=True)
@@ -136,7 +129,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     fasd_stock_df,
                     values='Stock Value',
                     names='FASD',
-                    title='Stock Value by FASD Status'
+                    hole=0.4,
+                    title=f'Stock Value by FASD Status ({plant if plant else "All"})'
                 )
             else:
                 fig_fasd = px.bar(
@@ -144,8 +138,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     x='Stock Value',
                     y='FASD',
                     orientation='h',
-                    title='Stock Value by FASD Status'
+                    title=f'Stock Value by FASD Status ({plant if plant else "All"})'
                 )
-                # Update y-axis to follow categorical order perfectly
                 fig_fasd.update_layout(yaxis={'categoryorder': 'array', 'categoryarray': fasd_order})
             st.plotly_chart(fig_fasd, use_container_width=True)
