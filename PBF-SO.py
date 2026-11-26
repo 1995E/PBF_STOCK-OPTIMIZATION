@@ -216,8 +216,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         min_value=1.0,
                         max_value=max_possible_y,
                         value=max_possible_y,
-                        #step=max(1.0, max_possible_y / 10),
-                        #key="y_axis_slider"
+                        step=max(1.0, max_possible_y / 10),
+                        key="y_axis_slider"
                     )
 
                 with sub_col_right:
