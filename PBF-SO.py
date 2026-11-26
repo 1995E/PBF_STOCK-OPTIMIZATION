@@ -191,23 +191,39 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 discipline_totals = discipline_totals.sort_values(by='Stock Value', ascending=False)
                 ordered_disciplines = discipline_totals['Material discipline'].tolist()
 
-                # Create vertical stacked column chart
+                # Group data to ensure individual stack labels display properly
+                col3_grouped = col3_df.groupby(['Material discipline', 'FASD'], as_index=False)['Stock Value'].sum()
+                col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0] # Filter out zeros for cleaner text labels
+
+                # Create vertical stacked column chart with custom aesthetics and stack value labels
                 fig_disp = px.bar(
-                    col3_df,
+                    col3_grouped,
                     x='Material discipline',
                     y='Stock Value',
                     color='FASD',
+                    text='Stock Value',
                     category_orders={
                         "FASD": fasd_v_order,
                         "Material discipline": ordered_disciplines
                     },
                     title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
-                    barmode='stack'
+                    barmode='stack',
+                    color_discrete_sequence=px.colors.qualitative.Antique
+                )
+                fig_disp.update_traces(
+                    texttemplate='$%{text:,.2s}', 
+                    textposition='inside',
+                    insidetextanchor='middle'
                 )
                 fig_disp.update_layout(
                     xaxis_title="Material Discipline",
                     yaxis_title="Stock Value",
-                    legend_title="FASD Status"
+                    legend_title="FASD Status",
+                    xaxis={'showgrid': False},
+                    yaxis={'gridcolor': 'rgba(235,235,235,1)'},
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
                 )
                 st.plotly_chart(fig_disp, use_container_width=True)
             else:
@@ -256,21 +272,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     ];
 
                     Total [
-                        label="Materials in {plant if plant else 'All'} plant\\n{Total_removed_materials}",
+                        label="Materials in {plant if plant else 'All'} plant\n{Total_removed_materials}",
                         fillcolor="#EFF6FF",
                         color="#3B82F6",
                         fontcolor="#1E40AF",
                         fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                     ];
                     PD_V1 [
-                        label="Stock materials\\n{cnt_pd_v1}",
+                        label="Stock materials\n{cnt_pd_v1}",
                         fillcolor="#ECFDF5",
                         color="#10B981",
                         fontcolor="#065F46",
                         fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                     ];
                     ND [
-                        label="Non-stocked materials\\n{cnt_nd}",
+                        label="Non-stocked materials\n{cnt_nd}",
                         fillcolor="#FFFBEB",
                         color="#F59E0B",
                         fontcolor="#92400E",
@@ -278,21 +294,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     ];
 
                     SE [
-                        label="SE: {sum_se}\\nStock value: ${val_se:,.2f}",
+                        label="SE: {sum_se}\nStock value: ${val_se:,.2f}",
                         fillcolor="#FDF2F8",
                         color="#EC4899",
                         fontcolor="#9D174D",
                         fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                     ];
                     SU [
-                        label="SU: {sum_su}\\nStock value: ${val_su:,.2f}",
+                        label="SU: {sum_su}\nStock value: ${val_su:,.2f}",
                         fillcolor="#F5F3FF",
                         color="#8B5CF6",
                         fontcolor="#5B21B6",
                         fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                     ];
                     MM [
-                        label="MM: {sum_mm}\\nStock value: ${val_mm:,.2f}",
+                        label="MM: {sum_mm}\nStock value: ${val_mm:,.2f}",
                         fillcolor="#EEF2FF",
                         color="#6366F1",
                         fontcolor="#3730A3",
