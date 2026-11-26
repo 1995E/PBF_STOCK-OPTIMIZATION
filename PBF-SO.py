@@ -98,7 +98,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Stock overview", "lorepsum 1", "lorepsum 2", "lorepsum 3", "lorepsum 4"])
 
     with tab1:
-        col1, col2, col3 = st.columns([1.0,1.0,1.1])
+        col1, col2, col3 = st.columns([1.0,1.0,1.0])
 
         with col1:
             # Toggle option on top
