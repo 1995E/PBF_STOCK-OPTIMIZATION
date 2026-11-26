@@ -187,7 +187,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             
             dot_code = f"""
             digraph G {{
-                graph [rankdir=TB, size="8,5", bgcolor="transparent", splines=ortho, nodesep=0.4, ranksep=0.6];
+                graph [rankdir=LR, size="8,5", bgcolor="transparent", splines=ortho, nodesep=0.4, ranksep=0.6];
                 node [
                     shape=box,
                     style="filled,rounded",
@@ -208,21 +208,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 ];
 
                 Total [
-                    label="Total Removed Materials ({plant if plant else 'All'})\\n{Total_removed_materials}",
+                    label="Materials in {plant if plant else 'All'} plant\\n{Total_removed_materials}",
                     fillcolor="#EFF6FF",
                     color="#3B82F6",
                     fontcolor="#1E40AF",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 PD_V1 [
-                    label="Stocked (PD/V1)\\n{cnt_pd_v1}",
+                    label="Stock materials\\n{cnt_pd_v1}",
                     fillcolor="#ECFDF5",
                     color="#10B981",
                     fontcolor="#065F46",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 ND [
-                    label="Non-stocked (ND)\\n{cnt_nd}",
+                    label="Non-stocked materials\\n{cnt_nd}",
                     fillcolor="#FFFBEB",
                     color="#F59E0B",
                     fontcolor="#92400E",
@@ -230,21 +230,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 ];
 
                 SE [
-                    label="SE Sum: {sum_se}\\nValue: ${val_se:,.2f}",
+                    label="SE: {sum_se}\\nValue: ${val_se:,.2f}",
                     fillcolor="#FDF2F8",
                     color="#EC4899",
                     fontcolor="#9D174D",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 SU [
-                    label="SU Sum: {sum_su}\\nValue: ${val_su:,.2f}",
+                    label="SU: {sum_su}\\nValue: ${val_su:,.2f}",
                     fillcolor="#F5F3FF",
                     color="#8B5CF6",
                     fontcolor="#5B21B6",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 MM [
-                    label="MM Sum: {sum_mm}\\nValue: ${val_mm:,.2f}",
+                    label="MM: {sum_mm}\\nValue: ${val_mm:,.2f}",
                     fillcolor="#EEF2FF",
                     color="#6366F1",
                     fontcolor="#3730A3",
