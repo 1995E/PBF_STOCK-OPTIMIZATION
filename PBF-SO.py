@@ -118,7 +118,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             else:
                 fig_plant = px.bar(
                     plant_stock_df,
-                    x='Stock Value',
+                    x='Stock Value', 
                     y='Plant',
                     text='Stock Value',
                     orientation='h',
@@ -196,20 +196,48 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fasd_v_order = ['Fast', 'Active', 'Slow', 'Dead']
                 col3_df['FASD'] = pd.Categorical(col3_df['FASD'], categories=fasd_v_order, ordered=True)
 
-                # Group by discipline to identify the descending sort order from highest total stock value to lowest
+                # Group by discipline to identify descending order
                 discipline_totals = col3_df.groupby('Material discipline')['Stock Value'].sum().reset_index()
                 discipline_totals = discipline_totals.sort_values(by='Stock Value', ascending=False)
                 ordered_disciplines = discipline_totals['Material discipline'].tolist()
 
-                # Group data to ensure individual stack labels display properly
                 col3_grouped = col3_df.groupby(['Material discipline', 'FASD'], as_index=False)['Stock Value'].sum()
-                col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0] # Filter out zeros for cleaner text labels
+                col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0]
 
-                # Split Column 3 into sub-columns: left for slider, right for chart
-                sub_col_left, sub_col_right = st.columns([0.25, 0.75])
+                # Inject CSS to make the slider appear and operate in a vertical orientation
+                st.markdown(
+                    """
+                    <style>
+                    /* Target the dynamic slider container to style it vertically */
+                    div[data-testid="stSlider"] {
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: center;
+                        height: 380px !important;
+                        padding-top: 50px;
+                    }
+                    /* Rotate standard horizontal range track and inputs */
+                    div[data-testid="stSlider"] > div {
+                        transform: rotate(-90deg) translate(-100px, 0px);
+                        transform-origin: left top;
+                        width: 320px !important;
+                    }
+                    /* Keep slider labels upright and clean */
+                    div[data-testid="stSlider"] label {
+                        transform: rotate(90deg) translate(140px, -45px);
+                        font-weight: bold;
+                        white-space: nowrap;
+                    }
+                    </style>
+                    """,
+                    unsafe_allow_html=True
+                )
+
+                # Split into sub-columns: narrow left for vertical zoom, wide right for chart
+                sub_col_left, sub_col_right = st.columns([0.15, 0.85])
 
                 with sub_col_left:
-                    # Slider controlling Y-axis max value range dynamically
                     max_possible_y = float(discipline_totals['Stock Value'].max()) if not discipline_totals.empty else 1000.0
                     y_limit = st.slider(
                         "Y Zoom",
@@ -221,7 +249,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     )
 
                 with sub_col_right:
-                    # Create vertical stacked column chart with custom aesthetics and stack value labels
                     fig_disp = px.bar(
                         col3_grouped,
                         x='Material discipline',
@@ -252,14 +279,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
                     )
                     st.plotly_chart(fig_disp, use_container_width=True)
-            else:
-                # Render the original Graphviz flowchart
+            else: 
                 st.markdown(
                     "<div style='padding-top: 30px; padding-bottom: 1px;'><span style='font-family: sans-serif; font-size: 17px; font-weight: bold; color: rgb(49, 51, 63);'>Material Breakdown Flow</span></div>",
                     unsafe_allow_html=True
                 )
 
-                # Use a wrapper with CSS flex centering to horizontally align the Graphviz chart
                 st.markdown(
                     """
                     <style>
@@ -349,7 +374,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 }}
                 """
 
-                # Embed the graph within a centered container block
                 st.markdown('<div class="centered-graphviz">', unsafe_allow_html=True)
                 st.graphviz_chart(dot_code, use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
