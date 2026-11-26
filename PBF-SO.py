@@ -120,8 +120,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     plant_stock_df,
                     x='Stock Value',
                     y='Plant',
+                    text='Stock Value',
                     orientation='h',
                     title='Stock Value by Plant'
+                )
+                fig_plant.update_traces(
+                    texttemplate='$%{text:,.2s}',
+                    textposition='inside'
                 )
                 fig_plant.update_layout(yaxis={'categoryorder': 'total ascending'})
             st.plotly_chart(fig_plant, use_container_width=True)
@@ -161,8 +166,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     fasd_stock_df,
                     x='Stock Value',
                     y='FASD',
+                    text='Stock Value',
                     orientation='h',
                     title=f'Stock Value by FASD Status ({plant if plant else "All"})'
+                )
+                fig_fasd.update_traces(
+                    texttemplate='$%{text:,.2s}',
+                    textposition='inside'
                 )
                 fig_fasd.update_layout(yaxis={'categoryorder': 'array', 'categoryarray': fasd_order})
             st.plotly_chart(fig_fasd, use_container_width=True)
@@ -202,7 +212,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     y='Stock Value',
                     color='FASD',
                     text='Stock Value',
-                    category_orders={
+                    category_orders={ 
                         "FASD": fasd_v_order,
                         "Material discipline": ordered_disciplines
                     },
@@ -211,7 +221,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     color_discrete_sequence=px.colors.qualitative.Antique
                 )
                 fig_disp.update_traces(
-                    texttemplate='$%{text:,.2s}', 
+                    texttemplate='$%{text:,.2s}',
                     textposition='inside',
                     insidetextanchor='middle'
                 )
