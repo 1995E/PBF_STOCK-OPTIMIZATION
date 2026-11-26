@@ -208,12 +208,22 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 # Split Column 3 into sub-columns: left for slider, right for chart
                 sub_col_left, sub_col_right = st.columns([0.1, 0.90])
 
+                
                 with sub_col_left:
+                    st.markdown("""
+                        <style>
+                        div[data-testid="stSlider"] span {
+                            display: none;
+                    }
+                    </style>
+                """, unsafe_allow_html=True)
+
+
+                    
                     # Slider controlling Y-axis max value range dynamically
                     max_possible_y = float(discipline_totals['Stock Value'].max()) if not discipline_totals.empty else 1000.0
                     y_limit = st.slider(
                         "Y Zoom",
-                        label="",
                         min_value=1.0,
                         max_value=max_possible_y,
                         value=max_possible_y,
