@@ -22,8 +22,6 @@ plant = st.segmented_control(
     ["All", 'GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV']
 )
 
-st.write("Selected:", stock_status)
-
 # 1. FILE UPLOADERS IN SIDEBAR
 with st.sidebar:
     st.header("Data Source Configuration")
