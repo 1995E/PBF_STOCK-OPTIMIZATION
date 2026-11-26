@@ -74,6 +74,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
     stock_greater_zero = pd_v1_df[pd_v1_df['Stock qty'] > 0].copy()
     stock_greater_zero['Stock Value'] = stock_greater_zero['Stock qty'] * stock_greater_zero['Unit price'].fillna(0)
 
+    # Remap "Never been consumed" to "Dead" in FASD column
+    if 'FASD' in stock_greater_zero.columns:
+        stock_greater_zero['FASD'] = stock_greater_zero['FASD'].replace('Never been consumed', 'Dead')
+
     # Tab configuration
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Stock overview", "lorepsum 1", "lorepsum 2", "lorepsum 3", "lorepsum 4"])
 
