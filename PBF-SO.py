@@ -98,7 +98,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Stock overview", "lorepsum 1", "lorepsum 2", "lorepsum 3", "lorepsum 4"])
 
     with tab1:
-        col1, col2, col3 = st.columns([0.8, 0.8, 0.9])
+        col1, col2, col3 = st.columns([0.8,0.8,0.9])
 
         with col1:
             # Toggle option on top
@@ -153,7 +153,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             fasd_stock_df['FASD'] = pd.Categorical(fasd_stock_df['FASD'], categories=fasd_order, ordered=True)
             fasd_stock_df = fasd_stock_df.sort_values('FASD', ascending=True)
 
-            if chart_mode_fasd: 
+            if chart_mode_fasd:
                 fig_fasd = px.pie(
                     fasd_stock_df,
                     values='Stock Value',
@@ -196,74 +196,32 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fasd_v_order = ['Fast', 'Active', 'Slow', 'Dead']
                 col3_df['FASD'] = pd.Categorical(col3_df['FASD'], categories=fasd_v_order, ordered=True)
 
-                # Group by discipline to identify descending order
+                # Group by discipline to identify the descending sort order from highest total stock value to lowest
                 discipline_totals = col3_df.groupby('Material discipline')['Stock Value'].sum().reset_index()
                 discipline_totals = discipline_totals.sort_values(by='Stock Value', ascending=False)
                 ordered_disciplines = discipline_totals['Material discipline'].tolist()
 
+                # Group data to ensure individual stack labels display properly
                 col3_grouped = col3_df.groupby(['Material discipline', 'FASD'], as_index=False)['Stock Value'].sum()
-                col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0]
+                col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0] # Filter out zeros for cleaner text labels
 
-                # Inject CSS to position the vertical slider on the RIGHT and completely HIDE output labels/numerical values
-                st.markdown( 
-                    """
-                    <style>
-                    /* Target the dynamic slider container to style it vertically on the right side */
-                    div[data-testid="stSlider"] {
-                        display: flex;
-                        flex-direction: column;
-                        justify-content: center;
-                        align-items: center;
-                        height: 380px !important;
-                        padding-top: 50px;
-                    }
-                    /* Rotate standard horizontal range track and inputs */
-                    div[data-testid="stSlider"] > div {
-                        transform: rotate(-90deg) translate(-100px, 0px);
-                        transform-origin: left top;
-                        width: 320px !important;
-                    }
-                    /* Hide dynamic slider values (min, max, and current values) completely */
-                    div[data-testid="stSlider"] [data-testid="stWidgetInstructions"],
-                    div[data-testid="stSlider"] div[role="slider"] div,
-                    div[data-testid="stSlider"] div[data-baseweb="slider"] div {
-                        display: none !important;
-                        visibility: hidden !important;
-                    }
-                    /* Keep only the main upright title label, hidden the output values */
-                    div[data-testid="stSlider"] label {
-                        transform: rotate(90deg) translate(140px, -45px);
-                        font-weight: bold;
-                        white-space: nowrap;
-                    }
-                    </style>
-                    """,
-                    unsafe_allow_html=True
-                )
-
-                # Split into sub-columns: wide chart on left (0.85), narrow slider on right (0.15)
-                sub_col_left, sub_col_right = st.columns([0.85, 0.15])
+                # Split Column 3 into sub-columns: left for slider, right for chart
+                sub_col_left, sub_col_right = st.columns([0.1, 0.90])
 
                 with sub_col_left:
+                    # Slider controlling Y-axis max value range dynamically
                     max_possible_y = float(discipline_totals['Stock Value'].max()) if not discipline_totals.empty else 1000.0
-
-                    # Temporary local storage of selected limit via horizontal logic but layout controls
-                    y_limit_container = st.empty()
-
-                with sub_col_right:
                     y_limit = st.slider(
                         "Y Zoom",
                         min_value=0.0,
                         max_value=max_possible_y,
                         value=max_possible_y,
-                        step=max(1.0, max_possible_y / 100),
+                        step=max(1.0, max_possible_y / 10),
                         key="y_axis_slider"
                     )
 
-                with sub_col_left:
-                    # Modern color palette for Fast, Active, Slow, Dead
-                    modern_colors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444']
-                    
+                with sub_col_right:
+                    # Create vertical stacked column chart with custom aesthetics and stack value labels
                     fig_disp = px.bar(
                         col3_grouped,
                         x='Material discipline',
@@ -276,35 +234,32 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         },
                         title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
                         barmode='stack',
-                        color_discrete_sequence=modern_colors
+                        color_discrete_sequence=px.colors.qualitative.Antique
                     )
                     fig_disp.update_traces(
                         texttemplate='$%{text:,.2s}',
                         textposition='inside',
-                        insidetextanchor='middle',
-                        marker_line_width=1,
-                        marker_line_color="#ffffff",
-                        hoverinfo="x+y+name",
-                        hovertemplate="<b>%{x}</b><br>%{hovertext}<br>Stock Value: $%{y:,.2f}<extra></extra>"
+                        insidetextanchor='middle'
                     )
                     fig_disp.update_layout(
                         xaxis_title="Material Discipline",
                         yaxis_title="Stock Value",
                         legend_title="FASD Status",
-                        xaxis={'showgrid': False, 'tickangle': -45},
+                        xaxis={'showgrid': False},
                         yaxis={'gridcolor': 'rgba(235,235,235,1)', 'range': [0, y_limit]},
                         plot_bgcolor='rgba(0,0,0,0)',
                         paper_bgcolor='rgba(0,0,0,0)',
-                        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                        bargap=0.3
+                        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
                     )
                     st.plotly_chart(fig_disp, use_container_width=True)
             else:
+                # Render the original Graphviz flowchart
                 st.markdown(
                     "<div style='padding-top: 30px; padding-bottom: 1px;'><span style='font-family: sans-serif; font-size: 17px; font-weight: bold; color: rgb(49, 51, 63);'>Material Breakdown Flow</span></div>",
                     unsafe_allow_html=True
                 )
 
+                # Use a wrapper with CSS flex centering to horizontally align the Graphviz chart
                 st.markdown(
                     """
                     <style>
@@ -343,21 +298,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     ];
 
                     Total [
-                        label="Materials in {plant if plant else 'All'} plant\\n{Total_removed_materials}",
+                        label="Materials in {plant if plant else 'All'} plant\n{Total_removed_materials}",
                         fillcolor="#EFF6FF",
                         color="#3B82F6",
                         fontcolor="#1E40AF",
                         fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                     ];
                     PD_V1 [
-                        label="Stock materials\\n{cnt_pd_v1}",
+                        label="Stock materials\n{cnt_pd_v1}",
                         fillcolor="#ECFDF5",
                         color="#10B981",
                         fontcolor="#065F46",
                         fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                     ];
                     ND [
-                        label="Non-stocked materials\\n{cnt_nd}",
+                        label="Non-stocked materials\n{cnt_nd}",
                         fillcolor="#FFFBEB",
                         color="#F59E0B",
                         fontcolor="#92400E",
@@ -365,21 +320,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     ];
 
                     SE [
-                        label="SE: {sum_se}\\nStock value: ${val_se:,.2f}",
+                        label="SE: {sum_se}\nStock value: ${val_se:,.2f}",
                         fillcolor="#FDF2F8",
                         color="#EC4899",
                         fontcolor="#9D174D",
                         fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                     ];
                     SU [
-                        label="SU: {sum_su}\\nStock value: ${val_su:,.2f}",
+                        label="SU: {sum_su}\nStock value: ${val_su:,.2f}",
                         fillcolor="#F5F3FF",
                         color="#8B5CF6",
                         fontcolor="#5B21B6",
                         fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                     ];
                     MM [
-                        label="MM: {sum_mm}\\nStock value: ${val_mm:,.2f}",
+                        label="MM: {sum_mm}\nStock value: ${val_mm:,.2f}",
                         fillcolor="#EEF2FF",
                         color="#6366F1",
                         fontcolor="#3730A3",
@@ -394,6 +349,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 }}
                 """
 
+                # Embed the graph within a centered container block
                 st.markdown('<div class="centered-graphviz">', unsafe_allow_html=True)
                 st.graphviz_chart(dot_code, use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
