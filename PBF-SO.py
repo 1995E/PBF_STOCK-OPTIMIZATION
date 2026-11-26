@@ -64,10 +64,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
     # Perform calculations using filtered data for the flowchart
     Total_removed_materials = chart_df['Material n°'].nunique()
     pd_v1_df = chart_df[chart_df['MRP Type'].isin(['PD', 'V1'])].copy()
-    
+
     # Calculate Stock Value for materials in the filtered dataset
     pd_v1_df['Stock Value'] = pd_v1_df['Stock qty'].fillna(0) * pd_v1_df['Unit price'].fillna(0)
-    
+
     pd_v1_unique_materials = pd_v1_df.drop_duplicates(subset=['Material n°']).copy()
 
     # Number of materials that are not PD/V1 (ND)
@@ -98,7 +98,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
     tab1, tab2, tab3, tab4, tab5 = st.tabs(["Stock overview", "lorepsum 1", "lorepsum 2", "lorepsum 3", "lorepsum 4"])
 
     with tab1:
-        col1, col2, col3 = st.columns([1.0,1.0,1.0])
+        col1, col2, col3 = st.columns(3)
 
         with col1:
             # Toggle option on top
@@ -168,6 +168,23 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.plotly_chart(fig_fasd, use_container_width=True)
 
         with col3:
+            st.subheader("Material Breakdown Flow")
+            
+            # Use a wrapper with CSS flex centering to horizontally align the Graphviz chart
+            st.markdown(
+                """
+                <style>
+                .centered-graphviz {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    width: 100%;
+                }
+                </style>
+                """,
+                unsafe_allow_html=True
+            )
+            
             dot_code = f"""
             digraph G {{
                 graph [rankdir=LR, size="8,5", bgcolor="transparent", splines=ortho, nodesep=0.4, ranksep=0.6];
@@ -191,21 +208,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 ];
 
                 Total [
-                    label="Total Removed Materials ({plant if plant else 'All'})\n{Total_removed_materials}",
+                    label="Total Removed Materials ({plant if plant else 'All'})\\n{Total_removed_materials}",
                     fillcolor="#EFF6FF",
                     color="#3B82F6",
                     fontcolor="#1E40AF",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 PD_V1 [
-                    label="Stocked (PD/V1)\n{cnt_pd_v1}",
+                    label="Stocked (PD/V1)\\n{cnt_pd_v1}",
                     fillcolor="#ECFDF5",
                     color="#10B981",
                     fontcolor="#065F46",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 ND [
-                    label="Non-stocked (ND)\n{cnt_nd}",
+                    label="Non-stocked (ND)\\n{cnt_nd}",
                     fillcolor="#FFFBEB",
                     color="#F59E0B",
                     fontcolor="#92400E",
@@ -213,21 +230,21 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 ];
 
                 SE [
-                    label="SE Sum: {sum_se}\nValue: ${val_se:,.2f}",
+                    label="SE Sum: {sum_se}\\nValue: ${val_se:,.2f}",
                     fillcolor="#FDF2F8",
                     color="#EC4899",
                     fontcolor="#9D174D",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 SU [
-                    label="SU Sum: {sum_su}\nValue: ${val_su:,.2f}",
+                    label="SU Sum: {sum_su}\\nValue: ${val_su:,.2f}",
                     fillcolor="#F5F3FF",
                     color="#8B5CF6",
                     fontcolor="#5B21B6",
                     fontname="Segoe UI Semibold, Segoe UI, Helvetica, Arial, sans-serif"
                 ];
                 MM [
-                    label="MM Sum: {sum_mm}\nValue: ${val_mm:,.2f}",
+                    label="MM Sum: {sum_mm}\\nValue: ${val_mm:,.2f}",
                     fillcolor="#EEF2FF",
                     color="#6366F1",
                     fontcolor="#3730A3",
@@ -241,4 +258,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 PD_V1 -> MM [color="#10B981"];
             }}
             """
+            
+            # Embed the graph within a centered container block
+            st.markdown('<div class="centered-graphviz">', unsafe_allow_html=True)
             st.graphviz_chart(dot_code, use_container_width=True)
+            st.markdown('</div>', unsafe_allow_html=True)
