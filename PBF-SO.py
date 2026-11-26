@@ -168,7 +168,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             st.plotly_chart(fig_fasd, use_container_width=True)
 
         with col3:
-            
+            st.subheader("📦 Removed Materials Analysis")
             # Use a wrapper with CSS flex centering to horizontally align the Graphviz chart
             st.markdown(
                 """
@@ -186,7 +186,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             
             dot_code = f"""
             digraph G {{
-                graph [rankdir=LR, size="8,5", bgcolor="transparent", splines=ortho, nodesep=0.4, ranksep=0.6, label="Material breakdown", labelloc='t', fontsize='24'];
+                graph [rankdir=LR, size="8,5", bgcolor="transparent", splines=ortho, nodesep=0.4, ranksep=0.6];
                 node [
                     shape=box,
                     style="filled,rounded",
