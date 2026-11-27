@@ -286,7 +286,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                    }
                 )
                 fig_fasd.update_traces(
-                    texttemplate='$%{text:,.2s}',
+                    texttemplate='<b>$%{text:,.2s}<b>',
                     textposition='auto',
                 )
                 fig_fasd.update_layout(
