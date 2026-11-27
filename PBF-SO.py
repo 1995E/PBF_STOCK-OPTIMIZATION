@@ -158,7 +158,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_plant.update_traces(
                     textposition='inside',
                     textinfo='percent+label',
-                    hovertemplate="<b>%{label}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
                 )
                 fig_plant.update_layout(
                     title=dict(
@@ -248,7 +247,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_fasd.update_traces(
                     textposition='inside',
                     textinfo='percent+label',
-                    hovertemplate="<b>%{filtered_stock_fasd}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
                 )
                 fig_fasd.update_layout(
                     title=dict(
@@ -279,7 +277,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_fasd.update_traces(
                     texttemplate='$%{text:,.2s}',
                     textposition='auto',
-                    hovertemplate="<b>%{y}</b><br>Stock Value: $%{{x:,.2f}}<extra></extra>"
                 )
                 fig_fasd.update_layout(
                     title=dict(
