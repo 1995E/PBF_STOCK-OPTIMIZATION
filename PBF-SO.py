@@ -248,7 +248,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_fasd.update_traces(
                     textposition='inside',
                     textinfo='percent+label',
-                    hovertemplate="<b>%{label}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
+                    hovertemplate="<b>%{filtered_stock_fasd}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
                 )
                 fig_fasd.update_layout(
                     title=dict(
