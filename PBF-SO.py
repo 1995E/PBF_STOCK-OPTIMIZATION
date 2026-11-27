@@ -186,7 +186,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     texttemplate='<b>$%{text:,.2s}<b>',
                     textposition='outside',
                     textfont=dict(
-                        size=15,
+                        size=12,
                         color='#000000'
                     )
                 )
