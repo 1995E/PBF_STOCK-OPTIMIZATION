@@ -179,7 +179,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     y='Plant',
                     text='Stock Value',
                     orientation='h',
-                    color='Stock Value',
+                    color='Plant',
                     color_discrete_map={
                         'GIRASSOL': '#dbb127',
                         'DALIA': '#45db27',
