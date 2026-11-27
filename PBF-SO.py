@@ -161,12 +161,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_plant.update_layout(
                     title=dict(
                         text='<b>Stock Value distribution by Plant</b>',
-                        font=dict(size=14, color='#1F2937'), 
+                        font=dict(size=20, color='#1F2937'), 
                         automargin=True,
                         y=0.95
                     ),
                     annotations=[dict(
-                        text=f"<b>Total</b><br>${total_plant_val/1e6:.1f}M",
+                        text=f"<b>Total</b><br><b>${total_plant_val/1e6:.1f}<b>M",
                         x=0.5, y=0.5, font_size=12, showarrow=False, font_color='#111827'
                     )],
                     showlegend=True,
