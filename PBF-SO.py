@@ -183,9 +183,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     y='Plant',
                     text='Stock Value',
                     orientation='h',
-                    color='Stock Value',
-                    color_continuous_scale=plant_seq
-                )
+                    #color='Stock Value',
+                    color_discrete_map={
+                        "Stock value": "#1E3A5F",
+                   }
                 fig_plant.update_traces(
                     texttemplate='$%{text:,.2s}',
                     textposition='auto',
