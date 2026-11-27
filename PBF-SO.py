@@ -278,7 +278,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     text='Stock Value',
                     orientation='h',
                     color='FASD',
-                    color_order = {'FASD': ['Fast', 'Active', 'Slow', 'Dead']}
+                    color_order = {'FASD': ['Fast', 'Active', 'Slow', 'Dead']},
                     color_discrete_map={
                         'Fast': '#BEDD00',
                         'Active': '#00C1CE',
