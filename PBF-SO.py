@@ -144,7 +144,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     values='Stock Value',
                     names='Plant',
                     hole=0.55,
-                    color_discrete_sequence=['#475569'],
+                    color='Plant',
+                    color_discrete_map={
+                        'GIRASSOL': '#0F766E',
+                        'DALIA': '#0891B2',
+                        'PAZFLOR': '#7C3AED',
+                        'CLOV': '#F59E0B'
+                    } 
                 )
                 fig_plant.update_traces(
                     textposition='inside',
