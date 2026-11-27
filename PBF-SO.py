@@ -187,6 +187,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     color_discrete_map={
                         "Stock value": "#1E3A5F",
                    }
+                )
                 fig_plant.update_traces(
                     texttemplate='$%{text:,.2s}',
                     textposition='auto',
