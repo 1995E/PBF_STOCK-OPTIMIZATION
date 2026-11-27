@@ -279,10 +279,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     orientation='h',
                     color='FASD',
                     color_discrete_map={
-                        'Fast': '#40a13f',
-                        'Active': '#56a6f0',
-                        'Slow': '#f0c818',
-                        'Dead': '#f54f4c'
+                        'Fast': '#BEDD00',
+                        'Active': '#00C1CE',
+                        'Slow': '#FFD700',
+                        'Dead': '#FF0000'
                    }
                 )
                 fig_fasd.update_traces(
