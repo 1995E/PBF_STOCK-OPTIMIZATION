@@ -167,7 +167,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     ),
                     annotations=[dict(
                         text=f"<b>Total</b><br><b>${total_plant_val/1e6:.1f}<b>M",
-                        x=0.5, y=0.5, font_size=18, showarrow=False, font_color='#8c7979'
+                        x=0.5, y=0.5, font_size=18, showarrow=False, font_color='#007EFF'
                     )],
                     showlegend=True,
                     legend=dict(orientation="h", y=-0.2, xanchor="center", x=0.5),
