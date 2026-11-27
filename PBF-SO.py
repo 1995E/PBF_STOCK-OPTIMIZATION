@@ -175,10 +175,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
             else:
                 fig_plant = px.bar(
                     plant_stock_df,
-                    x='Stock Value',
-                    y='Plant',
+                    x='Plant',
+                    y='Stock Value',
                     text='Stock Value',
-                    orientation='h',
+                    orientation='v',
                     color='Plant',
                     color_discrete_map={
                         'GIRASSOL': '#dbb127',
