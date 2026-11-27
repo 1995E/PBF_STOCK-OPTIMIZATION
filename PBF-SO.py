@@ -181,10 +181,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     orientation='h',
                     color='Stock Value',
                     color_discrete_map={
-                        'FAST': '#464a47',
-                        'Active': '#464a47',
-                        'Slow': '#464a47',
-                        'Dead': '#464a47'
+                        'GIRASSOL': '#dbb127',
+                        'DALIA': '#45db27',
+                        'PAZFLOR': '#2769db',
+                        'CLOV': '#a527db'
                    }
                 )
                 fig_plant.update_traces(
