@@ -45,20 +45,11 @@ with st.sidebar:
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
     
-    st.header("Chart Customization")
-    plant_color_name = st.selectbox("Plant Chart Color Scale", ["Tealgrn", "Viridis", "Plasma", "Blues", "Magma"])
-    fasd_color_name = st.selectbox("FASD Chart Color Scale", ["Mint", "Inferno", "Greens", "Reds", "Cividis"])
-    disp_color_name = st.selectbox("Discipline Chart Palette", ["Antique", "Plotly", "D3", "G10", "Pastel"])
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
     removed_materials_df = pd.read_excel(uploaded_materials)
     unit_price_df = pd.read_excel(uploaded_prices)
-
-    # Resolve Plotly Color Palettes dynamically based on user selection
-    plant_seq = getattr(px.colors.sequential, plant_color_name)
-    fasd_seq = getattr(px.colors.sequential, fasd_color_name)
-    disp_qual = getattr(px.colors.qualitative, disp_color_name)
 
     # 2. PROCESSING INFORMATION
     filtered_unit_prices = unit_price_df[unit_price_df['Valuation Type'] == 'BLOC-17']
