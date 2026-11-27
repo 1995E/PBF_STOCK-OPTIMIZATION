@@ -178,7 +178,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     x='Stock Value',
                     y='Plant',
                     text='Stock Value',
-                    orientation='v',
+                    orientation='h',
                     color='Plant',
                     color_discrete_map={
                         'GIRASSOL': '#dbb127',
