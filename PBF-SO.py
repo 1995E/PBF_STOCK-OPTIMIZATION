@@ -330,7 +330,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     },
                     title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
                     barmode='stack',
-                    color_discrete_sequence=disp_qual
+                    color_discrete_sequence=['#475569'],
                 )
                 fig_disp.update_traces(
                     texttemplate='$%{text:,.2s}',
