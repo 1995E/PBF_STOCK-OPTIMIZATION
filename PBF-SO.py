@@ -6,6 +6,14 @@ import numpy as np
 import io
 import re
 
+# ==========================================================
+# COLOR CONFIGURATION (Update chart and plot colors here)
+# ==========================================================
+DEFAULT_PLANT_COLOR_SCALE = "Tealgrn"
+DEFAULT_FASD_COLOR_SCALE = "Mint"
+DEFAULT_DISCIPLINE_PALETTE = "Antique"
+# ==========================================================
+
 st.set_page_config(
     page_title="PBF STOCK ANALYSE TOOL",
     layout="wide",
@@ -28,7 +36,7 @@ div[data-testid="column"]:nth-of-type(2) {
 div[data-testid="column"]:nth-of-type(3) {
     padding-left: 10px;
 }
-</style>
+</style> 
 """, unsafe_allow_html=True)
 
 plant = st.segmented_control(
@@ -46,9 +54,9 @@ with st.sidebar:
     st.markdown("---")
 
     st.header("Chart Customization")
-    plant_color_name = st.selectbox("Plant Chart Color Scale", ["Tealgrn", "Viridis", "Plasma", "Blues", "Magma", "Rainbow", "Jet"])
-    fasd_color_name = st.selectbox("FASD Chart Color Scale", ["Mint", "Inferno", "Greens", "Reds", "Cividis", "Warm", "Cool"])
-    disp_color_name = st.selectbox("Discipline Chart Palette", ["Antique", "Plotly", "D3", "G10", "Pastel", "Safe", "Prism"])
+    plant_color_name = st.selectbox("Plant Chart Color Scale", ["Tealgrn", "Viridis", "Plasma", "Blues", "Magma"], index=["Tealgrn", "Viridis", "Plasma", "Blues", "Magma"].index(DEFAULT_PLANT_COLOR_SCALE) if DEFAULT_PLANT_COLOR_SCALE in ["Tealgrn", "Viridis", "Plasma", "Blues", "Magma"] else 0)
+    fasd_color_name = st.selectbox("FASD Chart Color Scale", ["Mint", "Inferno", "Greens", "Reds", "Cividis"], index=["Mint", "Inferno", "Greens", "Reds", "Cividis"].index(DEFAULT_FASD_COLOR_SCALE) if DEFAULT_FASD_COLOR_SCALE in ["Mint", "Inferno", "Greens", "Reds", "Cividis"] else 0)
+    disp_color_name = st.selectbox("Discipline Chart Palette", ["Antique", "Plotly", "D3", "G10", "Pastel"], index=["Antique", "Plotly", "D3", "G10", "Pastel"].index(DEFAULT_DISCIPLINE_PALETTE) if DEFAULT_DISCIPLINE_PALETTE in ["Antique", "Plotly", "D3", "G10", "Pastel"] else 0)
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
@@ -158,7 +166,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_plant.update_traces(
                     textposition='inside',
                     textinfo='percent+label',
-                    hovertemplate="<b>%{label}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
                 )
                 fig_plant.update_layout(
                     title=dict(
@@ -189,7 +196,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_plant.update_traces(
                     texttemplate='$%{text:,.2s}',
                     textposition='auto',
-                    hovertemplate="<b>%{y}</b><br>Stock Value: $%{{x:,.2f}}<extra></extra>"
                 )
                 fig_plant.update_layout(
                     title=dict(
@@ -218,7 +224,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         with col2:
             # Apply plant filter if one is selected and not 'All'
             if plant and plant != 'All':
-                filtered_stock_fasd = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy() 
+                filtered_stock_fasd = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
             else:
                 filtered_stock_fasd = stock_greater_zero.copy()
 
@@ -246,7 +252,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_fasd.update_traces(
                     textposition='inside',
                     textinfo='percent+label',
-                    hovertemplate="<b>%{label}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
                 )
                 fig_fasd.update_layout(
                     title=dict(
@@ -277,7 +282,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_fasd.update_traces(
                     texttemplate='$%{text:,.2s}',
                     textposition='auto',
-                    hovertemplate="<b>%{y}</b><br>Stock Value: $%{{x:,.2f}}<extra></extra>"
                 )
                 fig_fasd.update_layout(
                     title=dict(
@@ -362,7 +366,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     title=dict(font=dict(size=14, color='#1F2937'), automargin=True, y=0.95)
                 )
                 st.plotly_chart(fig_disp, use_container_width=True)
-            else: 
+            else:
                 # Render the original Graphviz flowchart with top padding adjusted to match adjacent titles baseline
                 st.markdown(
                     "<div style='padding-top: 13px; padding-bottom: 22px;'><span style='font-family: sans-serif; font-size: 15px; font-weight: bold; color: #1F2937;'>Material Breakdown Flow</span></div>",
