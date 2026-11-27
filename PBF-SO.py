@@ -184,7 +184,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 )
                 fig_plant.update_traces(
                     texttemplate='<b>$%{text:,.2s}<b>',
-                    textposition='auto',
+                    textposition='outside',
                     textfont=dict(
                         size=15,
                         color='#000000'
