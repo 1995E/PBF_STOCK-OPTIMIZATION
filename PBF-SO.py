@@ -198,8 +198,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         automargin=True,
                         y=0.95
                     ),
-                    xaxis_title="Stock Value",
-                    yaxis_title="Plant",
+                    xaxis_title="Plant",
+                    yaxis_title="Stock Value",
                     coloraxis_showscale=False,
                     plot_bgcolor='rgba(0,0,0,0)',
                     paper_bgcolor='rgba(0,0,0,0)',
@@ -209,7 +209,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         tickformat="$.2s",
                         automargin=True
                     ),
-                    yaxis=dict(categoryorder='total ascending', automargin=True),
+                    xaxis=dict(categoryorder='total ascending', automargin=True),
                     margin=dict(t=60, b=50, l=10, r=10),
                     height=450
                 )
