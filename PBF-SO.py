@@ -12,6 +12,25 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Inject CSS for column separators and general chart fitting
+st.markdown("""
+<style>
+/* Add vertical dividers between the main layout columns */
+div[data-testid="column"]:nth-of-type(1) {
+    border-right: 1px solid #E5E7EB;
+    padding-right: 20px;
+}
+div[data-testid="column"]:nth-of-type(2) {
+    border-right: 1px solid #E5E7EB;
+    padding-right: 20px;
+    padding-left: 10px;
+}
+div[data-testid="column"]:nth-of-type(3) {
+    padding-left: 10px;
+}
+</style>
+""", unsafe_allow_html=True)
+
 plant = st.segmented_control(
     "Select plant",
     ["All", 'GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV']
@@ -99,7 +118,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
     with tab1:
         # Ensure uniform control bar on top to align everything horizontally
-        col_toggle1, col_toggle2, col_toggle3 = st.columns([0.8, 0.8, 0.9])
+        col_toggle1, col_toggle2, col_toggle3 = st.columns([1, 1, 1])
         with col_toggle1:
             chart_mode_plant = st.toggle("Show Donut Chart (Plant)", value=False, key="toggle_plant")
         with col_toggle2:
@@ -109,7 +128,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
 
         st.markdown("<hr style='margin-top: 5px; margin-bottom: 15px;' />", unsafe_allow_html=True)
 
-        col1, col2, col3 = st.columns([0.8, 0.8, 0.9])
+        # Use st.columns with gap for visual separation if needed, or manual vertical lines
+        col1, col2, col3 = st.columns([1, 1, 1], gap="small")
 
         with col1:
             # Group by plant
@@ -126,22 +146,25 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     color_discrete_sequence=px.colors.sequential.Tealgrn_r
                 )
                 fig_plant.update_traces(
-                    textposition='outside',
+                    textposition='inside',
                     textinfo='percent+label',
                     hovertemplate="<b>%{label}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
                 )
                 fig_plant.update_layout(
                     title=dict(
                         text='<b>Stock Value distribution by Plant</b>',
-                        font=dict(size=15, color='#1F2937')
+                        font=dict(size=14, color='#1F2937'),
+                        automargin=True,
+                        y=0.95
                     ),
                     annotations=[dict(
                         text=f"<b>Total</b><br>${total_plant_val/1e6:.1f}M",
-                        x=0.5, y=0.5, font_size=13, showarrow=False, font_color='#111827'
+                        x=0.5, y=0.5, font_size=12, showarrow=False, font_color='#111827'
                     )],
-                    showlegend=False,
-                    margin=dict(t=50, b=10, l=10, r=10),
-                    height=350
+                    showlegend=True,
+                    legend=dict(orientation="h", y=-0.2, xanchor="center", x=0.5),
+                    margin=dict(t=60, b=50, l=10, r=10),
+                    height=450
                 )
             else:
                 fig_plant = px.bar(
@@ -155,27 +178,30 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 )
                 fig_plant.update_traces(
                     texttemplate='$%{text:,.2s}',
-                    textposition='outside',
+                    textposition='auto',
                     hovertemplate="<b>%{y}</b><br>Stock Value: $%{{x:,.2f}}<extra></extra>"
                 )
                 fig_plant.update_layout(
                     title=dict(
                         text='<b>Stock Value by Plant</b>',
-                        font=dict(size=15, color='#1F2937')
+                        font=dict(size=14, color='#1F2937'),
+                        automargin=True,
+                        y=0.95
                     ),
-                    xaxis_title=None,
-                    yaxis_title=None,
+                    xaxis_title="Stock Value",
+                    yaxis_title="Plant",
                     coloraxis_showscale=False,
                     plot_bgcolor='rgba(0,0,0,0)',
                     paper_bgcolor='rgba(0,0,0,0)',
                     xaxis=dict(
                         showgrid=True,
                         gridcolor='rgba(235,235,235,1)',
-                        tickformat="$.2s"
+                        tickformat="$.2s",
+                        automargin=True
                     ),
-                    yaxis=dict(categoryorder='total ascending'),
-                    margin=dict(t=50, b=10, l=10, r=10),
-                    height=350
+                    yaxis=dict(categoryorder='total ascending', automargin=True),
+                    margin=dict(t=60, b=50, l=10, r=10),
+                    height=450
                 )
             st.plotly_chart(fig_plant, use_container_width=True)
 
@@ -208,22 +234,25 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     color_discrete_sequence=px.colors.sequential.Mint_r
                 )
                 fig_fasd.update_traces(
-                    textposition='outside',
+                    textposition='inside',
                     textinfo='percent+label',
                     hovertemplate="<b>%{label}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
                 )
                 fig_fasd.update_layout(
                     title=dict(
                         text=f'<b>FASD Status Distribution ({plant if plant else "All"})</b>',
-                        font=dict(size=15, color='#1F2937')
+                        font=dict(size=14, color='#1F2937'),
+                        automargin=True,
+                        y=0.95
                     ),
                     annotations=[dict(
                         text=f"<b>Total</b><br>${total_fasd_val/1e6:.1f}M",
-                        x=0.5, y=0.5, font_size=13, showarrow=False, font_color='#111827'
+                        x=0.5, y=0.5, font_size=12, showarrow=False, font_color='#111827'
                     )],
-                    showlegend=False,
-                    margin=dict(t=50, b=10, l=10, r=10),
-                    height=350
+                    showlegend=True,
+                    legend=dict(orientation="h", y=-0.2, xanchor="center", x=0.5),
+                    margin=dict(t=60, b=50, l=10, r=10),
+                    height=450
                 )
             else:
                 fig_fasd = px.bar(
@@ -237,27 +266,30 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 )
                 fig_fasd.update_traces(
                     texttemplate='$%{text:,.2s}',
-                    textposition='outside',
+                    textposition='auto',
                     hovertemplate="<b>%{y}</b><br>Stock Value: $%{{x:,.2f}}<extra></extra>"
                 )
                 fig_fasd.update_layout(
                     title=dict(
                         text=f'<b>FASD Status ({plant if plant else "All"})</b>',
-                        font=dict(size=15, color='#1F2937')
+                        font=dict(size=14, color='#1F2937'),
+                        automargin=True,
+                        y=0.95
                     ),
-                    xaxis_title=None,
-                    yaxis_title=None,
+                    xaxis_title="Stock Value",
+                    yaxis_title="FASD Status",
                     coloraxis_showscale=False,
                     plot_bgcolor='rgba(0,0,0,0)',
                     paper_bgcolor='rgba(0,0,0,0)',
                     xaxis=dict(
                         showgrid=True,
                         gridcolor='rgba(235,235,235,1)',
-                        tickformat="$.2s"
+                        tickformat="$.2s",
+                        automargin=True
                     ),
-                    yaxis=dict(categoryorder='array', categoryarray=fasd_order),
-                    margin=dict(t=50, b=10, l=10, r=10),
-                    height=350
+                    yaxis=dict(categoryorder='array', categoryarray=fasd_order, automargin=True),
+                    margin=dict(t=60, b=50, l=10, r=10),
+                    height=450
                 )
             st.plotly_chart(fig_fasd, use_container_width=True)
 
@@ -286,61 +318,40 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 col3_grouped = col3_df.groupby(['Material discipline', 'FASD'], as_index=False)['Stock Value'].sum()
                 col3_grouped = col3_grouped[col3_grouped['Stock Value'] > 0]
 
-                # Split Column 3 into sub-columns: left for slider, right for chart
-                sub_col_left, sub_col_right = st.columns([0.11, 0.89])
-
-                with sub_col_left:
-                    # Convert the maximum value to millions to present a clean scale on the slider
-                    max_possible_y_raw = float(discipline_totals['Stock Value'].max()) if not discipline_totals.empty else 1000000.0
-                    max_possible_y_m = max_possible_y_raw / 1_000_000.0
-                    
-                    # Display current value explicitly formatted in Millions (e.g., 2.5M)
-                    y_limit_m = st.slider(
-                        "Zoom",
-                        min_value=0.0,
-                        max_value=max_possible_y_m,
-                        value=max_possible_y_m,
-                        step=max(0.1, max_possible_y_m / 20.0),
-                        format="%.1fM",
-                        key="y_axis_slider_m"
-                    )
-                    # Convert selected million value back to raw units for plot range control
-                    y_limit = y_limit_m * 1_000_000.0
-
-                with sub_col_right:
-                    # Create vertical stacked column chart with custom aesthetics and stack value labels
-                    fig_disp = px.bar(
-                        col3_grouped,
-                        x='Material discipline',
-                        y='Stock Value',
-                        color='FASD',
-                        text='Stock Value',
-                        category_orders={
-                            "FASD": fasd_v_order,
-                            "Material discipline": ordered_disciplines
-                        },
-                        title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
-                        barmode='stack',
-                        color_discrete_sequence=px.colors.qualitative.Antique
-                    )
-                    fig_disp.update_traces(
-                        texttemplate='$%{text:,.2s}',
-                        textposition='inside',
-                        insidetextanchor='middle'
-                    )
-                    fig_disp.update_layout(
-                        xaxis_title="Material Discipline",
-                        yaxis_title="Stock Value",
-                        legend_title="FASD Status",
-                        xaxis={'showgrid': False},
-                        yaxis={'gridcolor': 'rgba(235,235,235,1)', 'range': [0, y_limit]},
-                        plot_bgcolor='rgba(0,0,0,0)',
-                        paper_bgcolor='rgba(0,0,0,0)',
-                        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                        height=350,
-                        margin=dict(t=50, b=10, l=10, r=10)
-                    )
-                    st.plotly_chart(fig_disp, use_container_width=True)
+                # Create vertical stacked column chart with custom aesthetics and stack value labels
+                fig_disp = px.bar(
+                    col3_grouped,
+                    x='Material discipline',
+                    y='Stock Value',
+                    color='FASD',
+                    text='Stock Value',
+                    category_orders={
+                        "FASD": fasd_v_order,
+                        "Material discipline": ordered_disciplines
+                    },
+                    title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
+                    barmode='stack',
+                    color_discrete_sequence=px.colors.qualitative.Antique
+                )
+                fig_disp.update_traces(
+                    texttemplate='$%{text:,.2s}',
+                    textposition='inside',
+                    insidetextanchor='middle'
+                )
+                fig_disp.update_layout(
+                    xaxis_title="Material Discipline",
+                    yaxis_title="Stock Value",
+                    legend_title="FASD Status",
+                    xaxis={'showgrid': False, 'tickangle': -45, 'automargin': True},
+                    yaxis={'gridcolor': 'rgba(235,235,235,1)', 'automargin': True},
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+                    height=450,
+                    margin=dict(t=60, b=50, l=10, r=10),
+                    title=dict(font=dict(size=14, color='#1F2937'), automargin=True, y=0.95)
+                )
+                st.plotly_chart(fig_disp, use_container_width=True)
             else:
                 # Render the original Graphviz flowchart with top padding adjusted to match adjacent titles baseline
                 st.markdown(
