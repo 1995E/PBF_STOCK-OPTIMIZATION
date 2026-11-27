@@ -262,7 +262,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     text='Stock Value',
                     orientation='h',
                     color='Stock Value',
-                    color_continuous_scale=fasd_seq
+                    color_discrete_sequence=['#475569']
                 )
                 fig_fasd.update_traces(
                     texttemplate='$%{text:,.2s}',
