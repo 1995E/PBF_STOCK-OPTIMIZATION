@@ -155,7 +155,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     }
                 )
                 fig_plant.update_traces(
-                    textposition='outside',
+                    textposition='inside',
                     textinfo='percent',
                 )
                 fig_plant.update_layout(
