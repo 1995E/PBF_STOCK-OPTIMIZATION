@@ -36,7 +36,7 @@ plant = st.segmented_control(
     ["All", 'GIRASSOL', 'DALIA', 'PAZFLOR', 'CLOV']
 )
 
-# 1. FILE UPLOADERS IN SIDEBAR
+# 1. FILE UPLOADERS & SETTINGS IN SIDEBAR
 with st.sidebar:
     st.header(
         "Data Source Configuration"
@@ -44,11 +44,21 @@ with st.sidebar:
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
+    
+    st.header("Chart Customization")
+    plant_color_name = st.selectbox("Plant Chart Color Scale", ["Tealgrn", "Viridis", "Plasma", "Blues", "Magma"])
+    fasd_color_name = st.selectbox("FASD Chart Color Scale", ["Mint", "Inferno", "Greens", "Reds", "Cividis"])
+    disp_color_name = st.selectbox("Discipline Chart Palette", ["Antique", "Plotly", "D3", "G10", "Pastel"])
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
     removed_materials_df = pd.read_excel(uploaded_materials)
     unit_price_df = pd.read_excel(uploaded_prices)
+
+    # Resolve Plotly Color Palettes dynamically based on user selection
+    plant_seq = getattr(px.colors.sequential, plant_color_name)
+    fasd_seq = getattr(px.colors.sequential, fasd_color_name)
+    disp_qual = getattr(px.colors.qualitative, disp_color_name)
 
     # 2. PROCESSING INFORMATION
     filtered_unit_prices = unit_price_df[unit_price_df['Valuation Type'] == 'BLOC-17']
@@ -143,7 +153,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     values='Stock Value',
                     names='Plant',
                     hole=0.55,
-                    color_discrete_sequence=px.colors.sequential.Tealgrn_r
+                    color_discrete_sequence=plant_seq[::-1]  # reversed to mimic previous _r sequence
                 )
                 fig_plant.update_traces(
                     textposition='inside',
@@ -174,7 +184,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     text='Stock Value',
                     orientation='h',
                     color='Stock Value',
-                    color_continuous_scale=px.colors.sequential.Tealgrn
+                    color_continuous_scale=plant_seq
                 )
                 fig_plant.update_traces(
                     texttemplate='$%{text:,.2s}',
@@ -231,7 +241,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     values='Stock Value',
                     names='FASD',
                     hole=0.55,
-                    color_discrete_sequence=px.colors.sequential.Mint_r
+                    color_discrete_sequence=fasd_seq[::-1]
                 )
                 fig_fasd.update_traces(
                     textposition='inside',
@@ -262,7 +272,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     text='Stock Value',
                     orientation='h',
                     color='Stock Value',
-                    color_continuous_scale=px.colors.sequential.Mint
+                    color_continuous_scale=fasd_seq
                 )
                 fig_fasd.update_traces(
                     texttemplate='$%{text:,.2s}',
@@ -331,7 +341,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     },
                     title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
                     barmode='stack',
-                    color_discrete_sequence=px.colors.qualitative.Antique
+                    color_discrete_sequence=disp_qual
                 )
                 fig_disp.update_traces(
                     texttemplate='$%{text:,.2s}',
