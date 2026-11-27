@@ -290,8 +290,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     textposition='auto',
                 )
                 fig_fasd.update_layout(
-                    legend_dict(
-                        traceorder="normal",
+                    legend=dict(
+                        traceorder='normal',
                     ),
                     title=dict(
                         text=f'<b>FASD Status {plant if plant else "All plant"}</b>',
