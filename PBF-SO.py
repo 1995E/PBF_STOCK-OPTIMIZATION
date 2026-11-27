@@ -166,7 +166,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         y=0.95
                     ),
                     annotations=[dict(
-                        text=f"<b>Total</b><br><b>${total_plant_val/1e6:.1f}<b>M",
+                        text=f"<b>Total</b><br>${total_plant_val/1e6:.1f}M",
                         x=0.5, y=0.5, font_size=18, showarrow=False, font_color='#007EFF'
                     )],
                     showlegend=True,
@@ -262,8 +262,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         y=0.95
                     ),
                     annotations=[dict(
-                        text=f"<b>Total</b><br><b>${total_fasd_val/1e6:.1f}M<b>",
-                        x=0.5, y=0.5, font_size=20, showarrow=False, font_color='#111827'
+                        text=f"<b>Total</b><br>${total_fasd_val/1e6:.1f}M",
+                        x=0.5, y=0.5, font_size=20, showarrow=False, font_color='#007EFF'
                     )],
                     showlegend=True,
                     legend=dict(orientation="h", y=-0.2, xanchor="center", x=0.5),
