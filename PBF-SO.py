@@ -154,7 +154,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 )
                 fig_plant.update_traces(
                     textposition='outside',
-                    textinfo='percent+label',
+                    textinfo='percent',
                 )
                 fig_plant.update_layout(
                     title=dict(
