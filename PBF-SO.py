@@ -233,7 +233,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             # Define desired order: Fast, Active, Slow, Dead (from top to bottom)
             fasd_order = ['Fast', 'Active', 'Slow', 'Dead']
             fasd_stock_df['FASD'] = pd.Categorical(fasd_stock_df['FASD'], categories=fasd_order, ordered=True)
-            fasd_stock_df = fasd_stock_df.sort_values('FASD', ascending=True)
+            fasd_stock_df = fasd_stock_df.sort_values('FASD', ascending=False)
             total_fasd_val = fasd_stock_df['Stock Value'].sum()
 
             if chart_mode_fasd:
