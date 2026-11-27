@@ -144,7 +144,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     values='Stock Value',
                     names='Plant',
                     hole=0.55,
-                    color_discrete_sequence=plant_seq[::-1]  # reversed to mimic previous _r sequence
+                    color_discrete_sequence=['#475569'],
                 )
                 fig_plant.update_traces(
                     textposition='inside',
@@ -232,7 +232,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     values='Stock Value',
                     names='FASD',
                     hole=0.55,
-                    color_discrete_sequence=fasd_seq[::-1]
+                    color_discrete_sequence=['#475569'],
                 )
                 fig_fasd.update_traces(
                     textposition='inside',
