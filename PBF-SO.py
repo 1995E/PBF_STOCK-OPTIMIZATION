@@ -366,7 +366,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     yaxis={'gridcolor': 'rgba(235,235,235,1)', 'automargin': True},
                     plot_bgcolor='rgba(0,0,0,0)',
                     paper_bgcolor='rgba(0,0,0,0)',
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
+                    legend=dict(orientation="v", yanchor="bottom", y=1.02, xanchor="center", x=0.5),
                     height=450,
                     margin=dict(t=60, b=50, l=10, r=10),
                     title=dict(font=dict(size=14, color='#1F2937'), automargin=True, y=0.95)
