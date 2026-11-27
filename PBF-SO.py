@@ -183,10 +183,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     orientation='v',
                     color='Plant',
                     color_discrete_map={
-                        'GIRASSOL': '#dbb127',
-                        'DALIA': '#32a889',
-                        'PAZFLOR': '#2769db',
-                        'CLOV': '#a527db'
+                        'GIRASSOL': '#1f007a',
+                        'DALIA': '#1f007a',
+                        'PAZFLOR': '#1f007a',
+                        'CLOV': '#1f007a'
                    }
                 )
                 fig_plant.update_traces(
