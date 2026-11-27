@@ -258,7 +258,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         y=0.95
                     ),
                     annotations=[dict(
-                        text=f"<b>Total</b><br>${total_fasd_val/1e6:.1f}M",
+                        text=f"<b>Total</b><br><b>${total_fasd_val/1e6:.1f}M<b>",
                         x=0.5, y=0.5, font_size=20, showarrow=False, font_color='#111827'
                     )],
                     showlegend=True,
