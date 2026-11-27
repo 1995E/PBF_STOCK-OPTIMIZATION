@@ -161,7 +161,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_plant.update_layout(
                     title=dict(
                         text='<b>Stock Value distribution by Plant</b>',
-                        font=dict(size=14, color='#1F2937'),
+                        font=dict(size=14, color='#1F2937'), 
                         automargin=True,
                         y=0.95
                     ),
