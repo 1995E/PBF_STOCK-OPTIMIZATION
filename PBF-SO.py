@@ -344,6 +344,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     x='Material discipline',
                     y='Stock Value',
                     color='FASD',
+                    color_discrete_map={
+                        'Fast': '#BEDD00',
+                        'Active': '#00C1CE',
+                        'Slow': '#FFD700',
+                        'Dead': '#FF0000'
+                    }
                     text='Stock Value',
                     category_orders={
                         "FASD": fasd_v_order,
