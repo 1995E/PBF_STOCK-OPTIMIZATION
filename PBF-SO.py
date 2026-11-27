@@ -360,7 +360,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     }
                 )
                 fig_disp.update_traces(
-                    texttemplate='<b>$%{text:,.2s}'<b>,
+                    texttemplate='$%{text:,.2s}',
                     textposition='inside',
                     insidetextanchor='middle'
                 )
