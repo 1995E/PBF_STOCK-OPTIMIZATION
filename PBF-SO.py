@@ -201,7 +201,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         y=0.95
                     ),
                     xaxis_title="Plant",
-                    yaxis_title="Stock Valuefffff",
+                    yaxis_title="Stock Value",
                     coloraxis_showscale=False,
                     plot_bgcolor='rgba(0,0,0,0)',
                     paper_bgcolor='rgba(0,0,0,0)',
@@ -245,7 +245,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     values='Stock Value',
                     names='FASD',
                     hole=0.55,
-                    color_discrete_sequence=['#475569'],
+                    color='FASD',
+                    color_discrete_map={
+                        'Fast': '#40a13f',
+                        'Active': '#56a6f0',
+                        'Slow': '#f0c818',
+                        'Dead': '#f54f4c'
+                   }
                 )
                 fig_fasd.update_traces(
                     textposition='inside',
@@ -274,8 +280,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     y='FASD',
                     text='Stock Value',
                     orientation='h',
-                    color='Stock Value',
-                    color_discrete_sequence=['#475569']
+                    color='FASD',
+                    color_discrete_map={
+                        'Fast': '#40a13f',
+                        'Active': '#56a6f0',
+                        'Slow': '#f0c818',
+                        'Dead': '#f54f4c'
+                   }
                 )
                 fig_fasd.update_traces(
                     texttemplate='$%{text:,.2s}',
