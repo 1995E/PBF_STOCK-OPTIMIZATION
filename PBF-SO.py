@@ -244,10 +244,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     hole=0.55,
                     color='FASD',
                     color_discrete_map={
-                        'Fast': '#40a13f',
-                        'Active': '#56a6f0',
-                        'Slow': '#f0c818',
-                        'Dead': '#f54f4c'
+                        'Fast': '#BEDD00',
+                        'Active': '#00C1CE',
+                        'Slow': '#FFD700',
+                        'Dead': '#FF0000'
                    }
                 )
                 fig_fasd.update_traces(
@@ -256,7 +256,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 )
                 fig_fasd.update_layout(
                     title=dict(
-                        text=f'<b>FASD Status Distribution ({plant if plant else "All"})</b>',
+                        text=f'<b>FASD Status Distribution {plant if plant else "All plants"}</b>',
                         font=dict(size=14, color='#1F2937'),
                         automargin=True,
                         y=0.95
@@ -291,7 +291,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 )
                 fig_fasd.update_layout(
                     title=dict(
-                        text=f'<b>FASD Status ({plant if plant else "All"})</b>',
+                        text=f'<b>FASD Status {plant if plant else "All plant"}</b>',
                         font=dict(size=14, color='#1F2937'),
                         automargin=True,
                         y=0.95
@@ -349,7 +349,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         "FASD": fasd_v_order,
                         "Material discipline": ordered_disciplines
                     },
-                    title=f'FASD Stock Value per Discipline ({plant if plant else "All"})',
+                    title=f'FASD Stock Value per Discipline {plant if plant else "All plant"}',
                     barmode='stack',
                     color_discrete_sequence=['#475569'],
                 )
