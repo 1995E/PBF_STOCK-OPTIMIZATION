@@ -44,7 +44,7 @@ with st.sidebar:
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
-    
+
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
@@ -135,8 +135,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
         with col1:
             # Group by plant
             plant_stock_df = stock_greater_zero.groupby('Plant', as_index=False)['Stock Value'].sum()
-            plant_stock_df = plant_stock_df.sort_values(by='Stock Value', ascending=True)
+            # Sort descending from highest to lowest stock value
+            plant_stock_df = plant_stock_df.sort_values(by='Stock Value', ascending=False)
             total_plant_val = plant_stock_df['Stock Value'].sum()
+            sorted_plants_list = plant_stock_df['Plant'].tolist()
 
             if chart_mode_plant:
                 fig_plant = px.pie(
@@ -150,7 +152,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         'DALIA': '#45db27',
                         'PAZFLOR': '#2769db',
                         'CLOV': '#a527db'
-                    } 
+                    }
                 )
                 fig_plant.update_traces(
                     textposition='outside',
@@ -208,9 +210,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         gridcolor='rgba(235,235,235,1)',
                         tickformat="$.2s",
                         automargin=True,
-                        categoryorder='total ascending'
+                        categoryorder='array',
+                        categoryarray=sorted_plants_list
                     ),
-                    yaxis=dict(categoryorder='total descending', automargin=True),
+                    yaxis=dict(automargin=True),
                     margin=dict(t=60, b=50, l=10, r=10),
                     height=450
                 )
