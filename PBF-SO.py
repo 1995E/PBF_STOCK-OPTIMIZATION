@@ -182,12 +182,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     text='Stock Value',
                     orientation='v',
                     color='Plant',
-                    color_discrete_map={
-                        'GIRASSOL': '#1f007a',
-                        'DALIA': '#1f007a',
-                        'PAZFLOR': '#1f007a',
-                        'CLOV': '#1f007a'
-                   }
+                    color_discrete_map={'#1f007a',}
                 )
                 fig_plant.update_traces(
                     texttemplate='$%{text:,.2s}',
