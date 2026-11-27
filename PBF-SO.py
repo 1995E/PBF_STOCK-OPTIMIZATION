@@ -181,7 +181,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     y='Stock Value',
                     text='Stock Value',
                     orientation='v',
-                    color='Plant',
+                    #color='Plant',
                     #color_discrete_sequence=['#1f007a']
                 )
                 fig_plant.update_traces(
