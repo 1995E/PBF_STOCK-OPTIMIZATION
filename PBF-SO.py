@@ -210,7 +210,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         automargin=True,
                         categoryorder='total ascending'
                     ),
-                    #yaxis=dict(categoryorder='total ascending', automargin=True),
+                    yaxis=dict(categoryorder='total ascending', automargin=True),
                     margin=dict(t=60, b=50, l=10, r=10),
                     height=450
                 )
