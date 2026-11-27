@@ -44,11 +44,11 @@ with st.sidebar:
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
-    
+
     st.header("Chart Customization")
-    plant_color_name = st.selectbox("Plant Chart Color Scale", ["Tealgrn", "Viridis", "Plasma", "Blues", "Magma"])
-    fasd_color_name = st.selectbox("FASD Chart Color Scale", ["Mint", "Inferno", "Greens", "Reds", "Cividis"])
-    disp_color_name = st.selectbox("Discipline Chart Palette", ["Antique", "Plotly", "D3", "G10", "Pastel"])
+    plant_color_name = st.selectbox("Plant Chart Color Scale", ["Tealgrn", "Viridis", "Plasma", "Blues", "Magma", "Rainbow", "Jet"])
+    fasd_color_name = st.selectbox("FASD Chart Color Scale", ["Mint", "Inferno", "Greens", "Reds", "Cividis", "Warm", "Cool"])
+    disp_color_name = st.selectbox("Discipline Chart Palette", ["Antique", "Plotly", "D3", "G10", "Pastel", "Safe", "Prism"])
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
@@ -158,6 +158,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_plant.update_traces(
                     textposition='inside',
                     textinfo='percent+label',
+                    hovertemplate="<b>%{label}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
                 )
                 fig_plant.update_layout(
                     title=dict(
@@ -183,13 +184,12 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     text='Stock Value',
                     orientation='h',
                     color='Stock Value',
-                    color_discrete_map={
-                        "Stock value": "#3cb371",
-                   }
+                    color_continuous_scale=plant_seq
                 )
                 fig_plant.update_traces(
                     texttemplate='$%{text:,.2s}',
                     textposition='auto',
+                    hovertemplate="<b>%{y}</b><br>Stock Value: $%{{x:,.2f}}<extra></extra>"
                 )
                 fig_plant.update_layout(
                     title=dict(
@@ -218,7 +218,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
         with col2:
             # Apply plant filter if one is selected and not 'All'
             if plant and plant != 'All':
-                filtered_stock_fasd = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy()
+                filtered_stock_fasd = stock_greater_zero[stock_greater_zero['Plant'] == plant].copy() 
             else:
                 filtered_stock_fasd = stock_greater_zero.copy()
 
@@ -246,6 +246,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_fasd.update_traces(
                     textposition='inside',
                     textinfo='percent+label',
+                    hovertemplate="<b>%{label}</b><br>Value: $%{{value:,.2f}}<br>Percent: %{{percent}}<extra></extra>"
                 )
                 fig_fasd.update_layout(
                     title=dict(
@@ -276,6 +277,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 fig_fasd.update_traces(
                     texttemplate='$%{text:,.2s}',
                     textposition='auto',
+                    hovertemplate="<b>%{y}</b><br>Stock Value: $%{{x:,.2f}}<extra></extra>"
                 )
                 fig_fasd.update_layout(
                     title=dict(
@@ -360,7 +362,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     title=dict(font=dict(size=14, color='#1F2937'), automargin=True, y=0.95)
                 )
                 st.plotly_chart(fig_disp, use_container_width=True)
-            else:
+            else: 
                 # Render the original Graphviz flowchart with top padding adjusted to match adjacent titles baseline
                 st.markdown(
                     "<div style='padding-top: 13px; padding-bottom: 22px;'><span style='font-family: sans-serif; font-size: 15px; font-weight: bold; color: #1F2937;'>Material Breakdown Flow</span></div>",
