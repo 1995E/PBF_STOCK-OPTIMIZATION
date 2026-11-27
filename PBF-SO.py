@@ -146,10 +146,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     hole=0.55,
                     color='Plant',
                     color_discrete_map={
-                        'GIRASSOL': '#0F766E',
-                        'DALIA': '#0891B2',
-                        'PAZFLOR': '#7C3AED',
-                        'CLOV': '#F59E0B'
+                        'GIRASSOL': '#464a47',
+                        'DALIA': '#464a47',
+                        'PAZFLOR': '#464a47',
+                        'CLOV': '#464a47'
                     } 
                 )
                 fig_plant.update_traces(
