@@ -207,9 +207,10 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         showgrid=True,
                         gridcolor='rgba(235,235,235,1)',
                         tickformat="$.2s",
-                        automargin=True
+                        automargin=True,
+                        categoryorder='total ascending'
                     ),
-                    xaxis=dict(categoryorder='total ascending', automargin=True),
+                    #yaxis=dict(categoryorder='total ascending', automargin=True),
                     margin=dict(t=60, b=50, l=10, r=10),
                     height=450
                 )
