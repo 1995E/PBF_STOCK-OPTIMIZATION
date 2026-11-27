@@ -156,7 +156,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                 )
                 fig_plant.update_traces(
                     textposition='outside',
-                    textinfo='percent'
+                    textinfo='percent',
                 )
                 fig_plant.update_layout(
                     title=dict(
@@ -167,7 +167,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     ),
                     annotations=[dict(
                         text=f"<b>Total</b><br><b>${total_plant_val/1e6:.1f}<b>M",
-                        x=0.5, y=0.5, font_size=18, showarrow=False, font_color='007EFF'
+                        x=0.5, y=0.5, font_size=18, showarrow=False, font_color='#8c7979'
                     )],
                     showlegend=True,
                     legend=dict(orientation="h", y=-0.2, xanchor="center", x=0.5),
