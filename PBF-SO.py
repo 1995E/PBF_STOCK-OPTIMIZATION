@@ -343,13 +343,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     col3_grouped,
                     x='Material discipline',
                     y='Stock Value',
-                    color='FASD',
-                    color_discrete_map={
-                        'Fast': '#BEDD00',
-                        'Active': '#00C1CE',
-                        'Slow': '#FFD700',
-                        'Dead': '#FF0000'
-                    }
                     text='Stock Value',
                     category_orders={
                         "FASD": fasd_v_order,
@@ -357,7 +350,13 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     },
                     title=f'FASD Stock Value per Discipline {plant if plant else "All plant"}',
                     barmode='stack',
-                    color_discrete_sequence=['#475569'],
+                    color='FASD',
+                    color_discrete_map={
+                        'Fast': '#BEDD00',
+                        'Active': '#00C1CE',
+                        'Slow': '#FFD700',
+                        'Dead': '#FF0000'
+                    }
                 )
                 fig_disp.update_traces(
                     texttemplate='$%{text:,.2s}',
