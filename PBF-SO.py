@@ -149,7 +149,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     color='Plant',
                     color_discrete_map={
                         'GIRASSOL': '#dbb127',
-                        'DALIA': '#45db27',
+                        'DALIA': '#32a889',
                         'PAZFLOR': '#2769db',
                         'CLOV': '#a527db'
                     }
@@ -184,7 +184,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     color='Plant',
                     color_discrete_map={
                         'GIRASSOL': '#dbb127',
-                        'DALIA': '#45db27',
+                        'DALIA': '#32a889',
                         'PAZFLOR': '#2769db',
                         'CLOV': '#a527db'
                    }
