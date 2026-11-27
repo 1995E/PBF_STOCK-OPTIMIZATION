@@ -200,8 +200,6 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         automargin=True,
                         y=0.95
                     ),
-                    #xaxis_title="Plant",
-                    #yaxis_title="Stock Value",
                     coloraxis_showscale=False,
                     plot_bgcolor='rgba(0,0,0,0)',
                     paper_bgcolor='rgba(0,0,0,0)',
