@@ -231,7 +231,7 @@ if uploaded_materials is not None and uploaded_prices is not None:
             fasd_stock_df = filtered_stock_fasd.groupby('FASD', as_index=False)['Stock Value'].sum()
 
             # Define desired order: Fast, Active, Slow, Dead (from top to bottom as requested)
-            fasd_order = ['Dead', 'Slow', 'Active', 'Fast']
+            fasd_order = ['Fast', 'Active', 'Slow', 'Dead']
             fasd_stock_df['FASD'] = pd.Categorical(fasd_stock_df['FASD'], categories=fasd_order, ordered=True)
             fasd_stock_df = fasd_stock_df.sort_values('FASD', ascending=True)
             total_fasd_val = fasd_stock_df['Stock Value'].sum()
@@ -284,7 +284,8 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         'Active': '#00C1CE',
                         'Slow': '#FFD700',
                         'Dead': '#FF0000'
-                   }
+                   },
+                   category_orders={"FASD": fasd_order}
                 )
                 fig_fasd.update_traces(
                     texttemplate='<b>$%{text:,.2s}<b>',
@@ -308,7 +309,11 @@ if uploaded_materials is not None and uploaded_prices is not None:
                         tickformat="$.2s",
                         automargin=True
                     ),
-                    yaxis=dict(categoryorder='array', categoryarray=fasd_order, automargin=True),
+                    yaxis=dict(
+                        categoryorder='array',
+                        categoryarray=['Dead', 'Slow', 'Active', 'Fast'],
+                        automargin=True
+                    ),
                     margin=dict(t=60, b=50, l=10, r=10),
                     height=450
                 )
