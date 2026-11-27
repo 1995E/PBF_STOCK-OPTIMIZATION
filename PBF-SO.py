@@ -6,14 +6,6 @@ import numpy as np
 import io
 import re
 
-# ==========================================================
-# COLOR CONFIGURATION (Update chart and plot colors here)
-# ==========================================================
-DEFAULT_PLANT_COLOR_SCALE = "Tealgrn"
-DEFAULT_FASD_COLOR_SCALE = "Mint"
-DEFAULT_DISCIPLINE_PALETTE = "Antique"
-# ==========================================================
-
 st.set_page_config(
     page_title="PBF STOCK ANALYSE TOOL",
     layout="wide",
@@ -36,7 +28,7 @@ div[data-testid="column"]:nth-of-type(2) {
 div[data-testid="column"]:nth-of-type(3) {
     padding-left: 10px;
 }
-</style> 
+</style>
 """, unsafe_allow_html=True)
 
 plant = st.segmented_control(
@@ -52,11 +44,11 @@ with st.sidebar:
     uploaded_materials = st.file_uploader("Material Overview per Plant (Excel)", type=["xlsx"])
     uploaded_prices = st.file_uploader("Material Overview per Price (Excel)", type=["xlsx"])
     st.markdown("---")
-
+    
     st.header("Chart Customization")
-    plant_color_name = st.selectbox("Plant Chart Color Scale", ["Tealgrn", "Viridis", "Plasma", "Blues", "Magma"], index=["Tealgrn", "Viridis", "Plasma", "Blues", "Magma"].index(DEFAULT_PLANT_COLOR_SCALE) if DEFAULT_PLANT_COLOR_SCALE in ["Tealgrn", "Viridis", "Plasma", "Blues", "Magma"] else 0)
-    fasd_color_name = st.selectbox("FASD Chart Color Scale", ["Mint", "Inferno", "Greens", "Reds", "Cividis"], index=["Mint", "Inferno", "Greens", "Reds", "Cividis"].index(DEFAULT_FASD_COLOR_SCALE) if DEFAULT_FASD_COLOR_SCALE in ["Mint", "Inferno", "Greens", "Reds", "Cividis"] else 0)
-    disp_color_name = st.selectbox("Discipline Chart Palette", ["Antique", "Plotly", "D3", "G10", "Pastel"], index=["Antique", "Plotly", "D3", "G10", "Pastel"].index(DEFAULT_DISCIPLINE_PALETTE) if DEFAULT_DISCIPLINE_PALETTE in ["Antique", "Plotly", "D3", "G10", "Pastel"] else 0)
+    plant_color_name = st.selectbox("Plant Chart Color Scale", ["Tealgrn", "Viridis", "Plasma", "Blues", "Magma"])
+    fasd_color_name = st.selectbox("FASD Chart Color Scale", ["Mint", "Inferno", "Greens", "Reds", "Cividis"])
+    disp_color_name = st.selectbox("Discipline Chart Palette", ["Antique", "Plotly", "D3", "G10", "Pastel"])
 
 if uploaded_materials is not None and uploaded_prices is not None:
     # Read DataFrames
@@ -191,7 +183,9 @@ if uploaded_materials is not None and uploaded_prices is not None:
                     text='Stock Value',
                     orientation='h',
                     color='Stock Value',
-                    color_continuous_scale=plant_seq
+                    color_discrete_map={
+                        "Stock value": "#3cb371",
+                   }
                 )
                 fig_plant.update_traces(
                     texttemplate='$%{text:,.2s}',
